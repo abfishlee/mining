@@ -4,7 +4,7 @@ const fs = require('fs');
 const { exec } = require('child_process');
 
 const app = express();
-const PORT = process.env.PORT || 9001;
+const PORT = process.env.PORT || 9003;
 const PYTHON_BIN = process.env.PYTHON_BIN || 'python';
 const PYTHON_TIMEOUT_MS = 30000;
 const PROBLEMS_DIR = path.join(__dirname, 'problems');
