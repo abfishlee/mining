@@ -4,7 +4,8 @@ const fs = require('fs');
 const { exec } = require('child_process');
 
 const app = express();
-const PORT = 9001;
+const PORT = process.env.PORT || 9001;
+const PYTHON_BIN = process.env.PYTHON_BIN || 'python';
 const PYTHON_TIMEOUT_MS = 30000;
 const PROBLEMS_DIR = path.join(__dirname, 'problems');
 const MAX_COLLECTED_FILE_BYTES = 1024 * 1024;
@@ -219,7 +220,7 @@ app.post('/api/run-python', (req, res) => {
     });
 
     // 파이썬 실행 (timeout 설정으로 무한루프 방지)
-    exec(`python "${scriptPath}"`, { timeout: PYTHON_TIMEOUT_MS, cwd: __dirname }, (error, stdout, stderr) => {
+    exec(`"${PYTHON_BIN}" "${scriptPath}"`, { timeout: PYTHON_TIMEOUT_MS, cwd: __dirname }, (error, stdout, stderr) => {
         // 임시 파일 삭제
         try { fs.unlinkSync(scriptPath); } catch (e) {}
         const files = collectOutputFiles(safeCollectFiles);
