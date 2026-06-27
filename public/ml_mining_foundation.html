@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>데이터 마이닝/머신러닝 기법 보강</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --surface-color: rgba(30, 41, 59, 0.78);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #a78bfa;
+            --glass-border: rgba(255, 255, 255, 0.12);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .layout-wrapper {
+            display: grid;
+            grid-template-columns: minmax(0, 1.05fr) minmax(420px, 0.95fr);
+            height: 100vh;
+        }
+
+        .content-panel {
+            overflow-y: auto;
+            padding: 34px;
+            background-image: radial-gradient(at 0% 0%, rgba(167, 139, 250, 0.16) 0, transparent 55%);
+        }
+
+        .content-inner { max-width: 920px; margin: 0 auto; }
+
+        .ide-panel {
+            display: flex;
+            flex-direction: column;
+            padding: 28px;
+            border-left: 1px solid var(--glass-border);
+            background: rgba(2, 6, 23, 0.96);
+        }
+
+        .back-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            display: inline-flex;
+            margin-bottom: 18px;
+        }
+
+        h1 { margin: 0 0 10px; color: #ede9fe; font-size: 2.35rem; }
+        h2, h3 { color: #ede9fe; margin-top: 0; }
+
+        .subtitle {
+            color: var(--text-muted);
+            line-height: 1.7;
+            margin-bottom: 26px;
+        }
+
+        .card {
+            background: var(--surface-color);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .why {
+            border-left: 4px solid var(--accent);
+            background: rgba(167, 139, 250, 0.1);
+            padding: 14px;
+            border-radius: 0 8px 8px 0;
+            color: #ddd6fe;
+            line-height: 1.65;
+            margin: 14px 0;
+        }
+
+        .model-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .model-card {
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 14px;
+            background: rgba(0, 0, 0, 0.18);
+            line-height: 1.6;
+        }
+
+        code, pre { font-family: Consolas, 'Courier New', monospace; }
+        pre { border-radius: 8px; border: 1px solid var(--glass-border); overflow: auto; }
+        ul { color: #dbeafe; line-height: 1.75; }
+
+        .btn {
+            border: none;
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-weight: 800;
+            cursor: pointer;
+            color: #2e1065;
+            background: var(--accent);
+        }
+
+        #python-editor {
+            flex: 1;
+            min-height: 260px;
+            resize: none;
+            color: #d4d4d4;
+            background: #1e1e1e;
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 15px;
+            font-size: 15px;
+            line-height: 1.55;
+            outline: none;
+        }
+
+        #console-output {
+            min-height: 190px;
+            max-height: 260px;
+            overflow: auto;
+            white-space: pre-wrap;
+            background: #000;
+            color: #22c55e;
+            border: 1px solid #1e293b;
+            border-radius: 8px;
+            padding: 14px;
+            margin-top: 14px;
+        }
+
+        @media (max-width: 980px) {
+            body { height: auto; overflow: auto; }
+            .layout-wrapper { display: block; height: auto; }
+            .ide-panel { border-left: none; border-top: 1px solid var(--glass-border); min-height: 70vh; }
+            .model-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="layout-wrapper">
+        <main class="content-panel">
+            <div class="content-inner">
+                <a href="index.html" class="back-link">← 대시보드로 돌아가기</a>
+                <h1>데이터 마이닝/머신러닝 기법 보강</h1>
+                <p class="subtitle">ADP와 빅분기 실기에서 모델은 "돌리는 것"만으로 끝나지 않습니다. 왜 선택했는지, 어떤 지표가 맞는지, 어떤 전처리가 필요한지, 결과를 어떻게 해석할지까지 답안에 남겨야 합니다.</p>
+
+                <section class="card">
+                    <h2>1. 모델 선택 기준</h2>
+                    <div class="model-grid">
+                        <div class="model-card"><strong>로지스틱 회귀</strong><br>이진 분류의 기본 모델입니다. 확률 해석과 계수 해석이 필요할 때 좋지만, 비선형 패턴에는 약할 수 있습니다.</div>
+                        <div class="model-card"><strong>KNN</strong><br>가까운 관측치로 예측합니다. 거리 기반이라 스케일링이 중요하고, 데이터가 커지면 예측이 느릴 수 있습니다.</div>
+                        <div class="model-card"><strong>의사결정나무</strong><br>규칙이 직관적입니다. 하지만 깊이를 제한하지 않으면 훈련 데이터에 과적합되기 쉽습니다.</div>
+                        <div class="model-card"><strong>랜덤포레스트</strong><br>여러 나무를 평균내 과적합을 줄입니다. 성능이 안정적이지만, 단일 나무보다 해석은 덜 직관적입니다.</div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h2>2. 평가 지표는 문제 목적이 정한다</h2>
+                    <div class="why">정확도는 직관적이지만 불균형 데이터에서는 위험합니다. 생존/이탈/불량처럼 양성 클래스의 확률 순위가 중요하면 ROC-AUC를 함께 봅니다. 양성 탐지가 중요하면 Recall, Precision, F1도 확인합니다.</div>
+                    <ul>
+                        <li><strong>Accuracy</strong>: 전체 중 맞춘 비율. 클래스 비율이 비슷할 때 유용합니다.</li>
+                        <li><strong>ROC-AUC</strong>: 양성 확률 순위가 얼마나 잘 구분되는지 봅니다. 작업형 2에서 자주 중요합니다.</li>
+                        <li><strong>F1</strong>: Precision과 Recall의 균형입니다. 불균형 분류에서 자주 사용합니다.</li>
+                        <li><strong>RMSE/MAE</strong>: 회귀 문제에서 예측 오차 크기를 봅니다.</li>
+                    </ul>
+                </section>
+
+                <section class="card">
+                    <h2>3. 기본 분류 파이프라인</h2>
+                    <pre><code class="language-python">import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, roc_auc_score
+
+df = pd.read_csv('data/titanic.csv')
+X = df[['Pclass', 'Sex', 'Age', 'Fare']].copy()
+X['Age'] = X['Age'].fillna(X['Age'].median())
+X = pd.get_dummies(X, drop_first=True)
+y = df['Survived']
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+model = LogisticRegression(max_iter=1000)
+model.fit(X_train, y_train)
+pred = model.predict(X_test)
+proba = model.predict_proba(X_test)[:, 1]
+
+print('accuracy', round(accuracy_score(y_test, pred), 4))
+print('roc_auc', round(roc_auc_score(y_test, proba), 4))</code></pre>
+                </section>
+
+                <section class="card">
+                    <h2>4. 답안에 꼭 쓰는 해석 문장</h2>
+                    <ul>
+                        <li>데이터 누수를 막기 위해 train/test 분리 후 전처리 기준을 train에서 학습했다.</li>
+                        <li>범주형 변수는 원핫 인코딩했고, 거리 기반 모델에는 스케일링을 적용했다.</li>
+                        <li>ROC-AUC는 확률 순위 성능을 보기 위해 사용했다.</li>
+                        <li>의사결정나무의 train 성능이 test보다 과도하게 높으면 과적합 가능성이 있다.</li>
+                        <li>변수 중요도는 모델이 사용한 정보량이지 인과관계를 의미하지 않는다.</li>
+                    </ul>
+                </section>
+            </div>
+        </main>
+
+        <aside class="ide-panel">
+            <h2>웹 파이썬 실행기</h2>
+            <p class="subtitle">모델과 지표를 바꿔보며 성능 차이를 직접 확인하세요.</p>
+            <textarea id="python-editor" spellcheck="false">import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, roc_auc_score
+
+df = pd.read_csv('data/titanic.csv')
+X = df[['Pclass', 'Sex', 'Age', 'Fare']].copy()
+X['Age'] = X['Age'].fillna(X['Age'].median())
+X = pd.get_dummies(X, drop_first=True)
+y = df['Survived']
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+model = RandomForestClassifier(n_estimators=200, max_depth=5, random_state=42)
+model.fit(X_train, y_train)
+pred = model.predict(X_test)
+proba = model.predict_proba(X_test)[:, 1]
+
+print('accuracy', round(accuracy_score(y_test, pred), 4))
+print('roc_auc', round(roc_auc_score(y_test, proba), 4))</textarea>
+            <button class="btn" id="run-btn" onclick="runPython()">파이썬 코드 실행</button>
+            <pre id="console-output">대기 중...</pre>
+        </aside>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script>
+        async function runPython() {
+            const code = document.getElementById('python-editor').value;
+            const outputEl = document.getElementById('console-output');
+            const runBtn = document.getElementById('run-btn');
+
+            if (!code.trim()) {
+                outputEl.innerText = '코드를 입력해주세요.';
+                return;
+            }
+
+            runBtn.innerText = '실행 중...';
+            runBtn.disabled = true;
+            outputEl.style.color = '#22c55e';
+            outputEl.innerText = '서버에서 파이썬 코드를 실행 중입니다...';
+
+            try {
+                const response = await fetch('/api/run-python', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code })
+                });
+                const result = await response.json();
+                outputEl.style.color = result.success ? '#22c55e' : '#ef4444';
+                outputEl.innerText = result.output || '실행 성공 (출력 없음)';
+            } catch (error) {
+                outputEl.style.color = '#ef4444';
+                outputEl.innerText = '서버 통신 오류: ' + error.message;
+            } finally {
+                runBtn.innerText = '파이썬 코드 실행';
+                runBtn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

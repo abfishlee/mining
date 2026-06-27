@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3주차: 통계 기초 및 가설 검정</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --surface-color: rgba(30, 41, 59, 0.7);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #8b5cf6; /* 3주차는 보라색 포인트 */
+            --accent-hover: #7c3aed;
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+        
+        
+
+        
+
+        .back-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 20px;
+            transition: color 0.3s;
+        }
+
+        .back-link:hover { color: var(--text-main); }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            animation: fadeIn 1s ease-out;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #a78bfa, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .card {
+            background: var(--surface-color);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            transform: translateY(20px);
+            opacity: 0;
+            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .card:nth-child(2) { animation-delay: 0.1s; }
+        .card:nth-child(3) { animation-delay: 0.2s; }
+        .card:nth-child(4) { animation-delay: 0.3s; }
+
+        h2 {
+            border-bottom: 2px solid var(--glass-border);
+            padding-bottom: 10px;
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .metaphor {
+            background: rgba(139, 92, 246, 0.1);
+            border-left: 4px solid var(--accent);
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            font-style: italic;
+            color: #ddd6fe;
+            margin-bottom: 20px;
+        }
+
+        /* 실무 노하우 디자인 */
+        .pro-tip {
+            border-left: 4px solid #f59e0b;
+            background: rgba(245, 158, 11, 0.08);
+        }
+        .pro-tip h2 {
+            border-bottom: none;
+            color: #fbbf24;
+        }
+
+        pre {
+            border-radius: 8px !important;
+            margin: 20px 0 !important;
+            border: 1px solid var(--glass-border);
+        }
+
+        .btn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(139, 92, 246, 0.3);
+        }
+
+        .answer-box {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0, 1, 0, 1);
+            opacity: 0;
+        }
+
+        .answer-box.show {
+            max-height: 1200px;
+            opacity: 1;
+            transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out 0.2s;
+        }
+
+        .drill-section {
+            margin-top: 40px;
+        }
+
+        .drill-item {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .decision-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 18px 0;
+            overflow: hidden;
+            border-radius: 8px;
+        }
+
+        .decision-table th,
+        .decision-table td {
+            border: 1px solid var(--glass-border);
+            padding: 12px;
+            vertical-align: top;
+            line-height: 1.55;
+        }
+
+        .decision-table th {
+            background: rgba(139, 92, 246, 0.18);
+            color: #ddd6fe;
+            text-align: left;
+        }
+
+        .insight-box {
+            background: rgba(59, 130, 246, 0.09);
+            border-left: 4px solid #60a5fa;
+            border-radius: 0 8px 8px 0;
+            padding: 15px;
+            margin: 16px 0;
+            color: #dbeafe;
+        }
+
+        .warning-box {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 4px solid #ef4444;
+            border-radius: 0 8px 8px 0;
+            padding: 15px;
+            margin: 16px 0;
+            color: #fecaca;
+        }
+
+        .tag {
+            display: inline-flex;
+            padding: 4px 9px;
+            margin: 2px 4px 2px 0;
+            border: 1px solid var(--glass-border);
+            border-radius: 6px;
+            background: rgba(255,255,255,0.06);
+            color: #e9d5ff;
+            font-size: 0.86rem;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* 스크롤바 커스텀 */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-color); }
+        ::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+    
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden; /* 전체 페이지 스크롤 방지 */
+        }
+        
+        .layout-wrapper {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .content-panel {
+            flex: 1;
+            overflow-y: auto;
+            padding: 40px;
+            /* 기존 바디에 있던 배경 효과를 이쪽으로 옮김 */
+            background-image: radial-gradient(at 0% 0%, var(--accent) 0px, transparent 80%);
+            background-color: var(--bg-color);
+        }
+
+        .content-inner {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .ide-panel {
+            flex: 1;
+            background: rgba(10, 15, 30, 0.95);
+            border-left: 2px solid var(--glass-border);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+        }
+
+        .ide-panel h2 { margin-top: 0; border: none; }
+        
+        #python-editor {
+            flex: 1;
+            min-height: 200px;
+            background: #1e1e1e; color: #d4d4d4; 
+            font-family: 'Consolas', 'Courier New', monospace; font-size: 15px;
+            border: 1px solid var(--glass-border); border-radius: 8px; 
+            padding: 15px; margin-bottom: 20px; resize: none; outline: none;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        #python-editor:focus {
+            border-color: var(--accent);
+        }
+
+        #console-output {
+            background: #000; color: #0f0; 
+            padding: 15px; border-radius: 8px; 
+            height: 250px; font-family: 'Consolas', monospace; 
+            white-space: pre-wrap; overflow-y: auto; border: 1px solid #333;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="layout-wrapper">
+
+    <div class="content-panel">
+        <div class="content-inner">
+        <a href="index.html" class="back-link">← 대시보드로 돌아가기</a>
+        <header>
+            <h1>범인을 찾아라: 가설 검정</h1>
+            <p>데이터가 단순한 우연인지, 진짜 진실을 말하는지 증명해봅시다! 🕵️‍♂️</p>
+        </header>
+
+        <div class="card">
+            <h2>🎲 1. 마법의 숫자, p-value</h2>
+            <div class="metaphor">
+                "재판에서 용의자가 무죄(우연)일 확률을 나타내는 숫자입니다. <strong>p-value가 0.05(5%)보다 작다면?</strong> '우연히 이런 일이 일어날 확률이 5%도 안 돼! 이건 분명히 범인(효과가 있다)이야!' 하고 유죄(대립가설 채택) 판결을 내립니다."
+            </div>
+            <p>빅데이터분석기사 3유형과 ADP 통계분석에서 가장 기본이 되는 개념입니다. 어떤 검정을 하든 마지막엔 항상 이 p-value를 확인합니다.</p>
+        </div>
+
+        <div class="card pro-tip">
+            <h2>💼 현업 선배의 실무 노하우 (실수 방지!)</h2>
+            <p><strong>🚨 무조건 p-value 0.05에 맹신하지 마세요!</strong></p>
+            <p>데이터 양(샘플 수)이 수백만 건 이상으로 어마어마하게 커지면, 아무리 미세하고 사소한 차이도 p-value가 0.0001 이하로 극단적으로 작게 나오는 마법(현상)이 벌어집니다. 이를 <strong>"Statistical vs Practical Significance"</strong> 딜레마라고 합니다.</p>
+            <ul>
+                <li><strong>나쁜 예:</strong> "대표님! A버튼과 B버튼 클릭률 차이의 p-value가 0.01이 나왔습니다! 무조건 바꿔야 합니다!" (알고 보니 클릭률 차이는 0.001% 였음)</li>
+                <li><strong>실무 정석:</strong> 통계적으로 유의미하더라도(p-value < 0.05), 실제 비즈니스에 영향을 줄 만큼 '효과 크기(Effect Size)'가 큰지 <strong>반드시 함께 고려</strong>해야 합니다. (ADP 서술형 단골 포인트!)</li>
+            </ul>
+        </div>
+
+        <div class="card">
+            <h2>🧭 2. 어떤 검정을 선택해야 할까?</h2>
+            <p>통계 문제에서 가장 먼저 할 일은 함수를 떠올리는 것이 아니라, <strong>자료 형태와 비교 구조</strong>를 읽는 것입니다. 시험에서 검정 선택을 틀리면 코드가 맞아도 해석이 무너집니다.</p>
+            <table class="decision-table">
+                <thead>
+                    <tr>
+                        <th>문제 상황</th>
+                        <th>사용할 검정</th>
+                        <th>핵심 질문</th>
+                        <th>Python 함수</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>한 집단 평균이 특정 기준값과 다른가?</td>
+                        <td>일표본 t-test</td>
+                        <td>우리 표본 평균이 기준값과 유의하게 다른가</td>
+                        <td><code>stats.ttest_1samp()</code></td>
+                    </tr>
+                    <tr>
+                        <td>같은 사람/대상의 전후 차이가 있는가?</td>
+                        <td>대응표본 t-test</td>
+                        <td>개입 전후 변화가 유의한가</td>
+                        <td><code>stats.ttest_rel()</code></td>
+                    </tr>
+                    <tr>
+                        <td>서로 다른 두 집단의 평균 차이가 있는가?</td>
+                        <td>독립표본 t-test</td>
+                        <td>두 집단 평균이 유의하게 다른가</td>
+                        <td><code>stats.ttest_ind()</code></td>
+                    </tr>
+                    <tr>
+                        <td>세 집단 이상 평균 차이가 있는가?</td>
+                        <td>일원분산분석 ANOVA</td>
+                        <td>적어도 한 집단 평균이 다른가</td>
+                        <td><code>stats.f_oneway()</code></td>
+                    </tr>
+                    <tr>
+                        <td>범주형 변수끼리 관련이 있는가?</td>
+                        <td>카이제곱 독립성 검정</td>
+                        <td>두 범주형 변수가 독립인가</td>
+                        <td><code>stats.chi2_contingency()</code></td>
+                    </tr>
+                    <tr>
+                        <td>연속형 변수끼리 관계가 있는가?</td>
+                        <td>상관분석</td>
+                        <td>두 변수가 함께 증가/감소하는가</td>
+                        <td><code>stats.pearsonr()</code>, <code>stats.spearmanr()</code></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="insight-box">
+                <strong>시험 읽기 요령:</strong> "평균"과 "두 집단"이 보이면 t-test, "세 집단 이상"이면 ANOVA, "범주형 비율/관련성"이면 카이제곱, "관계/상관"이면 상관분석부터 의심하세요.
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🧪 3. 검정 전에 확인할 가정</h2>
+            <p>통계 검정은 아무 데이터에나 기계적으로 붙이는 도구가 아닙니다. ADP에서는 검정 결과뿐 아니라 <strong>왜 이 검정이 적절한지</strong>를 설명해야 합니다.</p>
+            <table class="decision-table">
+                <thead>
+                    <tr>
+                        <th>확인할 것</th>
+                        <th>왜 중요한가</th>
+                        <th>대표 확인 방법</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>독립성</td>
+                        <td>독립표본 t-test는 두 집단이 서로 독립이어야 합니다. 같은 사람의 전후 비교라면 대응표본입니다.</td>
+                        <td>문제 설명 확인</td>
+                    </tr>
+                    <tr>
+                        <td>정규성</td>
+                        <td>t-test와 ANOVA는 각 집단 자료가 대체로 정규분포를 따른다고 가정합니다.</td>
+                        <td><code>stats.shapiro()</code>, Q-Q plot</td>
+                    </tr>
+                    <tr>
+                        <td>등분산성</td>
+                        <td>집단 간 분산이 많이 다르면 일반 t-test보다 Welch t-test가 더 적절합니다.</td>
+                        <td><code>stats.levene()</code></td>
+                    </tr>
+                    <tr>
+                        <td>이상치</td>
+                        <td>평균 기반 검정은 극단값에 민감합니다.</td>
+                        <td>boxplot, IQR, 기술통계</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div class="warning-box">
+                표본 수가 작고 정규성이 심하게 깨지면 비모수 검정을 고려합니다. 두 독립 집단은 Mann-Whitney U, 대응표본은 Wilcoxon, 세 집단 이상은 Kruskal-Wallis를 후보로 둡니다.
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>🆚 4. 두 그룹의 차이 비교 (T-test)</h2>
+            <div class="metaphor">
+                "남학생 반과 여학생 반의 수학 점수 평균을 비교하고 싶을 때 사용합니다. '그냥 우연히 점수가 높게 나온 걸까, 아니면 진짜 성별 차이가 있는 걸까?'를 판단합니다."
+            </div>
+            <p><span class="tag">평균 비교</span><span class="tag">두 집단</span><span class="tag">정규성 확인</span><span class="tag">등분산성 확인</span></p>
+            <p>독립표본 t-test는 서로 다른 두 집단의 평균을 비교합니다. 같은 고객을 캠페인 전후로 비교한다면 독립표본이 아니라 대응표본 t-test를 써야 합니다.</p>
+            <pre><code class="language-python">from scipy import stats
+
+# 남학생(male) 그룹과 여학생(female) 그룹의 성적 데이터
+male_scores = [85, 90, 88, 82, 79]
+female_scores = [92, 88, 95, 89, 91]
+
+# 등분산성이 의심되면 equal_var=False로 Welch t-test를 사용합니다.
+t_stat, p_value = stats.ttest_ind(male_scores, female_scores, equal_var=False)
+
+print(f"p-value: {p_value:.3f}")
+# p-value가 0.05보다 작으면 "두 그룹 간 평균 차이가 확실히 있다!"</code></pre>
+            <h3>ADP 해석 예시</h3>
+            <pre><code class="language-text">두 독립 집단의 평균 차이를 확인하기 위해 독립표본 t-test를 수행하였다.
+p-value가 0.05보다 작으면 귀무가설인 "두 집단의 평균은 같다"를 기각한다.
+따라서 두 집단 간 평균 차이는 통계적으로 유의하다고 해석할 수 있다.
+다만 표본 수, 이상치, 정규성 및 등분산성 위반 여부에 따라 결과의 신뢰도가 달라질 수 있다.</code></pre>
+        </div>
+
+        <div class="card">
+            <h2>🍕 5. 세 그룹 이상의 비교 (ANOVA)</h2>
+            <div class="metaphor">
+                "치킨, 피자, 햄버거를 먹은 세 그룹 간의 행복도 점수를 비교할 때 씁니다. T-test를 3번 하는 대신 한 번에 처리해주는 편리한 도구입니다."
+            </div>
+            <p><span class="tag">세 집단 이상</span><span class="tag">평균 비교</span><span class="tag">사후검정 필요</span></p>
+            <p>ANOVA는 "모든 집단 평균이 같다"는 귀무가설을 검정합니다. p-value가 작으면 적어도 한 집단은 다르다는 뜻이지, 어떤 집단끼리 다른지까지 알려주지는 않습니다. 그래서 ADP 답안에서는 사후검정 필요성을 언급하면 좋습니다.</p>
+            <pre><code class="language-python">from scipy import stats
+
+chicken = [80, 85, 90]
+pizza = [70, 75, 80]
+burger = [60, 65, 70]
+
+# 일원분산분석 (One-way ANOVA)
+f_stat, p_value = stats.f_oneway(chicken, pizza, burger)
+
+print(f"p-value: {p_value:.3f}")
+# 역시 p-value가 0.05 미만이면 "적어도 한 음식은 행복도가 확실히 다르다!"</code></pre>
+        </div>
+
+        <div class="card">
+            <h2>🧾 6. ADP 통계 답안 작성 공식</h2>
+            <p>ADP에서는 코드 출력만으로 부족합니다. 검정 목적, 가설, 결과, 해석, 한계를 문장으로 남겨야 합니다.</p>
+            <pre><code class="language-text">1. 문제 구조:
+   [종속변수]가 [집단/조건]에 따라 차이가 있는지 확인하는 문제이다.
+
+2. 검정 선택:
+   [자료 형태와 집단 수]를 고려하여 [검정명]을 사용하였다.
+
+3. 가설:
+   H0: [차이가 없다/관련이 없다]
+   H1: [차이가 있다/관련이 있다]
+
+4. 결과:
+   검정 결과 p-value는 [값]이다.
+
+5. 판단:
+   p-value가 유의수준 0.05보다 [작으므로/크므로] 귀무가설을 [기각/기각하지 못한다].
+
+6. 실무 해석:
+   따라서 [업무 상황]에서 [의사결정 의미]로 해석할 수 있다.
+
+7. 한계:
+   다만 [정규성/등분산성/표본 수/이상치/효과크기]를 추가로 고려해야 한다.</code></pre>
+        </div>
+
+        <div class="card drill-section">
+            <h2>🚀 드릴 연습문제 (통계 판단 훈련)</h2>
+
+            <div class="drill-item">
+                <p><strong>[문제 1]</strong> 다이어트 약을 먹기 전(before)과 먹은 후(after)의 체중을 비교하려면, 같은 사람을 두 번 측정한 것이므로 '대응표본 T-검정(Paired T-test)'을 써야 합니다. <code>scipy.stats.ttest_rel()</code> 함수를 써서 결과를 출력해 보세요.</p>
+                <button class="btn" onclick="toggleAnswer('ans1')">👁️ 정답 보기</button>
+                <div id="ans1" class="answer-box">
+                    <pre><code class="language-python">before = [80, 82, 79, 85]
+after = [75, 78, 77, 80]
+
+t_stat, p_val = stats.ttest_rel(before, after)
+print("p-value:", p_val)</code></pre>
+                </div>
+            </div>
+
+            <div class="drill-item">
+                <p><strong>[문제 2]</strong> ADP 실기에서 자주 묻습니다. T-test나 ANOVA를 하기 전에, 데이터가 예쁜 종 모양의 정규분포를 따르는지 먼저 검사해야 합니다(정규성 검정). 이를 위해 <code>scipy.stats.shapiro()</code> 함수를 써보세요.</p>
+                <button class="btn" onclick="toggleAnswer('ans2')">👁️ 정답 보기</button>
+                <div id="ans2" class="answer-box">
+                    <pre><code class="language-python">data = [80, 82, 79, 85, 81, 88, 86, 84]
+
+stat, p_val = stats.shapiro(data)
+# 이 때 p-value가 0.05 '이상'이어야 "아하, 정규분포를 따르는구나(우연히 종모양과 비슷하구나)" 하고 넘길 수 있습니다!
+print("정규성 검정 p-value:", p_val)</code></pre>
+                </div>
+            </div>
+
+            <div class="drill-item">
+                <p><strong>[문제 3: 실전 통계 검정]</strong> <code>tips.csv</code> 데이터를 불러오세요. 남성(Male)이 낸 팁(tip)과 여성(Female)이 낸 팁의 평균에 차이가 있는지 <strong>독립표본 T-검정</strong>을 수행하세요.</p>
+                <button class="btn" onclick="toggleAnswer('ans3')">👁️ 정답 보기</button>
+                <div id="ans3" class="answer-box">
+                    <pre><code class="language-python">import pandas as pd
+from scipy import stats
+
+tips = pd.read_csv('data/tips.csv')
+male_tips = tips[tips['sex'] == 'Male']['tip']
+female_tips = tips[tips['sex'] == 'Female']['tip']
+
+t_stat, p_val = stats.ttest_ind(male_tips, female_tips, equal_var=False)
+print(f"p-value: {p_val:.3f}")
+# p-value가 0.05 이상이면, 성별에 따른 평균 팁 차이가 통계적으로 유의하다고 보기 어렵습니다.</code></pre>
+                </div>
+            </div>
+
+            <div class="drill-item">
+                <p><strong>[문제 4]</strong> <code>tips.csv</code>에서 'day'(요일: Thur, Fri, Sat, Sun) 그룹 간에 'total_bill'(총 결제 금액) 평균의 차이가 있는지 <strong>일원 분산 분석(ANOVA)</strong>을 수행해 보세요.</p>
+                <button class="btn" onclick="toggleAnswer('ans4')">👁️ 정답 보기</button>
+                <div id="ans4" class="answer-box">
+                    <pre><code class="language-python"># 각 요일별 데이터를 리스트 형태로 추출합니다.
+thur = tips[tips['day'] == 'Thur']['total_bill']
+fri = tips[tips['day'] == 'Fri']['total_bill']
+sat = tips[tips['day'] == 'Sat']['total_bill']
+sun = tips[tips['day'] == 'Sun']['total_bill']
+
+f_stat, p_val = stats.f_oneway(thur, fri, sat, sun)
+print(f"ANOVA p-value: {p_val:.4f}")
+# 결과가 0.05보다 작다면, 어느 특정 요일의 매출은 확실히 다르다는 뜻입니다!</code></pre>
+                </div>
+            </div>
+
+            <div class="drill-item">
+                <p><strong>[문제 5: 카이제곱 독립성 검정]</strong> <code>tips.csv</code>에서 흡연 여부(<code>smoker</code>)와 시간대(<code>time</code>)가 서로 독립인지 검정하세요. 교차표를 만들고 p-value를 출력한 뒤, 독립 여부를 해석하세요.</p>
+                <button class="btn" onclick="toggleAnswer('ans5')">👁️ 정답 보기</button>
+                <div id="ans5" class="answer-box">
+                    <pre><code class="language-python">import pandas as pd
+from scipy import stats
+
+tips = pd.read_csv('data/tips.csv')
+
+table = pd.crosstab(tips['smoker'], tips['time'])
+chi2, p_val, dof, expected = stats.chi2_contingency(table)
+
+print(table)
+print("chi-square:", round(chi2, 4))
+print("p-value:", round(p_val, 4))
+
+if p_val < 0.05:
+    print("해석: 흡연 여부와 시간대는 독립이 아니며, 관련성이 있다고 볼 수 있습니다.")
+else:
+    print("해석: 흡연 여부와 시간대가 관련되어 있다고 보기 어렵습니다.")</code></pre>
+                </div>
+            </div>
+
+            <div class="drill-item">
+                <p><strong>[문제 6: 상관분석]</strong> <code>tips.csv</code>에서 총 결제금액(<code>total_bill</code>)과 팁(<code>tip</code>) 사이의 선형 관계를 Pearson 상관계수와 p-value로 확인하세요. 결과를 방향, 강도, 유의성으로 해석하세요.</p>
+                <button class="btn" onclick="toggleAnswer('ans6')">👁️ 정답 보기</button>
+                <div id="ans6" class="answer-box">
+                    <pre><code class="language-python">import pandas as pd
+from scipy import stats
+
+tips = pd.read_csv('data/tips.csv')
+
+corr, p_val = stats.pearsonr(tips['total_bill'], tips['tip'])
+
+print("correlation:", round(corr, 4))
+print("p-value:", round(p_val, 4))
+
+# 해석 예시:
+# 상관계수가 양수이면 total_bill이 클수록 tip도 커지는 경향이 있습니다.
+# p-value가 0.05 미만이면 이 선형 관계는 통계적으로 유의합니다.
+# 단, 상관관계는 인과관계를 의미하지 않습니다.</code></pre>
+                </div>
+            </div>
+
+            <div class="drill-item">
+                <p><strong>[문제 7: 비모수 대안]</strong> 두 집단 평균 비교를 하고 싶은데 표본 수가 작고 정규성이 의심됩니다. <code>tips.csv</code>의 남성/여성 팁 분포 차이를 Mann-Whitney U 검정으로 확인하세요.</p>
+                <button class="btn" onclick="toggleAnswer('ans7')">👁️ 정답 보기</button>
+                <div id="ans7" class="answer-box">
+                    <pre><code class="language-python">import pandas as pd
+from scipy import stats
+
+tips = pd.read_csv('data/tips.csv')
+male_tips = tips[tips['sex'] == 'Male']['tip']
+female_tips = tips[tips['sex'] == 'Female']['tip']
+
+u_stat, p_val = stats.mannwhitneyu(male_tips, female_tips, alternative='two-sided')
+
+print("U statistic:", round(u_stat, 4))
+print("p-value:", round(p_val, 4))
+
+# 해석:
+# p-value가 0.05 미만이면 두 집단의 분포 또는 중앙 경향에 차이가 있다고 볼 수 있습니다.
+# 비모수 검정은 정규성 가정이 약하지만, 평균 차이를 직접 검정한다고 표현하면 부정확할 수 있습니다.</code></pre>
+                </div>
+            </div>
+
+            <div class="drill-item">
+                <p><strong>[문제 8: ADP 서술형]</strong> 문제 3의 독립표본 t-test 결과를 ADP 답안 형식으로 5문장 이내로 작성하세요. 검정 선택 이유, 귀무가설, p-value 판단, 실무 해석, 한계를 포함해야 합니다.</p>
+                <button class="btn" onclick="toggleAnswer('ans8')">👁️ 모범 답안 보기</button>
+                <div id="ans8" class="answer-box">
+                    <pre><code class="language-text">성별에 따라 팁 금액 평균이 다른지 확인하기 위해 두 독립 집단의 평균 비교에 해당하는 독립표본 t-test를 수행하였다.
+귀무가설은 남성과 여성의 평균 팁 금액이 같다는 것이며, 대립가설은 두 집단의 평균 팁 금액이 다르다는 것이다.
+검정 결과 p-value가 0.05보다 크다면 귀무가설을 기각하지 못하므로, 성별에 따른 평균 팁 차이가 통계적으로 유의하다고 보기 어렵다.
+따라서 해당 데이터만으로는 성별이 팁 금액 차이를 만든다고 결론내리기 어렵다.
+다만 표본 수, 이상치, 등분산성 여부, 식사 금액과 같은 교란 변수를 추가로 고려해야 한다.</code></pre>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+        </div>
+
+        <div class="ide-panel">
+            <h2 style="color: var(--accent);">💻 웹 파이썬 실행기</h2>
+            <p style="color: #cbd5e1; font-size: 0.95rem; margin-bottom: 20px;">
+                왼쪽 창의 설명을 보면서 자유롭게 코딩해 보세요!<br>
+                💡 <strong>데이터 경로:</strong> <code>pd.read_csv('data/tips.csv')</code> 또는 <code>pd.read_csv('data/titanic.csv')</code>
+            </p>
+            
+            <textarea id="python-editor" spellcheck="false" placeholder="# 여기에 파이썬 코드를 작성하세요...">import pandas as pd
+from scipy import stats
+
+tips = pd.read_csv('data/tips.csv')
+male_tips = tips[tips['sex'] == 'Male']['tip']
+female_tips = tips[tips['sex'] == 'Female']['tip']
+
+t_stat, p_val = stats.ttest_ind(male_tips, female_tips, equal_var=False)
+print('t-statistic:', round(t_stat, 4))
+print('p-value:', round(p_val, 4))</textarea>
+            
+            <button class="btn" id="run-btn" onclick="runPython()" style="width: 100%; justify-content: center; font-size: 1.1rem; padding: 15px; margin-bottom: 20px;">
+                ▶ 파이썬 코드 실행
+            </button>
+
+            <h3 style="color: #94a3b8; font-size: 1rem; margin: 0 0 10px 0;">출력 결과 (Console)</h3>
+            <pre id="console-output">대기 중...</pre>
+        </div>
+
+    </div>
+
+<!-- 구문 강조를 위한 Prism.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    
+    <script>
+        function toggleAnswer(id) {
+            const el = document.getElementById(id);
+            if (el.classList.contains('show')) {
+                el.classList.remove('show');
+            } else {
+                el.classList.add('show');
+            }
+        }
+
+        async function runPython() {
+            const code = document.getElementById('python-editor').value;
+            const outputEl = document.getElementById('console-output');
+            const runBtn = document.getElementById('run-btn');
+            
+            if (!code.trim()) {
+                outputEl.innerText = '코드를 입력해주세요.';
+                return;
+            }
+
+            runBtn.innerText = '⏳ 실행 중...';
+            runBtn.style.opacity = '0.7';
+            runBtn.disabled = true;
+            outputEl.innerText = '서버에서 파이썬 코드를 실행 중입니다...';
+
+            try {
+                const response = await fetch('/api/run-python', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code: code })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    outputEl.style.color = '#0f0';
+                    outputEl.innerText = result.output || '실행 성공 (출력 없음)';
+                } else {
+                    outputEl.style.color = '#ff4444';
+                    outputEl.innerText = result.output;
+                }
+            } catch (error) {
+                outputEl.style.color = '#ff4444';
+                outputEl.innerText = '서버 통신 오류: ' + error.message;
+            } finally {
+                runBtn.innerText = '▶ 파이썬 코드 실행';
+                runBtn.style.opacity = '1';
+                runBtn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

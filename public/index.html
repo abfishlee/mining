@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>나의 학습 대시보드</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --surface-color: rgba(30, 41, 59, 0.7);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(59, 130, 246, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(139, 92, 246, 0.15) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            margin: 0;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 60px;
+            animation: fadeIn 1s ease-out;
+        }
+
+        h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #60a5fa, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            font-weight: 800;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.2rem;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background: var(--surface-color);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 30px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            text-decoration: none;
+            color: inherit;
+            display: flex;
+            flex-direction: column;
+            opacity: 0;
+            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .card:nth-child(1) { animation-delay: 0.1s; }
+        .card:nth-child(2) { animation-delay: 0.2s; }
+        .card:nth-child(3) { animation-delay: 0.3s; }
+        .card:nth-child(4) { animation-delay: 0.4s; }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 10px 30px rgba(59, 130, 246, 0.2);
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .week-badge {
+            background: rgba(59, 130, 246, 0.2);
+            color: #93c5fd;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status.completed { background: rgba(34, 197, 94, 0.2); color: #86efac; }
+        .status.active { background: rgba(234, 179, 8, 0.2); color: #fde047; }
+        .status.locked { background: rgba(148, 163, 184, 0.2); color: #cbd5e1; }
+
+        .card h2 {
+            margin: 0 0 10px 0;
+            font-size: 1.5rem;
+        }
+
+        .card p {
+            color: var(--text-muted);
+            margin: 0 0 20px 0;
+            flex-grow: 1;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+            border-radius: 3px;
+        }
+
+        .training-summary {
+            background: rgba(30, 41, 59, 0.82);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 26px;
+            margin-bottom: 28px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18);
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .summary-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 18px;
+            margin-bottom: 18px;
+        }
+
+        .summary-header h2 {
+            margin: 0 0 6px;
+            font-size: 1.45rem;
+        }
+
+        .summary-header p {
+            margin: 0;
+            color: var(--text-muted);
+        }
+
+        .summary-link {
+            color: #e0f2fe;
+            background: rgba(59, 130, 246, 0.25);
+            border: 1px solid rgba(147, 197, 253, 0.35);
+            border-radius: 8px;
+            padding: 9px 12px;
+            text-decoration: none;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .summary-stat {
+            background: rgba(0, 0, 0, 0.18);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 14px;
+        }
+
+        .summary-stat strong {
+            display: block;
+            font-size: 1.35rem;
+            color: #f8fafc;
+            margin-bottom: 4px;
+        }
+
+        .summary-stat span {
+            color: var(--text-muted);
+            font-size: 0.86rem;
+        }
+
+        .set-progress-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .set-progress-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 12px;
+            align-items: center;
+            color: #dbeafe;
+        }
+
+        .set-progress-row small {
+            color: var(--text-muted);
+        }
+
+        .diagnosis-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            gap: 16px;
+            margin-top: 20px;
+        }
+
+        .diagnosis-panel {
+            background: rgba(0, 0, 0, 0.18);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 16px;
+        }
+
+        .diagnosis-panel h3 {
+            margin: 0 0 12px;
+            color: #e0f2fe;
+        }
+
+        .weak-topic-row,
+        .recommend-row {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) auto;
+            gap: 10px;
+            align-items: center;
+            padding: 10px 0;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            color: #dbeafe;
+        }
+
+        .weak-topic-row:first-of-type,
+        .recommend-row:first-of-type {
+            border-top: none;
+        }
+
+        .weak-topic-row small,
+        .recommend-row small {
+            display: block;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .diagnosis-empty {
+            color: var(--text-muted);
+            margin: 0;
+        }
+
+        @media (max-width: 760px) {
+            .summary-header {
+                display: block;
+            }
+
+            .summary-link {
+                display: inline-flex;
+                margin-top: 14px;
+            }
+
+            .summary-stats {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+            }
+
+            .diagnosis-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>데이터 사이언스 마스터 클래스</h1>
+            <p class="subtitle">빅데이터분석기사 & ADP 실기 8주 완성 로드맵</p>
+        </header>
+
+        <section class="training-summary" id="training-summary">
+            <div class="summary-header">
+                <div>
+                    <h2>문제은행 진행 상황</h2>
+                    <p id="summary-caption">문제은행 기록을 불러오는 중...</p>
+                </div>
+                <a href="problem_bank.html" class="summary-link">훈련실 열기</a>
+            </div>
+            <div class="summary-stats">
+                <div class="summary-stat">
+                    <strong id="total-problems">-</strong>
+                    <span>총 문제</span>
+                </div>
+                <div class="summary-stat">
+                    <strong id="attempted-problems">-</strong>
+                    <span>시도한 문제</span>
+                </div>
+                <div class="summary-stat">
+                    <strong id="passed-problems">-</strong>
+                    <span>통과한 문제</span>
+                </div>
+                <div class="summary-stat">
+                    <strong id="overall-progress">-</strong>
+                    <span>전체 진행률</span>
+                </div>
+            </div>
+            <div class="progress-bar" style="height: 9px; margin-bottom: 16px;">
+                <div class="progress-fill" id="overall-progress-fill" style="width: 0%;"></div>
+            </div>
+            <div class="set-progress-list" id="set-progress-list"></div>
+            <div class="diagnosis-grid">
+                <div class="diagnosis-panel">
+                    <h3>약점 토픽</h3>
+                    <div id="weak-topic-list">
+                        <p class="diagnosis-empty">채점 기록이 쌓이면 자주 틀리는 토픽을 보여줍니다.</p>
+                    </div>
+                </div>
+                <div class="diagnosis-panel">
+                    <h3>다음 추천 문제</h3>
+                    <div id="recommendation-list">
+                        <p class="diagnosis-empty">아직 추천할 풀이 기록이 없습니다.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="grid">
+            <a href="final_study_guide.html" class="card">
+                <div class="card-header">
+                    <span class="week-badge">Guide</span>
+                    <span class="week-badge status active">완성</span>
+                </div>
+                <h2>최종 사용 가이드</h2>
+                <p>매일 공부 루틴, 시험 7일 전/3일 전/당일 체크리스트, 이 시스템을 쓰는 순서를 정리했습니다.</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 100%;"></div>
+                </div>
+            </a>
+
+            <a href="environment_check.html" class="card">
+                <div class="card-header">
+                    <span class="week-badge">System</span>
+                    <span class="week-badge status active">점검</span>
+                </div>
+                <h2>환경/패키지 점검</h2>
+                <p>pandas, numpy, scipy, sklearn, statsmodels, xgboost import와 데이터 경로를 한 번에 확인합니다.</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 100%;"></div>
+                </div>
+            </a>
+
+            <a href="python_pandas_foundation.html" class="card">
+                <div class="card-header">
+                    <span class="week-badge">Foundation</span>
+                    <span class="week-badge status active">보강</span>
+                </div>
+                <h2>Python/Pandas 기초 보강</h2>
+                <p>경로, print, 필터링, 결측치, groupby처럼 시험 코드의 뼈대가 되는 패턴을 다시 단단히 잡습니다.</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 65%;"></div>
+                </div>
+            </a>
+
+            <a href="pandas_preprocessing_patterns.html" class="card">
+                <div class="card-header">
+                    <span class="week-badge">Pandas</span>
+                    <span class="week-badge status active">보강</span>
+                </div>
+                <h2>전처리/EDA 실전 패턴</h2>
+                <p>다중 조건, 정렬, groupby, crosstab, 파생변수처럼 작업형 1에서 자주 꼬아 내는 Pandas 패턴을 훈련합니다.</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 60%;"></div>
+                </div>
+            </a>
+
+            <a href="statistics_foundation.html" class="card">
+                <div class="card-header">
+                    <span class="week-badge">Stats</span>
+                    <span class="week-badge status active">보강</span>
+                </div>
+                <h2>통계 기초 보강</h2>
+                <p>검정 선택 기준, p-value 해석, t-test/ANOVA/카이제곱/상관분석을 초보자 눈높이로 다시 훈련합니다.</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 55%;"></div>
+                </div>
+            </a>
+
+            <a href="ml_mining_foundation.html" class="card">
+                <div class="card-header">
+                    <span class="week-badge">Mining</span>
+                    <span class="week-badge status active">보강</span>
+                </div>
+                <h2>데이터 마이닝/ML 기법 보강</h2>
+                <p>모델 선택 이유, 스케일링, 과적합, ROC-AUC, 계수와 변수 중요도 해석까지 답안형으로 훈련합니다.</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 55%;"></div>
+                </div>
+            </a>
+
+            <a href="customer_churn_practice.html" class="card">
+                <div class="card-header">
+                    <span class="week-badge">Dataset</span>
+                    <span class="week-badge status active">신규</span>
+                </div>
+                <h2>고객 이탈 데이터 실전 연습</h2>
+                <p>새로운 customer_churn 데이터로 이탈률, 조건 필터링, 위험군 정의, 실무 해석을 훈련합니다.</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 50%;"></div>
+                </div>
+            </a>
+
+            <!-- 1주차 -->
+            <a href="week1_pandas.html" class="card">
+                <div class="card-header">
+                    <span class="week-badge">Week 1</span>
+                    <span class="week-badge status completed">완료 됨</span>
+                </div>
+                <h2>Pandas 기초 다지기</h2>
+                <p>도마 위에 데이터를 올리고 맛보는 시간! 결측치 처리부터 필터링까지 요리의 기초를 배웁니다.</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 100%;"></div>
+                </div>
+            </a>
+
+            <!-- 2주차 -->
+            <a href="week2_eda.html" class="card">
+                <div class="card-header">
+                    <span class="week-badge">Week 2</span>
+                    <span class="week-badge status completed">완료 됨</span>
+                </div>
+                <h2>데이터 전처리 심화 (EDA)</h2>
+                <p>스케일링, 인코딩, 파생 변수 생성 등 데이터를 맛깔나게 양념하는 방법을 배웁니다.</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 100%;"></div>
+                </div>
+            </a>
+
+            <!-- 3주차 -->
+            <a href="week3_stats.html" class="card">
+                <div class="card-header">
+                    <span class="week-badge">Week 3</span>
+                    <span class="week-badge status completed">완료 됨</span>
+                </div>
+                <h2>통계 기초 & 가설 검정</h2>
+                <p>p-value로 진짜 범인을 지목해봅시다. T-test, ANOVA, 카이제곱 검정을 정복합니다.</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 100%;"></div>
+                </div>
+            </a>
+
+            <!-- 4-1주차 -->
+            <a href="week4_1_ml_basic.html" class="card" style="animation-delay: 0.3s;">
+                <div class="card-header">
+                    <span class="week-badge">Week 4-1</span>
+                    <span class="week-badge status completed">완료 됨</span>
+                </div>
+                <h2>머신러닝 기초 (단일 모델)</h2>
+                <p>로지스틱 회귀, KNN, 의사결정나무(Decision Tree) 등 직관적인 기초 알고리즘을 배웁니다.</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 100%;"></div>
+                </div>
+            </a>
+
+            <!-- 4-2주차 -->
+            <a href="week4_2_ensemble.html" class="card" style="animation-delay: 0.35s;">
+                <div class="card-header">
+                    <span class="week-badge">Week 4-2</span>
+                    <span class="week-badge status completed">완료 됨</span>
+                </div>
+                <h2>앙상블과 부스팅 (집단 지성)</h2>
+                <p>캐글(Kaggle) 우승의 핵심! 랜덤포레스트와 강력한 부스팅(XGBoost)을 배웁니다.</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 100%;"></div>
+                </div>
+            </a>
+
+            <!-- 5주차 -->
+            <a href="week5_mock_test.html" class="card" style="animation-delay: 0.4s;">
+                <div class="card-header">
+                    <span class="week-badge">Week 5</span>
+                    <span class="week-badge status completed">완료 됨</span>
+                </div>
+                <h2>빅분기 실전 모의고사</h2>
+                <p>작업형 1, 2, 3유형 실전 문제를 실제 시험 환경과 똑같이 시간 재고 풀어봅니다.</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 100%;"></div>
+                </div>
+            </a>
+
+            <!-- 6-1주차 -->
+            <a href="week6_1_unsupervised.html" class="card" style="animation-delay: 0.5s;">
+                <div class="card-header">
+                    <span class="week-badge">Week 6-1</span>
+                    <span class="week-badge status completed">완료 됨</span>
+                </div>
+                <h2>비지도학습 & 연관 마이닝</h2>
+                <p>정답이 없는 데이터에서 패턴을 찾습니다. K-Means, 계층적 군집화, 장바구니(Apriori) 분석.</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 100%;"></div>
+                </div>
+            </a>
+
+            <!-- 6-2주차 -->
+            <a href="week6_2_adv_stats.html" class="card" style="animation-delay: 0.6s;">
+                <div class="card-header">
+                    <span class="week-badge">Week 6-2</span>
+                    <span class="week-badge status completed">완료 됨</span>
+                </div>
+                <h2>고급 데이터 전처리 (ADP 대비)</h2>
+                <p>차원 축소(PCA)와 다중공선성(VIF) 등 ADP 실무에 꼭 필요한 고급 스킬을 배웁니다.</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 100%;"></div>
+                </div>
+            </a>
+
+            <!-- 7-1주차 -->
+            <a href="week7_1_adp_mock.html" class="card" style="animation-delay: 0.7s;">
+                <div class="card-header">
+                    <span class="week-badge">Week 7-1</span>
+                    <span class="week-badge status completed">완료 됨</span>
+                </div>
+                <h2>ADP 실전 모의고사 (회귀/분류)</h2>
+                <p>다중공선성을 고려한 모델링, 불균형 데이터 평가지표 계산을 훈련합니다.</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 100%;"></div>
+                </div>
+            </a>
+
+            <!-- 7-2주차 -->
+            <a href="week7_2_adp_mock.html" class="card" style="animation-delay: 0.75s;">
+                <div class="card-header">
+                    <span class="week-badge">Week 7-2</span>
+                    <span class="week-badge status completed">완료 됨</span>
+                </div>
+                <h2>ADP 실전 모의고사 (비지도/고급)</h2>
+                <p>군집화와 통계 분석(ANOVA), 시계열 처리 기초 및 앙상블 파라미터 튜닝 훈련.</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 100%;"></div>
+                </div>
+            </a>
+
+            <!-- 8주차 (최종장) -->
+            <a href="week8_final.html" class="card" style="animation-delay: 0.8s;">
+                <div class="card-header">
+                    <span class="week-badge" style="background-color: #f59e0b;">Week 8</span>
+                    <span class="week-badge status active">최종 수료</span>
+                </div>
+                <h2>🎓 그랜드 파이널 랩업</h2>
+                <p>8주간의 여정을 총정리하고, 시험 당일 반드시 챙겨야 할 생존 체크리스트를 점검합니다.</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 100%; background-color: #f59e0b;"></div>
+                </div>
+            </a>
+
+            <!-- 딥다이브 -->
+            <a href="stats_mining_deep_dive.html" class="card" style="animation-delay: 0.7s;">
+                <div class="card-header">
+                    <span class="week-badge">Deep Dive</span>
+                    <span class="week-badge status active">강화 됨</span>
+                </div>
+                <h2>통계 & 데이터마이닝 딥다이브</h2>
+                <p>왜 쓰는지, 언제 쓰는지, 무엇을 조심해야 하는지, 실무에서는 어떻게 해석하는지까지 훈련합니다.</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 35%;"></div>
+                </div>
+            </a>
+
+            <!-- 문제은행 -->
+            <a href="problem_bank.html" class="card" style="animation-delay: 0.8s;">
+                <div class="card-header">
+                    <span class="week-badge">Training</span>
+                    <span class="week-badge status active">시작 됨</span>
+                </div>
+                <h2>문제은행 훈련실</h2>
+                <p>문제 JSON을 불러와 지문, 루브릭, 흔한 실수, 내 답안 저장, 코드 실행까지 한 화면에서 훈련합니다.</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 20%;"></div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <script>
+        function problemStatsKey(problemId) {
+            return `problem-bank:${problemId}:stats`;
+        }
+
+        function loadProblemStats(problemId) {
+            try {
+                return JSON.parse(localStorage.getItem(problemStatsKey(problemId)) || '{}');
+            } catch {
+                return {};
+            }
+        }
+
+        function pct(part, total) {
+            if (!total) return 0;
+            return Math.round((part / total) * 100);
+        }
+
+        function escapeHtml(value) {
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function topicLabel(topic) {
+            return String(topic).replace(/_/g, ' ');
+        }
+
+        function problemBankLink(record) {
+            const params = new URLSearchParams({
+                set: record.set.file,
+                problem: record.problem.id
+            });
+            return `problem_bank.html?${params.toString()}`;
+        }
+
+        function buildDiagnosis(problemRecords) {
+            const topics = new Map();
+            const failedProblems = [];
+            const unattemptedProblems = [];
+
+            problemRecords.forEach((record) => {
+                const stats = record.stats;
+                const didAttempt = (stats.runCount || 0) > 0 || (stats.gradeCount || 0) > 0;
+                const failed = stats.lastPassed === false;
+                const passed = stats.lastPassed === true;
+
+                record.problem.topic.forEach((topic) => {
+                    if (!topics.has(topic)) {
+                        topics.set(topic, { topic, total: 0, attempted: 0, passed: 0, failed: 0 });
+                    }
+                    const item = topics.get(topic);
+                    item.total += 1;
+                    if (didAttempt) item.attempted += 1;
+                    if (passed) item.passed += 1;
+                    if (failed) item.failed += 1;
+                });
+
+                if (failed) failedProblems.push(record);
+                if (!didAttempt) unattemptedProblems.push(record);
+            });
+
+            const weakTopics = Array.from(topics.values())
+                .filter((topic) => topic.failed > 0 || (topic.attempted > 0 && topic.passed < topic.attempted))
+                .sort((a, b) => (b.failed - a.failed) || (pct(a.passed, a.attempted) - pct(b.passed, b.attempted)) || (b.attempted - a.attempted))
+                .slice(0, 5);
+
+            const weakTopicSet = new Set(weakTopics.map((topic) => topic.topic));
+            const recommendations = [
+                ...failedProblems,
+                ...unattemptedProblems.filter((record) => record.problem.topic.some((topic) => weakTopicSet.has(topic))),
+                ...unattemptedProblems
+            ];
+
+            const seen = new Set();
+            const uniqueRecommendations = recommendations
+                .filter((record) => {
+                    if (seen.has(record.problem.id)) return false;
+                    seen.add(record.problem.id);
+                    return true;
+                })
+                .slice(0, 5);
+
+            return { weakTopics, recommendations: uniqueRecommendations };
+        }
+
+        function renderDiagnosis(problemRecords) {
+            const weakTopicList = document.getElementById('weak-topic-list');
+            const recommendationList = document.getElementById('recommendation-list');
+            const diagnosis = buildDiagnosis(problemRecords);
+
+            if (diagnosis.weakTopics.length === 0) {
+                weakTopicList.innerHTML = '<p class="diagnosis-empty">아직 뚜렷한 약점이 없습니다. 문제를 몇 개 더 채점하면 분석이 정교해집니다.</p>';
+            } else {
+                weakTopicList.innerHTML = diagnosis.weakTopics.map((topic) => {
+                    const passRate = pct(topic.passed, topic.attempted || topic.total);
+                    return `
+                        <div class="weak-topic-row">
+                            <div>
+                                <strong>${escapeHtml(topicLabel(topic.topic))}</strong>
+                                <small>${topic.attempted}/${topic.total} 시도 · 실패 ${topic.failed} · 통과율 ${passRate}%</small>
+                            </div>
+                            <span class="week-badge status active">복습</span>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            if (diagnosis.recommendations.length === 0) {
+                recommendationList.innerHTML = '<p class="diagnosis-empty">모든 추천 후보를 이미 통과했습니다. 새 모의고사 세트를 풀 차례입니다.</p>';
+            } else {
+                recommendationList.innerHTML = diagnosis.recommendations.map((record) => {
+                    const stats = record.stats;
+                    const label = stats.lastPassed === false ? '재도전' : '미시도';
+                    return `
+                        <div class="recommend-row">
+                            <div>
+                                <strong>${escapeHtml(record.problem.id)}</strong>
+                                <small>${escapeHtml(record.set.title)} · ${escapeHtml(record.problem.topic.slice(0, 3).map(topicLabel).join(', '))}</small>
+                            </div>
+                            <a class="summary-link" href="${escapeHtml(problemBankLink(record))}">${label}</a>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
+
+        async function loadTrainingSummary() {
+            const caption = document.getElementById('summary-caption');
+            try {
+                const response = await fetch('/api/problem-sets');
+                const data = await response.json();
+                const setDetails = await Promise.all((data.sets || []).map(async (set) => {
+                    const detailResponse = await fetch(`/api/problem-sets/${encodeURIComponent(set.file)}`);
+                    const detail = await detailResponse.json();
+                    return { ...detail, file: set.file };
+                }));
+
+                let total = 0;
+                let attempted = 0;
+                let passed = 0;
+                const rows = [];
+                const problemRecords = [];
+
+                setDetails.forEach((set) => {
+                    let setAttempted = 0;
+                    let setPassed = 0;
+                    set.problems.forEach((problem) => {
+                        total += 1;
+                        const stats = loadProblemStats(problem.id);
+                        problemRecords.push({ set, problem, stats });
+                        const didAttempt = (stats.runCount || 0) > 0 || (stats.gradeCount || 0) > 0;
+                        if (didAttempt) {
+                            attempted += 1;
+                            setAttempted += 1;
+                        }
+                        if (stats.lastPassed === true) {
+                            passed += 1;
+                            setPassed += 1;
+                        }
+                    });
+                    rows.push({ title: set.title, total: set.problems.length, attempted: setAttempted, passed: setPassed });
+                });
+
+                const progress = pct(passed, total);
+                document.getElementById('total-problems').innerText = total;
+                document.getElementById('attempted-problems').innerText = attempted;
+                document.getElementById('passed-problems').innerText = passed;
+                document.getElementById('overall-progress').innerText = `${progress}%`;
+                document.getElementById('overall-progress-fill').style.width = `${progress}%`;
+                caption.innerText = attempted === 0
+                    ? '아직 문제 풀이 기록이 없습니다. 오늘 한 문제만 풀어도 시스템이 움직이기 시작합니다.'
+                    : `${attempted}문제를 시도했고 ${passed}문제를 통과했습니다.`;
+
+                document.getElementById('set-progress-list').innerHTML = rows.map((row) => {
+                    const rowProgress = pct(row.passed, row.total);
+                    return `
+                        <div class="set-progress-row">
+                            <div>
+                                <strong>${row.title}</strong><br>
+                                <small>${row.attempted}/${row.total} 시도 · ${row.passed}/${row.total} 통과</small>
+                                <div class="progress-bar" style="margin-top: 8px;">
+                                    <div class="progress-fill" style="width: ${rowProgress}%;"></div>
+                                </div>
+                            </div>
+                            <span class="week-badge">${rowProgress}%</span>
+                        </div>
+                    `;
+                }).join('');
+                renderDiagnosis(problemRecords);
+            } catch (error) {
+                caption.innerText = '문제은행 진행 상황을 불러오지 못했습니다.';
+                document.getElementById('set-progress-list').innerHTML = `<p style="color: var(--text-muted);">${error.message}</p>`;
+            }
+        }
+
+        loadTrainingSummary();
+    </script>
+
+</body>
+</html>

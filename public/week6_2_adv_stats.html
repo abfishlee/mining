@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 6-2: 고급 데이터 전처리 (ADP 대비)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --surface-color: rgba(30, 41, 59, 0.7);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #f97316;
+            --accent-hover: #ea580c;
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .layout-wrapper { display: flex; width: 100vw; height: 100vh; }
+        .content-panel { flex: 1; overflow-y: auto; padding: 40px; background-image: radial-gradient(at 0% 0%, var(--accent) 0px, transparent 80%); background-color: var(--bg-color); }
+        .content-inner { max-width: 800px; margin: 0 auto; }
+        .ide-panel { flex: 1; background: rgba(10, 15, 30, 0.95); border-left: 2px solid var(--glass-border); padding: 30px; display: flex; flex-direction: column; box-shadow: -10px 0 30px rgba(0,0,0,0.5); }
+        .ide-panel h2 { margin-top: 0; border: none; }
+        
+        #python-editor { flex: 1; min-height: 200px; background: #1e1e1e; color: #d4d4d4; font-family: 'Consolas', 'Courier New', monospace; font-size: 15px; border: 1px solid var(--glass-border); border-radius: 8px; padding: 15px; margin-bottom: 20px; resize: none; outline: none; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); }
+        #python-editor:focus { border-color: var(--accent); }
+        #console-output { background: #000; color: #0f0; padding: 15px; border-radius: 8px; height: 250px; font-family: 'Consolas', monospace; white-space: pre-wrap; overflow-y: auto; border: 1px solid #333; }
+
+        .back-link { color: var(--text-muted); text-decoration: none; display: inline-flex; align-items: center; gap: 5px; margin-bottom: 20px; transition: color 0.3s; }
+        .back-link:hover { color: var(--text-main); }
+        header { text-align: center; margin-bottom: 50px; animation: fadeIn 1s ease-out; }
+        h1 { font-size: 2.5rem; margin-bottom: 10px; color: var(--accent); }
+        .card { background: var(--surface-color); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--glass-border); border-radius: 16px; padding: 30px; margin-bottom: 30px; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); transform: translateY(20px); opacity: 0; animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        h2 { border-bottom: 2px solid var(--glass-border); padding-bottom: 10px; margin-top: 0; display: flex; align-items: center; gap: 10px; }
+        .metaphor { background: rgba(255,255,255,0.05); border-left: 4px solid var(--accent); padding: 15px; border-radius: 0 8px 8px 0; font-style: italic; color: #bae6fd; margin-bottom: 20px; }
+        .pro-tip { border-left: 4px solid #f59e0b; background: rgba(245, 158, 11, 0.08); }
+        .pro-tip h2 { border-bottom: none; color: #fbbf24; }
+        pre { border-radius: 8px !important; margin: 20px 0 !important; border: 1px solid var(--glass-border); }
+        .btn { background-color: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: all 0.3s ease; }
+        .btn:hover { background-color: var(--accent-hover); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(255,255,255,0.1); }
+        .answer-box { max-height: 0; overflow: hidden; transition: max-height 0.5s ease; opacity: 0; }
+        .answer-box.show { max-height: 2200px; opacity: 1; transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out 0.2s; }
+        .drill-section { margin-top: 40px; }
+        .drill-item { background: rgba(0, 0, 0, 0.2); padding: 20px; border-radius: 8px; margin-bottom: 15px; border: 1px solid var(--glass-border); }
+        .decision-table { width: 100%; border-collapse: collapse; margin: 18px 0; border-radius: 8px; overflow: hidden; }
+        .decision-table th, .decision-table td { border: 1px solid var(--glass-border); padding: 12px; vertical-align: top; line-height: 1.55; }
+        .decision-table th { background: rgba(249, 115, 22, 0.18); color: #fed7aa; text-align: left; }
+        .insight-box { background: rgba(59, 130, 246, 0.09); border-left: 4px solid #60a5fa; border-radius: 0 8px 8px 0; padding: 15px; margin: 16px 0; color: #dbeafe; }
+        .warning-box { background: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444; border-radius: 0 8px 8px 0; padding: 15px; margin: 16px 0; color: #fecaca; }
+        .tag { display: inline-flex; padding: 4px 9px; margin: 2px 4px 2px 0; border: 1px solid var(--glass-border); border-radius: 6px; background: rgba(255,255,255,0.06); color: #ffedd5; font-size: 0.86rem; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { to { transform: translateY(0); opacity: 1; } }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-color); }
+        ::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+    </style>
+</head>
+<body>
+    <div class="layout-wrapper">
+        <div class="content-panel">
+            <div class="content-inner">
+                <a href="index.html" class="back-link">← 대시보드로 돌아가기</a>
+                <header>
+                    <h1>Week 6-2: 고급 데이터 전처리 (ADP 대비)</h1>
+                    <p>데이터 사이언티스트를 위한 궁극의 차원 관리 기법</p>
+                </header>
+
+                <div class="card">
+                    <h2>🧭 0. 변수 관계를 왜 관리해야 할까?</h2>
+                    <p>ADP에서는 모델 성능뿐 아니라 변수 간 관계와 해석 가능성을 설명해야 합니다. 변수가 너무 비슷하거나 너무 많으면 모델은 학습은 할 수 있어도, 해석과 일반화에서 문제가 생길 수 있습니다.</p>
+                    <table class="decision-table">
+                        <thead>
+                            <tr>
+                                <th>상황</th>
+                                <th>문제</th>
+                                <th>대표 대응</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>설명변수끼리 강하게 상관됨</td>
+                                <td>회귀계수 불안정, 해석 왜곡</td>
+                                <td>VIF 확인, 변수 제거, 규제 회귀, 트리 모델</td>
+                            </tr>
+                            <tr>
+                                <td>변수가 너무 많음</td>
+                                <td>차원의 저주, 과적합, 계산 비용 증가</td>
+                                <td>PCA, 변수 선택, 도메인 기반 변수 축소</td>
+                            </tr>
+                            <tr>
+                                <td>변수 단위가 크게 다름</td>
+                                <td>PCA/거리기반 모델에서 큰 단위 변수가 지배</td>
+                                <td>StandardScaler 등 표준화</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="insight-box">
+                        <strong>시험 감각:</strong> VIF는 회귀 해석 안정성, PCA는 차원 축소와 정보 압축을 묻는 경우가 많습니다. 둘 다 “왜 했는지”와 “무엇을 잃는지”를 써야 합니다.
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>👯 1. 다중공선성 (VIF)</h2>
+                    <div class="metaphor">"재판에 목격자가 2명 왔는데 둘이 똑같은 대본을 읽는 쌍둥이였습니다. 판사(모델)가 헷갈리지 않게 한 명을 집에 돌려보내는 작업입니다."</div>
+                    <p>변수(X)들끼리 상관관계가 너무 높으면 회귀계수가 왜곡됩니다. VIF(Variance Inflation Factor) 값이 10을 넘으면 문제가 있다고 판단하고, 해당 변수를 제거하거나 릿지/라쏘 같은 규제 모델, 혹은 트리기반 모델(Random Forest)을 사용해야 합니다.</p>
+                    <p><span class="tag">회귀 해석</span><span class="tag">다중공선성</span><span class="tag">VIF 10 기준</span><span class="tag">계수 불안정</span></p>
+                    <p>VIF는 한 설명변수가 다른 설명변수들로 얼마나 잘 설명되는지를 보는 지표입니다. VIF가 높으면 해당 변수의 정보가 다른 변수들과 많이 겹친다는 뜻이고, 회귀계수의 방향과 크기가 불안정해질 수 있습니다.</p>
+                    <pre><code class="language-python">import pandas as pd
+from statsmodels.stats.outliers_influence import variance_inflation_factor
+
+X = df[['x1', 'x2', 'x3']]
+vif = pd.Series(
+    [variance_inflation_factor(X.values, i) for i in range(X.shape[1])],
+    index=X.columns
+)
+print(vif)</code></pre>
+                    <div class="warning-box">
+                        VIF가 높다고 무조건 삭제하는 것은 위험합니다. 업무적으로 중요한 변수인지, 파생변수와 원변수가 함께 들어간 것은 아닌지, 예측 성능과 해석 목적 중 무엇이 중요한지 먼저 판단해야 합니다.
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>🗜️ 2. 차원 축소: 주성분 분석 (PCA)</h2>
+                    <div class="metaphor">"3D 물체를 그림자로 비추면 2D가 됩니다. 특징(변수)이 100개나 되어서 모델이 힘들어할 때, 데이터의 정보(분산)를 최대한 보존하면서 변수를 2~3개의 '주성분(Principal Component)'으로 압축하는 마법입니다."</div>
+                    <p>PCA를 수행하기 전에는 반드시 <strong>StandardScaler를 이용한 데이터 정규화</strong>가 필수입니다!</p>
+                    <p><span class="tag">차원 축소</span><span class="tag">설명분산비율</span><span class="tag">스케일링 필수</span><span class="tag">해석력 손실</span></p>
+                    <p>PCA는 서로 상관된 여러 변수를 새로운 축인 주성분으로 변환합니다. 첫 번째 주성분은 데이터 분산을 가장 많이 설명하고, 두 번째 주성분은 첫 번째와 직교하면서 남은 분산을 최대한 설명합니다.</p>
+                    <pre><code class="language-python">from sklearn.decomposition import PCA
+from sklearn.preprocessing import StandardScaler
+
+# 1. 정규화 필수
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+# 2. 100개의 변수를 2개로 압축 (n_components=2)
+pca = PCA(n_components=2)
+X_pca = pca.fit_transform(X_scaled)</code></pre>
+                    <div class="insight-box">
+                        <strong>해석 포인트:</strong> <code>explained_variance_ratio_</code>의 합이 높을수록 축소 후에도 원래 정보가 많이 보존됩니다. 다만 주성분은 원래 변수들의 조합이라 “변수 하나의 의미”로 직접 해석하기 어렵습니다.
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>🧾 3. ADP 답안 작성 공식</h2>
+                    <pre><code class="language-text">본 분석에서는 [회귀 해석/차원 축소] 과정에서 [다중공선성/고차원 문제]를 확인하기 위해 [VIF/PCA]를 사용하였다.
+VIF는 설명변수 간 정보 중복을 확인하는 지표이며, 일반적으로 10 이상이면 다중공선성을 의심한다.
+PCA는 변수들을 서로 직교하는 주성분으로 변환하여 차원을 줄이고, 설명분산비율로 정보 보존 정도를 확인한다.
+분석 결과 [수치]가 나타났으므로 [변수 제거/규제 모델/주성분 개수 선택]을 고려할 수 있다.
+다만 변수 제거는 도메인 의미를 훼손할 수 있고, PCA는 해석력이 낮아지는 한계가 있다.</code></pre>
+                </div>
+
+                <div class="card drill-section">
+                    <h2>🚀 드릴 연습문제 (VIF & PCA)</h2>
+
+                    <div class="drill-item">
+                        <p><strong>[문제 1: VIF 계산]</strong> <code>tips.csv</code>에서 <code>tip_rate = tip / total_bill * 100</code> 파생변수를 만든 뒤 <code>total_bill, tip, size, tip_rate</code>의 VIF를 계산하세요. <code>total_bill</code>의 VIF를 소수점 4자리까지 출력하세요.</p>
+                        <button class="btn" onclick="toggleAnswer('ans1')">👁️ 정답 보기</button>
+                        <div id="ans1" class="answer-box">
+                            <pre><code class="language-python">import pandas as pd
+from statsmodels.stats.outliers_influence import variance_inflation_factor
+
+tips = pd.read_csv('data/tips.csv')
+tips['tip_rate'] = tips['tip'] / tips['total_bill'] * 100
+X = tips[['total_bill', 'tip', 'size', 'tip_rate']]
+
+vif = pd.Series(
+    [variance_inflation_factor(X.values, i) for i in range(X.shape[1])],
+    index=X.columns
+)
+
+print('total_bill:', round(vif['total_bill'], 4))</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="drill-item">
+                        <p><strong>[문제 2: PCA 설명분산]</strong> <code>iris.csv</code>에서 species를 제외한 4개 변수를 표준화한 뒤 PCA(n_components=2)를 수행하세요. 두 주성분의 설명분산비율 합을 소수점 4자리까지 출력하세요.</p>
+                        <button class="btn" onclick="toggleAnswer('ans2')">👁️ 정답 보기</button>
+                        <div id="ans2" class="answer-box">
+                            <pre><code class="language-python">import pandas as pd
+from sklearn.preprocessing import StandardScaler
+from sklearn.decomposition import PCA
+
+iris = pd.read_csv('data/iris.csv')
+X = iris.drop('species', axis=1)
+X_scaled = StandardScaler().fit_transform(X)
+
+pca = PCA(n_components=2)
+pca.fit(X_scaled)
+
+print('explained_sum:', round(pca.explained_variance_ratio_.sum(), 4))</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="drill-item">
+                        <p><strong>[문제 3: ADP 서술형]</strong> PCA 2개 주성분의 설명분산비율 합이 0.9581이라고 가정합니다. PCA 사용 이유, 결과 해석, 한계를 5문장 이내로 작성하세요.</p>
+                        <button class="btn" onclick="toggleAnswer('ans3')">👁️ 모범 답안 보기</button>
+                        <div id="ans3" class="answer-box">
+                            <pre><code class="language-text">변수 간 상관성과 차원 증가로 인한 복잡도를 줄이기 위해 PCA를 적용하였다.
+PCA는 원 변수를 서로 직교하는 주성분으로 변환하여 정보 손실을 최소화하면서 차원을 축소하는 방법이다.
+2개 주성분의 설명분산비율 합이 0.9581이므로 원 데이터 분산의 약 95.81%가 보존되어 정보 손실이 비교적 작다고 볼 수 있다.
+다만 주성분은 원 변수들의 선형 결합이므로 개별 변수의 의미를 직접 해석하기 어렵다.
+따라서 예측 성능과 해석 가능성의 균형을 고려해 사용해야 한다.</code></pre>
+                        </div>
+                    </div>
+                </div>
+        
+            </div>
+        </div>
+        <div class="ide-panel">
+            <h2 style="color: var(--accent);">💻 웹 파이썬 실행기</h2>
+            <p style="color: #cbd5e1; font-size: 0.95rem; margin-bottom: 20px;">
+                왼쪽 창의 문제를 보고, 여기서 자유롭게 코딩하세요!<br>
+                💡 <strong>데이터 경로:</strong> <code>pd.read_csv('data/tips.csv')</code>, <code>pd.read_csv('data/iris.csv')</code>
+            </p>
+            <textarea id="python-editor" spellcheck="false" placeholder="# 여기에 코드를 작성하세요...">import pandas as pd
+from statsmodels.stats.outliers_influence import variance_inflation_factor
+
+tips = pd.read_csv('data/tips.csv')
+tips['tip_rate'] = tips['tip'] / tips['total_bill'] * 100
+
+X = tips[['total_bill', 'tip', 'size', 'tip_rate']]
+vif = pd.Series(
+    [variance_inflation_factor(X.values, i) for i in range(X.shape[1])],
+    index=X.columns
+)
+
+print(vif.sort_values(ascending=False))</textarea>
+            <button class="btn" id="run-btn" onclick="runPython()" style="width: 100%; justify-content: center; font-size: 1.1rem; padding: 15px; margin-bottom: 20px;">
+                ▶ 파이썬 코드 실행
+            </button>
+            <h3 style="color: #94a3b8; font-size: 1rem; margin: 0 0 10px 0;">출력 결과 (Console)</h3>
+            <pre id="console-output">대기 중...</pre>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script>
+        function toggleAnswer(id) {
+            const el = document.getElementById(id);
+            if (el.classList.contains('show')) el.classList.remove('show');
+            else el.classList.add('show');
+        }
+        async function runPython() {
+            const code = document.getElementById('python-editor').value;
+            const outputEl = document.getElementById('console-output');
+            const runBtn = document.getElementById('run-btn');
+            if (!code.trim()) { outputEl.innerText = '코드를 입력해주세요.'; return; }
+            runBtn.innerText = '⏳ 실행 중...'; runBtn.disabled = true;
+            outputEl.innerText = '서버에서 실행 중입니다...';
+            try {
+                const res = await fetch('/api/run-python', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code: code })
+                });
+                const result = await res.json();
+                if (result.success) { outputEl.style.color = '#0f0'; outputEl.innerText = result.output || '실행 성공'; }
+                else { outputEl.style.color = '#ff4444'; outputEl.innerText = result.output; }
+            } catch (err) { outputEl.style.color = '#ff4444'; outputEl.innerText = '오류: ' + err.message; }
+            finally { runBtn.innerText = '▶ 파이썬 코드 실행'; runBtn.disabled = false; }
+        }
+    </script>
+</body>
+</html>

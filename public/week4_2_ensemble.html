@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 4-2: 앙상블과 부스팅</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --surface-color: rgba(30, 41, 59, 0.7);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #8b5cf6;
+            --accent-hover: #7c3aed;
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .layout-wrapper { display: flex; width: 100vw; height: 100vh; }
+        .content-panel { flex: 1; overflow-y: auto; padding: 40px; background-image: radial-gradient(at 0% 0%, var(--accent) 0px, transparent 80%); background-color: var(--bg-color); }
+        .content-inner { max-width: 800px; margin: 0 auto; }
+        .ide-panel { flex: 1; background: rgba(10, 15, 30, 0.95); border-left: 2px solid var(--glass-border); padding: 30px; display: flex; flex-direction: column; box-shadow: -10px 0 30px rgba(0,0,0,0.5); }
+        .ide-panel h2 { margin-top: 0; border: none; }
+        
+        #python-editor { flex: 1; min-height: 200px; background: #1e1e1e; color: #d4d4d4; font-family: 'Consolas', 'Courier New', monospace; font-size: 15px; border: 1px solid var(--glass-border); border-radius: 8px; padding: 15px; margin-bottom: 20px; resize: none; outline: none; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); }
+        #python-editor:focus { border-color: var(--accent); }
+        #console-output { background: #000; color: #0f0; padding: 15px; border-radius: 8px; height: 250px; font-family: 'Consolas', monospace; white-space: pre-wrap; overflow-y: auto; border: 1px solid #333; }
+
+        .back-link { color: var(--text-muted); text-decoration: none; display: inline-flex; align-items: center; gap: 5px; margin-bottom: 20px; transition: color 0.3s; }
+        .back-link:hover { color: var(--text-main); }
+        header { text-align: center; margin-bottom: 50px; animation: fadeIn 1s ease-out; }
+        h1 { font-size: 2.5rem; margin-bottom: 10px; color: var(--accent); }
+        .card { background: var(--surface-color); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--glass-border); border-radius: 16px; padding: 30px; margin-bottom: 30px; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); transform: translateY(20px); opacity: 0; animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        h2 { border-bottom: 2px solid var(--glass-border); padding-bottom: 10px; margin-top: 0; display: flex; align-items: center; gap: 10px; }
+        .metaphor { background: rgba(255,255,255,0.05); border-left: 4px solid var(--accent); padding: 15px; border-radius: 0 8px 8px 0; font-style: italic; color: #bae6fd; margin-bottom: 20px; }
+        .pro-tip { border-left: 4px solid #f59e0b; background: rgba(245, 158, 11, 0.08); }
+        .pro-tip h2 { border-bottom: none; color: #fbbf24; }
+        pre { border-radius: 8px !important; margin: 20px 0 !important; border: 1px solid var(--glass-border); }
+        .btn { background-color: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: all 0.3s ease; }
+        .btn:hover { background-color: var(--accent-hover); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(255,255,255,0.1); }
+        .answer-box { max-height: 0; overflow: hidden; transition: max-height 0.5s ease; opacity: 0; }
+        .answer-box.show { max-height: 2200px; opacity: 1; transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out 0.2s; }
+        .drill-section { margin-top: 40px; }
+        .drill-item { background: rgba(0, 0, 0, 0.2); padding: 20px; border-radius: 8px; margin-bottom: 15px; border: 1px solid var(--glass-border); }
+        .decision-table { width: 100%; border-collapse: collapse; margin: 18px 0; border-radius: 8px; overflow: hidden; }
+        .decision-table th, .decision-table td { border: 1px solid var(--glass-border); padding: 12px; vertical-align: top; line-height: 1.55; }
+        .decision-table th { background: rgba(139, 92, 246, 0.18); color: #ddd6fe; text-align: left; }
+        .insight-box { background: rgba(20, 184, 166, 0.1); border-left: 4px solid #14b8a6; border-radius: 0 8px 8px 0; padding: 15px; margin: 16px 0; color: #ccfbf1; }
+        .warning-box { background: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444; border-radius: 0 8px 8px 0; padding: 15px; margin: 16px 0; color: #fecaca; }
+        .tag { display: inline-flex; padding: 4px 9px; margin: 2px 4px 2px 0; border: 1px solid var(--glass-border); border-radius: 6px; background: rgba(255,255,255,0.06); color: #ede9fe; font-size: 0.86rem; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { to { transform: translateY(0); opacity: 1; } }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-color); }
+        ::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+    </style>
+</head>
+<body>
+    <div class="layout-wrapper">
+        <div class="content-panel">
+            <div class="content-inner">
+                <a href="index.html" class="back-link">← 대시보드로 돌아가기</a>
+                <header>
+                    <h1>Week 4-2: 앙상블과 부스팅</h1>
+                    <p>집단 지성의 힘! 캐글 우승을 휩쓰는 현대 머신러닝의 핵심</p>
+                </header>
+
+                <div class="card">
+                    <h2>🧭 0. 앙상블을 왜 쓰는가?</h2>
+                    <p>단일 의사결정나무는 해석이 쉽지만 데이터가 조금만 바뀌어도 결과가 크게 흔들리고 과적합되기 쉽습니다. 앙상블은 여러 모델을 결합하여 이런 불안정성을 줄이고 예측 성능을 높이는 방법입니다.</p>
+                    <table class="decision-table">
+                        <thead>
+                            <tr>
+                                <th>방법</th>
+                                <th>핵심 아이디어</th>
+                                <th>강점</th>
+                                <th>주의점</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>배깅</td>
+                                <td>서로 다른 샘플로 여러 모델을 병렬 학습 후 평균/투표</td>
+                                <td>분산 감소, 과적합 완화, 안정성 향상</td>
+                                <td>부스팅보다 최고 성능은 낮을 수 있음</td>
+                            </tr>
+                            <tr>
+                                <td>랜덤포레스트</td>
+                                <td>배깅 + 변수도 무작위로 골라 여러 나무 생성</td>
+                                <td>강한 기본 모델, 전처리 부담 낮음, 변수 중요도 제공</td>
+                                <td>개별 의사결정나무보다 해석이 어려움</td>
+                            </tr>
+                            <tr>
+                                <td>부스팅</td>
+                                <td>이전 모델이 틀린 부분을 다음 모델이 순차적으로 보완</td>
+                                <td>정형 데이터에서 높은 성능</td>
+                                <td>튜닝에 민감하고 과적합/시간 비용 주의</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="insight-box">
+                        <strong>실전 감각:</strong> 빠르고 안정적인 기준 성능은 랜덤포레스트, 점수를 더 끌어올리고 싶으면 부스팅을 시도합니다. ADP에서는 성능뿐 아니라 해석 가능성과 과적합 통제도 함께 설명해야 합니다.
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>🌲 1. 배깅(Bagging): 랜덤 포레스트</h2>
+                    <div class="metaphor">"의사결정나무 1그루는 오류를 범하기 쉽습니다. 하지만 나무 100그루를 심어서 숲(Forest)을 만들고, 100그루의 나무에게 투표(Voting)를 시키면 결과가 훨씬 정확해집니다!"</div>
+                    <p>데이터를 무작위로 조금씩 다르게 뽑아서 여러 개의 나무를 만들고 결과를 합치는 방식입니다.</p>
+                    <p><span class="tag">배깅</span><span class="tag">분산 감소</span><span class="tag">스케일링 거의 불필요</span><span class="tag">변수 중요도</span></p>
+                    <p>랜덤포레스트는 여러 의사결정나무가 서로 다른 관점에서 판단하도록 만듭니다. 개별 나무는 과적합될 수 있지만, 여러 나무의 투표를 합치면 예측이 안정됩니다.</p>
+                    <div class="insight-box">
+                        <strong>언제 쓰나:</strong> 빠르게 강한 기준 모델을 만들고 싶을 때, 변수 간 비선형 관계와 상호작용이 있을 때 좋습니다. 수치형 스케일링에 둔감해서 전처리 부담이 비교적 낮습니다.
+                    </div>
+                    <pre><code class="language-python">from sklearn.ensemble import RandomForestClassifier
+# n_estimators=100 (나무 100그루를 심겠다)
+rf = RandomForestClassifier(n_estimators=100, random_state=42)
+rf.fit(X_train, y_train)</code></pre>
+                </div>
+
+                <div class="card">
+                    <h2>🚀 2. 부스팅(Boosting): XGBoost & LightGBM</h2>
+                    <div class="metaphor">"랜덤 포레스트가 학생 100명이 각자 문제를 풀고 다수결을 하는 것이라면, 부스팅은 학생 1번이 틀린 문제를 학생 2번이 집중해서 풀고, 그걸 3번이 다시 보완하는 <strong>오답노트 릴레이</strong> 방식입니다."</div>
+                    <p>부스팅은 약한 모델을 순차적으로 쌓아 강한 모델을 만듭니다. 이전 모델이 틀린 사례에 더 집중하므로 정형 데이터에서 높은 성능을 내는 경우가 많습니다.</p>
+                    <p><span class="tag">순차 학습</span><span class="tag">높은 성능</span><span class="tag">튜닝 민감</span><span class="tag">과적합 주의</span></p>
+                    <div class="warning-box">
+                        부스팅은 강력하지만 무조건 만능은 아닙니다. 데이터가 작거나 잡음이 많으면 틀린 사례를 과하게 쫓아 과적합될 수 있습니다. <code>learning_rate</code>, <code>max_depth</code>, <code>subsample</code>로 복잡도를 조절합니다.
+                    </div>
+                    <pre><code class="language-python"># XGBoost는 scikit-learn과 사용법이 완벽하게 똑같습니다!
+from xgboost import XGBClassifier
+
+xgb = XGBClassifier(
+    n_estimators=100,
+    learning_rate=0.1,
+    max_depth=3,
+    random_state=42,
+    eval_metric='logloss'
+)
+xgb.fit(X_train, y_train)</code></pre>
+                </div>
+                
+                <div class="card pro-tip">
+                    <h2>💼 실무 노하우: 하이퍼파라미터 튜닝</h2>
+                    <p>튜닝은 많이 만지는 것보다 의미를 알고 조금씩 바꾸는 것이 중요합니다. 시험에서는 시간이 제한되므로 작은 후보군으로 빠르게 비교하세요.</p>
+                    <table class="decision-table">
+                        <thead>
+                            <tr>
+                                <th>파라미터</th>
+                                <th>의미</th>
+                                <th>조절 방향</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>n_estimators</code></td>
+                                <td>나무 개수</td>
+                                <td>늘리면 복잡해지고 시간이 증가합니다.</td>
+                            </tr>
+                            <tr>
+                                <td><code>max_depth</code></td>
+                                <td>각 나무의 깊이</td>
+                                <td>깊을수록 복잡한 패턴을 잡지만 과적합 위험이 커집니다.</td>
+                            </tr>
+                            <tr>
+                                <td><code>learning_rate</code></td>
+                                <td>각 나무가 반영되는 속도</td>
+                                <td>작게 하면 안정적이지만 더 많은 나무와 시간이 필요합니다.</td>
+                            </tr>
+                            <tr>
+                                <td><code>subsample</code></td>
+                                <td>학습에 사용할 행 비율</td>
+                                <td>1보다 작게 두면 과적합 완화에 도움이 됩니다.</td>
+                            </tr>
+                            <tr>
+                                <td><code>max_features</code></td>
+                                <td>나무가 사용할 변수 수</td>
+                                <td>랜덤포레스트에서 나무 간 다양성을 만듭니다.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card">
+                    <h2>🔎 3. 변수 중요도 해석</h2>
+                    <p>트리 기반 앙상블은 변수 중요도(<code>feature_importances_</code>)를 제공합니다. 이는 모델이 어떤 변수를 분할에 많이 사용했는지 보여주는 힌트입니다.</p>
+                    <pre><code class="language-python">import pandas as pd
+
+importance = pd.Series(rf.feature_importances_, index=X_train.columns)
+print(importance.sort_values(ascending=False))</code></pre>
+                    <div class="warning-box">
+                        변수 중요도는 인과관계가 아닙니다. 중요도가 높다는 것은 모델 예측에 자주 쓰였다는 뜻이지, 그 변수가 결과를 원인적으로 만든다는 뜻은 아닙니다. 상관된 변수끼리는 중요도가 나뉘거나 왜곡될 수 있습니다.
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>🧾 4. ADP 앙상블 답안 작성 공식</h2>
+                    <pre><code class="language-text">본 문제는 [분류/회귀] 예측 성능을 높이는 것이 목적이므로 앙상블 모델을 사용하였다.
+랜덤포레스트는 여러 의사결정나무를 배깅 방식으로 결합하여 단일 나무의 높은 분산과 과적합을 완화한다.
+부스팅 모델은 이전 모델의 오차를 순차적으로 보완하므로 정형 데이터에서 높은 성능을 기대할 수 있다.
+평가지표는 [Accuracy/F1/ROC-AUC/RMSE]를 사용했으며, 이는 [문제 특성]에 적합하다.
+다만 앙상블 모델은 단일 나무보다 해석력이 낮고, 부스팅은 하이퍼파라미터에 민감하므로 교차검증과 과적합 확인이 필요하다.</code></pre>
+                </div>
+
+                <div class="card drill-section">
+                    <h2>🚀 드릴 연습문제 (앙상블 실전)</h2>
+
+                    <div class="drill-item">
+                        <p><strong>[문제 1: 랜덤포레스트 분류]</strong> <code>titanic.csv</code>로 생존 여부를 예측하세요. RandomForestClassifier를 사용하고 Accuracy, ROC-AUC, 변수 중요도를 출력하세요.</p>
+                        <button class="btn" onclick="toggleAnswer('ans1')">👁️ 정답 보기</button>
+                        <div id="ans1" class="answer-box">
+                            <pre><code class="language-python">import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, roc_auc_score
+
+df = pd.read_csv('data/titanic.csv')
+X = df[['Pclass', 'Sex', 'Age', 'Fare']].copy()
+y = df['Survived']
+
+X['Age'] = X['Age'].fillna(X['Age'].median())
+X = pd.get_dummies(X, drop_first=True)
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+rf = RandomForestClassifier(n_estimators=200, max_depth=5, random_state=42)
+rf.fit(X_train, y_train)
+
+pred = rf.predict(X_test)
+proba = rf.predict_proba(X_test)[:, 1]
+
+print('Accuracy:', round(accuracy_score(y_test, pred), 4))
+print('ROC-AUC:', round(roc_auc_score(y_test, proba), 4))
+print(pd.Series(rf.feature_importances_, index=X.columns).sort_values(ascending=False))</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="drill-item">
+                        <p><strong>[문제 2: 과적합 비교]</strong> 랜덤포레스트에서 <code>max_depth=None</code>과 <code>max_depth=4</code>를 비교하세요. train/test Accuracy 차이를 보고 과적합 여부를 해석하세요.</p>
+                        <button class="btn" onclick="toggleAnswer('ans2')">👁️ 정답 보기</button>
+                        <div id="ans2" class="answer-box">
+                            <pre><code class="language-python">for depth in [None, 4]:
+    model = RandomForestClassifier(
+        n_estimators=200,
+        max_depth=depth,
+        random_state=42
+    )
+    model.fit(X_train, y_train)
+    train_pred = model.predict(X_train)
+    test_pred = model.predict(X_test)
+    print('max_depth:', depth)
+    print('train acc:', round(accuracy_score(y_train, train_pred), 4))
+    print('test acc:', round(accuracy_score(y_test, test_pred), 4))
+    print()
+
+print('해석: train 성능이 test 성능보다 지나치게 높으면 과적합을 의심합니다.')</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="drill-item">
+                        <p><strong>[문제 3: XGBoost 도전]</strong> 같은 데이터로 XGBClassifier를 학습하고 ROC-AUC를 출력하세요. 시간이 오래 걸리면 <code>n_estimators</code>를 작게 두세요.</p>
+                        <button class="btn" onclick="toggleAnswer('ans3')">👁️ 정답 보기</button>
+                        <div id="ans3" class="answer-box">
+                            <pre><code class="language-python">from xgboost import XGBClassifier
+
+xgb = XGBClassifier(
+    n_estimators=80,
+    learning_rate=0.05,
+    max_depth=3,
+    subsample=0.9,
+    random_state=42,
+    eval_metric='logloss'
+)
+xgb.fit(X_train, y_train)
+
+pred = xgb.predict(X_test)
+proba = xgb.predict_proba(X_test)[:, 1]
+
+print('Accuracy:', round(accuracy_score(y_test, pred), 4))
+print('ROC-AUC:', round(roc_auc_score(y_test, proba), 4))</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="drill-item">
+                        <p><strong>[문제 4: ADP 서술형]</strong> 랜덤포레스트의 ROC-AUC가 0.85이고, 가장 중요한 변수가 Fare로 나왔다고 가정합니다. 모델 선택 이유, 성능 해석, 변수 중요도 해석의 주의점을 5문장 이내로 작성하세요.</p>
+                        <button class="btn" onclick="toggleAnswer('ans4')">👁️ 모범 답안 보기</button>
+                        <div id="ans4" class="answer-box">
+                            <pre><code class="language-text">본 문제는 생존 여부를 예측하는 이진 분류 문제이며, 비선형 관계와 변수 간 상호작용을 고려하기 위해 랜덤포레스트를 사용하였다.
+랜덤포레스트는 여러 의사결정나무를 배깅 방식으로 결합하므로 단일 나무보다 예측이 안정적이고 과적합을 완화할 수 있다.
+ROC-AUC가 0.85라는 것은 생존자와 비생존자를 구분하는 모델의 순위화 능력이 양호함을 의미한다.
+변수 중요도에서 Fare가 높게 나타난 것은 모델 예측에 Fare가 많이 활용되었다는 뜻이지만, Fare가 생존의 원인이라고 단정할 수는 없다.
+따라서 교차검증, 추가 변수 검토, 변수 간 상관성 확인을 통해 모델의 일반화 성능과 해석 타당성을 보완해야 한다.</code></pre>
+                        </div>
+                    </div>
+                </div>
+        
+            </div>
+        </div>
+        <div class="ide-panel">
+            <h2 style="color: var(--accent);">💻 웹 파이썬 실행기</h2>
+            <p style="color: #cbd5e1; font-size: 0.95rem; margin-bottom: 20px;">
+                왼쪽 창의 문제를 보고, 여기서 자유롭게 코딩하세요!<br>
+                💡 <strong>데이터 경로:</strong> <code>pd.read_csv('data/titanic.csv')</code>
+            </p>
+            <textarea id="python-editor" spellcheck="false" placeholder="# 여기에 코드를 작성하세요...">import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, roc_auc_score
+
+df = pd.read_csv('data/titanic.csv')
+
+X = df[['Pclass', 'Sex', 'Age', 'Fare']].copy()
+y = df['Survived']
+
+X['Age'] = X['Age'].fillna(X['Age'].median())
+X = pd.get_dummies(X, drop_first=True)
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+rf = RandomForestClassifier(
+    n_estimators=200,
+    max_depth=5,
+    random_state=42
+)
+rf.fit(X_train, y_train)
+
+pred = rf.predict(X_test)
+proba = rf.predict_proba(X_test)[:, 1]
+
+print('Accuracy:', round(accuracy_score(y_test, pred), 4))
+print('ROC-AUC:', round(roc_auc_score(y_test, proba), 4))
+print()
+print('Feature importance')
+print(pd.Series(rf.feature_importances_, index=X.columns).sort_values(ascending=False))</textarea>
+            <button class="btn" id="run-btn" onclick="runPython()" style="width: 100%; justify-content: center; font-size: 1.1rem; padding: 15px; margin-bottom: 20px;">
+                ▶ 파이썬 코드 실행
+            </button>
+            <h3 style="color: #94a3b8; font-size: 1rem; margin: 0 0 10px 0;">출력 결과 (Console)</h3>
+            <pre id="console-output">대기 중...</pre>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script>
+        function toggleAnswer(id) {
+            const el = document.getElementById(id);
+            if (el.classList.contains('show')) el.classList.remove('show');
+            else el.classList.add('show');
+        }
+        async function runPython() {
+            const code = document.getElementById('python-editor').value;
+            const outputEl = document.getElementById('console-output');
+            const runBtn = document.getElementById('run-btn');
+            if (!code.trim()) { outputEl.innerText = '코드를 입력해주세요.'; return; }
+            runBtn.innerText = '⏳ 실행 중...'; runBtn.disabled = true;
+            outputEl.innerText = '서버에서 실행 중입니다...';
+            try {
+                const res = await fetch('/api/run-python', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code: code })
+                });
+                const result = await res.json();
+                if (result.success) { outputEl.style.color = '#0f0'; outputEl.innerText = result.output || '실행 성공'; }
+                else { outputEl.style.color = '#ff4444'; outputEl.innerText = result.output; }
+            } catch (err) { outputEl.style.color = '#ff4444'; outputEl.innerText = '오류: ' + err.message; }
+            finally { runBtn.innerText = '▶ 파이썬 코드 실행'; runBtn.disabled = false; }
+        }
+    </script>
+</body>
+</html>

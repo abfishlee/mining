@@ -1,0 +1,144 @@
+{
+  "page": "week3_stats.html",
+  "title": "Week 3: 통계 기초 & 가설 검정",
+  "problems": [
+    {
+      "id": "w3_ttest_tips_gender",
+      "type": "code_numeric",
+      "exam": ["ADP", "BigData"],
+      "topic": ["statistics", "ttest", "p_value"],
+      "difficulty": "basic",
+      "dataset": "data/tips.csv",
+      "timeLimitMinutes": 10,
+      "prompt": "tips.csv에서 남성(Male)과 여성(Female)의 tip 평균 차이가 있는지 Welch 독립표본 t-test를 수행하고 p-value를 소수점 4자리까지 출력하시오.",
+      "expected": {
+        "kind": "numeric_tolerance",
+        "value": 0.1378,
+        "tolerance": 0.001
+      },
+      "rubric": [
+        "tips.csv를 올바르게 불러온다.",
+        "sex가 Male인 집단과 Female인 집단의 tip을 분리한다.",
+        "stats.ttest_ind에 equal_var=False를 적용하여 Welch t-test를 수행한다.",
+        "p-value를 출력한다.",
+        "p-value가 0.05보다 크므로 평균 차이가 유의하다고 보기 어렵다고 해석한다."
+      ],
+      "commonMistakes": [
+        "성별 컬럼의 문자열 값을 소문자로 잘못 필터링한다.",
+        "p-value 대신 t-statistic을 정답으로 출력한다.",
+        "p-value가 0.05보다 큰데도 차이가 있다고 결론낸다.",
+        "통계적으로 유의하지 않다는 말을 두 평균이 완전히 같다는 뜻으로 해석한다."
+      ]
+    },
+    {
+      "id": "w3_anova_total_bill_day",
+      "type": "code_numeric",
+      "exam": ["ADP", "BigData"],
+      "topic": ["statistics", "anova", "p_value"],
+      "difficulty": "basic",
+      "dataset": "data/tips.csv",
+      "timeLimitMinutes": 10,
+      "prompt": "tips.csv에서 요일(day)에 따라 total_bill 평균 차이가 있는지 일원분산분석(ANOVA)을 수행하고 p-value를 소수점 4자리까지 출력하시오.",
+      "expected": {
+        "kind": "numeric_tolerance",
+        "value": 0.0425,
+        "tolerance": 0.001
+      },
+      "rubric": [
+        "day별로 total_bill 데이터를 분리한다.",
+        "stats.f_oneway로 일원분산분석을 수행한다.",
+        "p-value를 출력한다.",
+        "p-value가 0.05보다 작으므로 적어도 한 요일의 평균 total_bill이 다르다고 해석한다.",
+        "어느 요일끼리 다른지는 사후검정이 필요하다고 언급한다."
+      ],
+      "commonMistakes": [
+        "ANOVA 결과가 어떤 집단끼리 다른지까지 바로 알려준다고 해석한다.",
+        "요일별 그룹을 누락한다.",
+        "p-value 대신 F-statistic을 정답으로 출력한다.",
+        "반복 t-test로 여러 집단을 비교하여 1종 오류 증가를 고려하지 않는다."
+      ]
+    },
+    {
+      "id": "w3_chi_square_smoker_time",
+      "type": "code_numeric",
+      "exam": ["ADP", "BigData"],
+      "topic": ["statistics", "chi_square", "categorical"],
+      "difficulty": "basic",
+      "dataset": "data/tips.csv",
+      "timeLimitMinutes": 10,
+      "prompt": "tips.csv에서 흡연 여부(smoker)와 식사 시간대(time)가 독립인지 카이제곱 독립성 검정을 수행하고 p-value를 소수점 4자리까지 출력하시오.",
+      "expected": {
+        "kind": "numeric_tolerance",
+        "value": 0.4771,
+        "tolerance": 0.001
+      },
+      "rubric": [
+        "pd.crosstab으로 smoker와 time의 교차표를 만든다.",
+        "stats.chi2_contingency로 카이제곱 독립성 검정을 수행한다.",
+        "p-value를 출력한다.",
+        "p-value가 0.05보다 크므로 두 범주형 변수가 관련되어 있다고 보기 어렵다고 해석한다."
+      ],
+      "commonMistakes": [
+        "범주형 변수에 t-test를 적용한다.",
+        "원자료를 그대로 chi2_contingency에 넣고 교차표를 만들지 않는다.",
+        "p-value가 0.05보다 큰데도 독립이 아니라고 결론낸다."
+      ]
+    },
+    {
+      "id": "w3_corr_total_bill_tip",
+      "type": "code_numeric",
+      "exam": ["ADP", "BigData"],
+      "topic": ["statistics", "correlation", "pearson"],
+      "difficulty": "basic",
+      "dataset": "data/tips.csv",
+      "timeLimitMinutes": 10,
+      "prompt": "tips.csv에서 total_bill과 tip의 Pearson 상관계수와 p-value를 각각 소수점 4자리까지 출력하시오.",
+      "expected": {
+        "kind": "multiple_numeric_tolerance",
+        "values": {
+          "correlation": 0.6757,
+          "p-value": 0.0
+        },
+        "tolerance": 0.001
+      },
+      "rubric": [
+        "stats.pearsonr를 사용하여 상관계수와 p-value를 함께 구한다.",
+        "상관계수와 p-value를 각각 출력한다.",
+        "양의 상관관계가 있음을 방향과 함께 해석한다.",
+        "상관관계가 인과관계를 의미하지 않는다는 한계를 언급한다."
+      ],
+      "commonMistakes": [
+        "상관계수만 출력하고 p-value를 누락한다.",
+        "상관관계를 인과관계로 해석한다.",
+        "상관계수의 부호를 해석하지 않는다."
+      ]
+    },
+    {
+      "id": "w3_adp_ttest_writeup",
+      "type": "written_rubric",
+      "exam": ["ADP"],
+      "topic": ["statistics", "interpretation", "ttest"],
+      "difficulty": "intermediate",
+      "dataset": "data/tips.csv",
+      "timeLimitMinutes": 8,
+      "prompt": "성별에 따른 tip 평균 차이를 Welch 독립표본 t-test로 검정한 결과 p-value가 0.1378이었다. ADP 답안 형식으로 검정 선택 이유, 가설, 판단, 실무 해석, 한계를 서술하시오.",
+      "expected": {
+        "kind": "rubric_keywords",
+        "keywords": ["독립표본", "귀무가설", "p-value", "0.05", "기각하지"]
+      },
+      "rubric": [
+        "두 독립 집단 평균 비교이므로 독립표본 t-test를 사용했다고 설명한다.",
+        "귀무가설과 대립가설을 명시한다.",
+        "p-value 0.1378이 유의수준 0.05보다 크다고 판단한다.",
+        "귀무가설을 기각하지 못한다고 쓴다.",
+        "표본 수, 이상치, 등분산성, 교란 변수 등 한계를 언급한다."
+      ],
+      "commonMistakes": [
+        "귀무가설을 채택한다고 단정적으로 표현한다.",
+        "유의하지 않음을 두 평균이 동일하다는 증명으로 해석한다.",
+        "검정 선택 이유를 쓰지 않는다.",
+        "실무적 한계와 추가 검토 사항을 누락한다."
+      ]
+    }
+  ]
+}

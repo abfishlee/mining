@@ -1,0 +1,16 @@
+{
+  "name": "mining",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "test": "node scripts/check-pages.js && node scripts/check-problems.js",
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "express": "^5.2.1"
+  }
+}

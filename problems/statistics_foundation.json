@@ -1,0 +1,189 @@
+{
+  "page": "statistics_foundation.html",
+  "title": "통계 기초 보강",
+  "problems": [
+    {
+      "id": "stat_one_sample_tip_mean",
+      "type": "code_numeric",
+      "exam": ["BigData", "ADP"],
+      "topic": ["statistics", "one_sample_ttest", "p_value"],
+      "difficulty": "basic",
+      "dataset": "data/tips.csv",
+      "timeLimitMinutes": 8,
+      "prompt": "tips.csv에서 tip 평균이 3이라고 볼 수 있는지 단일표본 t-test를 수행하고 p-value를 소수점 넷째 자리까지 출력하시오.",
+      "expected": {
+        "kind": "numeric_tolerance",
+        "value": 0.9845,
+        "tolerance": 0.001
+      },
+      "rubric": [
+        "tip 컬럼을 선택한다.",
+        "stats.ttest_1samp를 사용한다.",
+        "검정 기준 평균을 3으로 설정한다.",
+        "p-value를 출력한다.",
+        "p-value가 0.05보다 크므로 평균이 3과 다르다고 보기 어렵다고 해석한다."
+      ],
+      "commonMistakes": [
+        "t-statistic을 출력한다.",
+        "독립표본 t-test를 사용한다.",
+        "p-value가 크다는 것을 평균이 정확히 3이라고 증명한 것으로 해석한다."
+      ]
+    },
+    {
+      "id": "stat_welch_total_bill_sex",
+      "type": "code_numeric",
+      "exam": ["BigData", "ADP"],
+      "topic": ["statistics", "welch_ttest", "p_value"],
+      "difficulty": "basic",
+      "dataset": "data/tips.csv",
+      "timeLimitMinutes": 9,
+      "prompt": "tips.csv에서 남성과 여성의 total_bill 평균 차이가 있는지 Welch 독립표본 t-test를 수행하고 p-value를 소수점 넷째 자리까지 출력하시오.",
+      "expected": {
+        "kind": "numeric_tolerance",
+        "value": 0.0186,
+        "tolerance": 0.001
+      },
+      "rubric": [
+        "sex가 Male인 total_bill과 Female인 total_bill을 분리한다.",
+        "stats.ttest_ind에 equal_var=False를 적용한다.",
+        "p-value를 출력한다.",
+        "p-value가 0.05보다 작으므로 평균 차이가 유의하다고 해석한다."
+      ],
+      "commonMistakes": [
+        "equal_var=False를 누락한다.",
+        "sex 값을 male/female 소문자로 잘못 필터링한다.",
+        "전체 total_bill 평균을 비교 없이 출력한다."
+      ]
+    },
+    {
+      "id": "stat_chi_square_day_time",
+      "type": "code_numeric",
+      "exam": ["BigData", "ADP"],
+      "topic": ["statistics", "chi_square", "categorical"],
+      "difficulty": "basic",
+      "dataset": "data/tips.csv",
+      "timeLimitMinutes": 9,
+      "prompt": "tips.csv에서 day와 time이 독립인지 카이제곱 독립성 검정을 수행하고 p-value를 소수점 넷째 자리까지 출력하시오.",
+      "expected": {
+        "kind": "numeric_tolerance",
+        "value": 0.0,
+        "tolerance": 0.001
+      },
+      "rubric": [
+        "pd.crosstab으로 day와 time의 교차표를 만든다.",
+        "stats.chi2_contingency를 사용한다.",
+        "p-value를 출력한다.",
+        "p-value가 0.05보다 작으므로 두 범주형 변수는 독립이라고 보기 어렵다고 해석한다."
+      ],
+      "commonMistakes": [
+        "교차표 없이 원본 컬럼을 바로 넣는다.",
+        "범주형 변수에 t-test를 사용한다.",
+        "p-value가 작다는 것을 독립이라고 해석한다."
+      ]
+    },
+    {
+      "id": "stat_anova_tip_day",
+      "type": "code_numeric",
+      "exam": ["BigData", "ADP"],
+      "topic": ["statistics", "anova", "p_value"],
+      "difficulty": "basic",
+      "dataset": "data/tips.csv",
+      "timeLimitMinutes": 10,
+      "prompt": "tips.csv에서 day에 따라 tip 평균 차이가 있는지 일원분산분석(ANOVA)을 수행하고 p-value를 소수점 넷째 자리까지 출력하시오.",
+      "expected": {
+        "kind": "numeric_tolerance",
+        "value": 0.1736,
+        "tolerance": 0.001
+      },
+      "rubric": [
+        "day별 tip 데이터를 분리한다.",
+        "stats.f_oneway를 사용한다.",
+        "p-value를 출력한다.",
+        "p-value가 0.05보다 크므로 요일별 평균 차이가 유의하다고 보기 어렵다고 해석한다."
+      ],
+      "commonMistakes": [
+        "요일이 4개인데 t-test만 수행한다.",
+        "ANOVA p-value가 크다는 것을 모든 평균이 정확히 같다는 뜻으로 해석한다.",
+        "total_bill로 잘못 검정한다."
+      ]
+    },
+    {
+      "id": "stat_corr_size_tip",
+      "type": "code_numeric",
+      "exam": ["BigData", "ADP"],
+      "topic": ["statistics", "correlation", "pearson"],
+      "difficulty": "basic",
+      "dataset": "data/tips.csv",
+      "timeLimitMinutes": 8,
+      "prompt": "tips.csv에서 size와 tip의 Pearson 상관계수를 소수점 넷째 자리까지 출력하시오.",
+      "expected": {
+        "kind": "numeric_tolerance",
+        "value": 0.4893,
+        "tolerance": 0.001
+      },
+      "rubric": [
+        "stats.pearsonr 또는 corr을 사용한다.",
+        "size와 tip의 상관계수를 계산한다.",
+        "상관계수 값을 출력한다.",
+        "양의 상관관계이며 인과관계는 아니라고 해석한다."
+      ],
+      "commonMistakes": [
+        "p-value를 상관계수로 출력한다.",
+        "상관계수를 인과 효과로 해석한다.",
+        "size가 범주형이라고 보고 카이제곱 검정을 사용한다."
+      ]
+    },
+    {
+      "id": "stat_levene_total_bill_sex",
+      "type": "code_numeric",
+      "exam": ["ADP"],
+      "topic": ["statistics", "levene", "equal_variance"],
+      "difficulty": "intermediate",
+      "dataset": "data/tips.csv",
+      "timeLimitMinutes": 8,
+      "prompt": "tips.csv에서 남성과 여성의 total_bill 분산이 같다고 볼 수 있는지 Levene 등분산 검정을 수행하고 p-value를 소수점 넷째 자리까지 출력하시오.",
+      "expected": {
+        "kind": "numeric_tolerance",
+        "value": 0.2027,
+        "tolerance": 0.001
+      },
+      "rubric": [
+        "남성과 여성의 total_bill을 분리한다.",
+        "stats.levene을 사용한다.",
+        "p-value를 출력한다.",
+        "p-value가 0.05보다 크므로 등분산성을 기각하기 어렵다고 해석한다."
+      ],
+      "commonMistakes": [
+        "등분산 검정 결과를 평균 차이 검정 결과로 해석한다.",
+        "Levene 검정의 귀무가설을 반대로 이해한다.",
+        "p-value 대신 통계량을 출력한다."
+      ]
+    },
+    {
+      "id": "stat_adp_pvalue_interpretation",
+      "type": "written_rubric",
+      "exam": ["ADP"],
+      "topic": ["statistics", "interpretation", "p_value"],
+      "difficulty": "intermediate",
+      "dataset": "data/tips.csv",
+      "timeLimitMinutes": 8,
+      "prompt": "남성과 여성의 total_bill 평균 차이에 대한 Welch t-test 결과 p-value가 0.0186이었다. ADP 답안 형식으로 검정 선택 이유, 귀무가설, 판단, 실무 해석, 한계를 서술하시오.",
+      "expected": {
+        "kind": "rubric_keywords",
+        "keywords": ["Welch", "귀무가설", "p-value", "0.05", "기각", "한계"]
+      },
+      "rubric": [
+        "두 독립 집단 평균 비교이므로 Welch 독립표본 t-test를 사용했다고 설명한다.",
+        "귀무가설은 남성과 여성의 평균 total_bill이 같다는 것이라고 쓴다.",
+        "p-value 0.0186이 0.05보다 작으므로 귀무가설을 기각한다고 판단한다.",
+        "평균 차이는 통계적으로 유의하다고 해석한다.",
+        "표본 구성, 이상치, 교란 변수, 효과 크기 등 한계를 언급한다."
+      ],
+      "commonMistakes": [
+        "p-value가 작다는 것을 인과관계 증명으로 해석한다.",
+        "귀무가설을 채택/기각 표현 없이 애매하게 쓴다.",
+        "통계적 유의성과 실무적 중요성을 구분하지 않는다."
+      ]
+    }
+  ]
+}

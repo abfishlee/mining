@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>통계 기초 보강</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --surface-color: rgba(30, 41, 59, 0.78);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #38bdf8;
+            --glass-border: rgba(255, 255, 255, 0.12);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .layout-wrapper {
+            display: grid;
+            grid-template-columns: minmax(0, 1.05fr) minmax(420px, 0.95fr);
+            height: 100vh;
+        }
+
+        .content-panel {
+            overflow-y: auto;
+            padding: 34px;
+            background-image: radial-gradient(at 0% 0%, rgba(56, 189, 248, 0.16) 0, transparent 55%);
+        }
+
+        .content-inner { max-width: 900px; margin: 0 auto; }
+
+        .ide-panel {
+            display: flex;
+            flex-direction: column;
+            padding: 28px;
+            border-left: 1px solid var(--glass-border);
+            background: rgba(2, 6, 23, 0.96);
+        }
+
+        .back-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            display: inline-flex;
+            margin-bottom: 18px;
+        }
+
+        h1 { margin: 0 0 10px; color: #e0f2fe; font-size: 2.35rem; }
+        h2, h3 { color: #e0f2fe; margin-top: 0; }
+
+        .subtitle {
+            color: var(--text-muted);
+            line-height: 1.7;
+            margin-bottom: 26px;
+        }
+
+        .card {
+            background: var(--surface-color);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .why {
+            border-left: 4px solid var(--accent);
+            background: rgba(56, 189, 248, 0.1);
+            padding: 14px;
+            border-radius: 0 8px 8px 0;
+            color: #bae6fd;
+            line-height: 1.65;
+            margin: 14px 0;
+        }
+
+        .decision-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .decision {
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 14px;
+            background: rgba(0, 0, 0, 0.18);
+            line-height: 1.6;
+        }
+
+        code, pre { font-family: Consolas, 'Courier New', monospace; }
+        pre { border-radius: 8px; border: 1px solid var(--glass-border); overflow: auto; }
+        ul { color: #dbeafe; line-height: 1.75; }
+
+        .btn {
+            border: none;
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-weight: 800;
+            cursor: pointer;
+            color: #082f49;
+            background: var(--accent);
+        }
+
+        #python-editor {
+            flex: 1;
+            min-height: 260px;
+            resize: none;
+            color: #d4d4d4;
+            background: #1e1e1e;
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 15px;
+            font-size: 15px;
+            line-height: 1.55;
+            outline: none;
+        }
+
+        #console-output {
+            min-height: 190px;
+            max-height: 260px;
+            overflow: auto;
+            white-space: pre-wrap;
+            background: #000;
+            color: #22c55e;
+            border: 1px solid #1e293b;
+            border-radius: 8px;
+            padding: 14px;
+            margin-top: 14px;
+        }
+
+        @media (max-width: 980px) {
+            body { height: auto; overflow: auto; }
+            .layout-wrapper { display: block; height: auto; }
+            .ide-panel { border-left: none; border-top: 1px solid var(--glass-border); min-height: 70vh; }
+            .decision-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="layout-wrapper">
+        <main class="content-panel">
+            <div class="content-inner">
+                <a href="index.html" class="back-link">← 대시보드로 돌아가기</a>
+                <h1>통계 기초 보강</h1>
+                <p class="subtitle">통계 문제는 계산보다 선택과 해석에서 틀리는 경우가 많습니다. 이 페이지는 "어떤 검정을 왜 쓰는지", "p-value를 어떻게 말해야 하는지", "실무에서 어떤 한계를 써야 하는지"를 반복 가능한 형태로 정리합니다.</p>
+
+                <section class="card">
+                    <h2>1. 검정 선택은 변수 타입과 집단 수로 결정</h2>
+                    <div class="decision-grid">
+                        <div class="decision"><strong>한 집단 평균 vs 기준값</strong><br>예: 평균 tip이 3달러인가?<br><code>stats.ttest_1samp()</code></div>
+                        <div class="decision"><strong>두 독립 집단 평균</strong><br>예: 남녀 total_bill 평균 차이<br><code>stats.ttest_ind(..., equal_var=False)</code></div>
+                        <div class="decision"><strong>세 집단 이상 평균</strong><br>예: 요일별 tip 평균 차이<br><code>stats.f_oneway()</code></div>
+                        <div class="decision"><strong>범주형 변수 관계</strong><br>예: 요일과 식사 시간대의 관련성<br><code>pd.crosstab()</code> + <code>stats.chi2_contingency()</code></div>
+                        <div class="decision"><strong>수치형 두 변수 관계</strong><br>예: total_bill과 tip 관계<br><code>stats.pearsonr()</code></div>
+                        <div class="decision"><strong>가정 점검</strong><br>정규성: Shapiro, 등분산성: Levene<br>가정이 약하면 해석에 한계를 씁니다.</div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h2>2. p-value 해석 문장 템플릿</h2>
+                    <div class="why">p-value는 "귀무가설이 맞다고 가정했을 때, 지금 같은 데이터가 관측될 가능성"입니다. 작으면 귀무가설과 데이터가 잘 맞지 않는다는 뜻이지, 대립가설이 100% 증명됐다는 뜻은 아닙니다.</div>
+                    <ul>
+                        <li><strong>p-value &lt; 0.05</strong>: 유의수준 0.05에서 귀무가설을 기각한다. 통계적으로 유의한 차이/관계가 있다고 볼 수 있다.</li>
+                        <li><strong>p-value >= 0.05</strong>: 귀무가설을 기각하지 못한다. 차이/관계가 있다고 보기 어렵다.</li>
+                        <li><strong>주의</strong>: "귀무가설을 채택한다", "차이가 전혀 없다", "인과관계가 증명됐다"라고 쓰면 위험합니다.</li>
+                    </ul>
+                </section>
+
+                <section class="card">
+                    <h2>3. 코드 패턴</h2>
+                    <pre><code class="language-python">import pandas as pd
+from scipy import stats
+
+tips = pd.read_csv('data/tips.csv')
+
+male = tips[tips['sex'] == 'Male']['total_bill']
+female = tips[tips['sex'] == 'Female']['total_bill']
+
+t_stat, p_value = stats.ttest_ind(male, female, equal_var=False)
+print(round(p_value, 4))</code></pre>
+                    <ul>
+                        <li>두 집단이 서로 다른 사람/행이면 독립표본입니다.</li>
+                        <li>등분산을 확신하기 어렵다면 Welch t-test인 <code>equal_var=False</code>가 안전합니다.</li>
+                        <li>ADP 답안에는 검정 선택 이유, 가설, 판단, 한계를 함께 씁니다.</li>
+                    </ul>
+                </section>
+
+                <section class="card">
+                    <h2>4. 실무 해석에서 꼭 덧붙일 말</h2>
+                    <ul>
+                        <li>통계적 유의성이 있어도 효과 크기가 실무적으로 충분한지는 별도 검토가 필요합니다.</li>
+                        <li>표본이 크면 작은 차이도 유의해질 수 있고, 표본이 작으면 큰 차이도 유의하지 않을 수 있습니다.</li>
+                        <li>상관관계는 인과관계가 아닙니다. 교란 변수와 실험 설계 여부를 확인해야 합니다.</li>
+                        <li>정규성/등분산성/독립성 가정이 약하면 비모수 검정 또는 강건한 검정을 고려합니다.</li>
+                    </ul>
+                </section>
+            </div>
+        </main>
+
+        <aside class="ide-panel">
+            <h2>웹 파이썬 실행기</h2>
+            <p class="subtitle">검정 코드를 바꿔 실행하면서 p-value 해석을 반복하세요.</p>
+            <textarea id="python-editor" spellcheck="false">import pandas as pd
+from scipy import stats
+
+tips = pd.read_csv('data/tips.csv')
+
+male = tips[tips['sex'] == 'Male']['total_bill']
+female = tips[tips['sex'] == 'Female']['total_bill']
+
+t_stat, p_value = stats.ttest_ind(male, female, equal_var=False)
+print(round(p_value, 4))</textarea>
+            <button class="btn" id="run-btn" onclick="runPython()">파이썬 코드 실행</button>
+            <pre id="console-output">대기 중...</pre>
+        </aside>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script>
+        async function runPython() {
+            const code = document.getElementById('python-editor').value;
+            const outputEl = document.getElementById('console-output');
+            const runBtn = document.getElementById('run-btn');
+
+            if (!code.trim()) {
+                outputEl.innerText = '코드를 입력해주세요.';
+                return;
+            }
+
+            runBtn.innerText = '실행 중...';
+            runBtn.disabled = true;
+            outputEl.style.color = '#22c55e';
+            outputEl.innerText = '서버에서 파이썬 코드를 실행 중입니다...';
+
+            try {
+                const response = await fetch('/api/run-python', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code })
+                });
+                const result = await response.json();
+                outputEl.style.color = result.success ? '#22c55e' : '#ef4444';
+                outputEl.innerText = result.output || '실행 성공 (출력 없음)';
+            } catch (error) {
+                outputEl.style.color = '#ef4444';
+                outputEl.innerText = '서버 통신 오류: ' + error.message;
+            } finally {
+                runBtn.innerText = '파이썬 코드 실행';
+                runBtn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

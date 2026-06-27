@@ -1,0 +1,165 @@
+{
+  "page": "ml_mining_foundation.html",
+  "title": "데이터 마이닝/머신러닝 기법 보강",
+  "problems": [
+    {
+      "id": "ml_logistic_titanic_auc",
+      "type": "code_numeric",
+      "exam": ["BigData", "ADP"],
+      "topic": ["machine_learning", "logistic_regression", "roc_auc"],
+      "difficulty": "basic",
+      "dataset": "data/titanic.csv",
+      "timeLimitMinutes": 15,
+      "prompt": "titanic.csv에서 Pclass, Sex, Age, Fare로 Survived를 예측하는 LogisticRegression(max_iter=1000)을 학습하고 ROC-AUC를 소수점 4자리까지 출력하시오. test_size=0.2, random_state=42, stratify=y를 사용하시오.",
+      "expected": {
+        "kind": "numeric_tolerance",
+        "value": 0.8365,
+        "tolerance": 0.01
+      },
+      "rubric": [
+        "Age 결측치를 중앙값으로 대체한다.",
+        "Sex를 원핫 인코딩한다.",
+        "train_test_split(test_size=0.2, random_state=42, stratify=y)을 사용한다.",
+        "LogisticRegression(max_iter=1000)을 학습한다.",
+        "predict_proba의 양성 클래스 확률로 ROC-AUC를 계산한다."
+      ],
+      "commonMistakes": [
+        "ROC-AUC에 predict 결과를 넣는다.",
+        "stratify를 누락해 결과가 달라진다.",
+        "Sex 인코딩을 하지 않는다."
+      ]
+    },
+    {
+      "id": "ml_knn_scaled_auc",
+      "type": "code_numeric",
+      "exam": ["ADP"],
+      "topic": ["machine_learning", "knn", "scaling", "roc_auc"],
+      "difficulty": "intermediate",
+      "dataset": "data/titanic.csv",
+      "timeLimitMinutes": 15,
+      "prompt": "같은 Titanic 분류 데이터에서 StandardScaler를 적용한 뒤 KNeighborsClassifier(n_neighbors=5)를 학습하고 ROC-AUC를 소수점 4자리까지 출력하시오.",
+      "expected": {
+        "kind": "numeric_tolerance",
+        "value": 0.8526,
+        "tolerance": 0.01
+      },
+      "rubric": [
+        "train/test 분리 후 train에 fit한 StandardScaler를 test에 transform한다.",
+        "KNeighborsClassifier(n_neighbors=5)를 사용한다.",
+        "predict_proba로 양성 확률을 구한다.",
+        "ROC-AUC를 출력한다.",
+        "KNN은 거리 기반 모델이므로 스케일링이 중요하다고 해석한다."
+      ],
+      "commonMistakes": [
+        "전체 데이터에 scaler를 fit해 데이터 누수를 만든다.",
+        "스케일링 없이 KNN을 학습한다.",
+        "predict 결과로 ROC-AUC를 계산한다."
+      ]
+    },
+    {
+      "id": "ml_tree_overfit_gap",
+      "type": "code_numeric",
+      "exam": ["ADP"],
+      "topic": ["machine_learning", "decision_tree", "overfitting"],
+      "difficulty": "intermediate",
+      "dataset": "data/titanic.csv",
+      "timeLimitMinutes": 15,
+      "prompt": "DecisionTreeClassifier(max_depth=None, random_state=42)를 학습하고 train Accuracy와 test Accuracy의 차이(train-test)를 소수점 4자리까지 출력하시오. 동일한 train/test split 조건을 사용하시오.",
+      "expected": {
+        "kind": "numeric_tolerance",
+        "value": 0.1702,
+        "tolerance": 0.01
+      },
+      "rubric": [
+        "max_depth=None인 의사결정나무를 학습한다.",
+        "train Accuracy와 test Accuracy를 각각 계산한다.",
+        "train Accuracy - test Accuracy를 출력한다.",
+        "차이가 크면 과적합 가능성을 해석한다."
+      ],
+      "commonMistakes": [
+        "test Accuracy만 출력한다.",
+        "test - train으로 차이를 반대로 계산한다.",
+        "과적합을 성능이 좋다는 뜻으로만 해석한다."
+      ]
+    },
+    {
+      "id": "ml_random_forest_auc",
+      "type": "code_numeric",
+      "exam": ["BigData", "ADP"],
+      "topic": ["machine_learning", "random_forest", "roc_auc"],
+      "difficulty": "basic",
+      "dataset": "data/titanic.csv",
+      "timeLimitMinutes": 15,
+      "prompt": "RandomForestClassifier(n_estimators=200, max_depth=5, random_state=42)를 학습하고 ROC-AUC를 소수점 4자리까지 출력하시오. 동일한 Titanic 전처리와 split 조건을 사용하시오.",
+      "expected": {
+        "kind": "numeric_tolerance",
+        "value": 0.8357,
+        "tolerance": 0.01
+      },
+      "rubric": [
+        "지정된 랜덤포레스트 파라미터를 사용한다.",
+        "동일한 전처리와 train/test split 조건을 사용한다.",
+        "predict_proba로 ROC-AUC를 계산한다.",
+        "랜덤포레스트는 여러 나무를 사용해 단일 트리보다 안정적이라고 설명한다."
+      ],
+      "commonMistakes": [
+        "random_state를 누락해 결과가 흔들린다.",
+        "max_depth를 다르게 설정한다.",
+        "Accuracy를 ROC-AUC로 착각한다."
+      ]
+    },
+    {
+      "id": "ml_logistic_sex_coef",
+      "type": "code_numeric",
+      "exam": ["ADP"],
+      "topic": ["machine_learning", "logistic_regression", "interpretation"],
+      "difficulty": "intermediate",
+      "dataset": "data/titanic.csv",
+      "timeLimitMinutes": 15,
+      "prompt": "LogisticRegression(max_iter=1000)을 동일 조건으로 학습한 뒤 Sex_male 계수를 소수점 4자리까지 출력하시오.",
+      "expected": {
+        "kind": "numeric_tolerance",
+        "value": -2.5096,
+        "tolerance": 0.05
+      },
+      "rubric": [
+        "원핫 인코딩 후 Sex_male 컬럼을 확인한다.",
+        "로지스틱 회귀 계수와 컬럼명을 매핑한다.",
+        "Sex_male 계수를 출력한다.",
+        "계수가 음수이면 male일 때 생존 로그오즈가 낮아지는 방향이라고 해석한다."
+      ],
+      "commonMistakes": [
+        "계수를 확률 그 자체로 해석한다.",
+        "컬럼 순서를 잘못 매핑한다.",
+        "Sex_female 컬럼이 생긴다고 가정한다."
+      ]
+    },
+    {
+      "id": "ml_model_choice_writeup",
+      "type": "written_rubric",
+      "exam": ["ADP"],
+      "topic": ["machine_learning", "model_selection", "interpretation"],
+      "difficulty": "intermediate",
+      "dataset": "data/titanic.csv",
+      "timeLimitMinutes": 10,
+      "prompt": "Titanic 생존 예측에서 Logistic Regression, KNN, Decision Tree, Random Forest를 비교한다고 하자. ADP 답안 형식으로 각 모델을 언제 쓰는지, 전처리 주의점, 평가 지표, 과적합/해석상 한계를 서술하시오.",
+      "expected": {
+        "kind": "rubric_keywords",
+        "keywords": ["로지스틱", "KNN", "스케일링", "과적합", "ROC-AUC", "해석"]
+      },
+      "rubric": [
+        "로지스틱 회귀는 해석 가능성과 기준 모델로 유용하다고 설명한다.",
+        "KNN은 거리 기반이므로 스케일링이 필요하다고 쓴다.",
+        "의사결정나무는 과적합 위험이 있어 max_depth 등 제한이 필요하다고 쓴다.",
+        "랜덤포레스트는 여러 나무로 성능 안정성을 높인다고 설명한다.",
+        "분류 확률 성능 평가는 ROC-AUC를 사용할 수 있다고 쓴다.",
+        "변수 중요도나 계수는 인과관계가 아니라 모델 해석 도구라고 한계를 쓴다."
+      ],
+      "commonMistakes": [
+        "모든 모델에 동일한 전처리가 필요하다고 단정한다.",
+        "정확도만 보고 불균형 가능성을 무시한다.",
+        "변수 중요도를 인과관계로 해석한다."
+      ]
+    }
+  ]
+}

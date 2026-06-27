@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pandas 전처리/EDA 실전 패턴</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --surface-color: rgba(30, 41, 59, 0.78);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #f59e0b;
+            --glass-border: rgba(255, 255, 255, 0.12);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .layout-wrapper {
+            display: grid;
+            grid-template-columns: minmax(0, 1.05fr) minmax(420px, 0.95fr);
+            height: 100vh;
+        }
+
+        .content-panel {
+            overflow-y: auto;
+            padding: 34px;
+            background-image: radial-gradient(at 0% 0%, rgba(245, 158, 11, 0.16) 0, transparent 55%);
+        }
+
+        .content-inner {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .ide-panel {
+            display: flex;
+            flex-direction: column;
+            padding: 28px;
+            border-left: 1px solid var(--glass-border);
+            background: rgba(2, 6, 23, 0.96);
+        }
+
+        .back-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            display: inline-flex;
+            margin-bottom: 18px;
+        }
+
+        h1 {
+            margin: 0 0 10px;
+            color: #fef3c7;
+            font-size: 2.35rem;
+        }
+
+        h2, h3 {
+            color: #fef3c7;
+            margin-top: 0;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            line-height: 1.7;
+            margin-bottom: 26px;
+        }
+
+        .card {
+            background: var(--surface-color);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+
+        .why {
+            border-left: 4px solid var(--accent);
+            background: rgba(245, 158, 11, 0.1);
+            padding: 14px;
+            border-radius: 0 8px 8px 0;
+            color: #fde68a;
+            line-height: 1.65;
+            margin: 14px 0;
+        }
+
+        .pattern-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+        }
+
+        .pattern {
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 14px;
+            background: rgba(0, 0, 0, 0.18);
+            line-height: 1.6;
+        }
+
+        code, pre {
+            font-family: Consolas, 'Courier New', monospace;
+        }
+
+        pre {
+            border-radius: 8px;
+            border: 1px solid var(--glass-border);
+            overflow: auto;
+        }
+
+        ul {
+            color: #dbeafe;
+            line-height: 1.75;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 8px;
+            padding: 12px 14px;
+            font-weight: 800;
+            cursor: pointer;
+            color: #451a03;
+            background: var(--accent);
+        }
+
+        #python-editor {
+            flex: 1;
+            min-height: 260px;
+            resize: none;
+            color: #d4d4d4;
+            background: #1e1e1e;
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 15px;
+            font-size: 15px;
+            line-height: 1.55;
+            outline: none;
+        }
+
+        #console-output {
+            min-height: 190px;
+            max-height: 260px;
+            overflow: auto;
+            white-space: pre-wrap;
+            background: #000;
+            color: #22c55e;
+            border: 1px solid #1e293b;
+            border-radius: 8px;
+            padding: 14px;
+            margin-top: 14px;
+        }
+
+        @media (max-width: 980px) {
+            body {
+                height: auto;
+                overflow: auto;
+            }
+
+            .layout-wrapper {
+                display: block;
+                height: auto;
+            }
+
+            .ide-panel {
+                border-left: none;
+                border-top: 1px solid var(--glass-border);
+                min-height: 70vh;
+            }
+
+            .pattern-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="layout-wrapper">
+        <main class="content-panel">
+            <div class="content-inner">
+                <a href="index.html" class="back-link">← 대시보드로 돌아가기</a>
+                <h1>Pandas 전처리/EDA 실전 패턴</h1>
+                <p class="subtitle">기초 문법을 알았다면 이제 시험 지문을 Pandas 코드로 바꾸는 훈련이 필요합니다. 이 페이지는 조건, 집계, 정렬, 교차표, 파생변수처럼 작업형 1과 ADP EDA에서 자주 반복되는 패턴을 정리합니다.</p>
+
+                <section class="card">
+                    <h2>1. 조건 필터링은 질문을 행으로 번역하는 일</h2>
+                    <div class="why">"여성이고 1등급이고 생존한 승객"처럼 지문에 조건이 여러 개 나오면 각 조건을 괄호로 감싸고 <code>&</code>로 연결합니다. 파이썬의 <code>and</code>가 아니라 Pandas의 벡터 조건 연산자를 써야 합니다.</div>
+                    <pre><code class="language-python">female_first_survived = df[
+    (df['Sex'] == 'female') &
+    (df['Pclass'] == 1) &
+    (df['Survived'] == 1)
+]
+print(len(female_first_survived))</code></pre>
+                </section>
+
+                <section class="card">
+                    <h2>2. 집계는 "무엇별로, 무엇을, 어떻게"로 읽기</h2>
+                    <div class="pattern-grid">
+                        <div class="pattern"><strong>등급별 평균</strong><br><code>df.groupby('Pclass')['Fare'].mean()</code><br>무엇별로: Pclass, 무엇을: Fare, 어떻게: mean</div>
+                        <div class="pattern"><strong>요일별 최대 집단 찾기</strong><br><code>tips.groupby('day')['total_bill'].mean().idxmax()</code><br>평균이 가장 큰 그룹 이름을 찾습니다.</div>
+                        <div class="pattern"><strong>빈도 세기</strong><br><code>df['Embarked'].value_counts()</code><br>범주형 변수의 분포와 최빈값을 확인합니다.</div>
+                        <div class="pattern"><strong>교차표</strong><br><code>pd.crosstab(df['Sex'], df['Pclass'])</code><br>두 범주형 변수가 어떻게 만나는지 표로 봅니다.</div>
+                    </div>
+                </section>
+
+                <section class="card">
+                    <h2>3. 정렬과 상위값은 기준 열을 먼저 확인</h2>
+                    <div class="why">"가장 큰", "상위", "하위"가 나오면 정렬 기준과 오름차순/내림차순을 먼저 정합니다. <code>ascending=False</code>는 큰 값부터 보는 뜻입니다.</div>
+                    <pre><code class="language-python">top_row = df.sort_values('Fare', ascending=False).iloc[0]
+print(top_row['PassengerId'])</code></pre>
+                    <ul>
+                        <li><code>sort_values()</code> 뒤에 <code>iloc[0]</code>을 쓰면 정렬 후 첫 행을 가져옵니다.</li>
+                        <li>동점 처리 지시가 있으면 <code>sort_values(['Fare', 'Age'], ascending=[False, True])</code>처럼 기준을 추가합니다.</li>
+                    </ul>
+                </section>
+
+                <section class="card">
+                    <h2>4. 파생변수는 문제 풀이를 쉽게 만드는 중간 계산</h2>
+                    <div class="why">실전에서는 원래 컬럼 그대로 답이 나오지 않는 경우가 많습니다. 가족 수, 비율, 로그 변환, 결제 단가처럼 새 컬럼을 만들어야 지문을 코드로 옮기기 쉬워집니다.</div>
+                    <pre><code class="language-python">tips['tip_rate'] = tips['tip'] / tips['total_bill'] * 100
+print(round(tips['tip_rate'].mean(), 2))</code></pre>
+                </section>
+
+                <section class="card">
+                    <h2>5. 실전 풀이 체크리스트</h2>
+                    <ul>
+                        <li>지문에서 데이터셋, 조건, 대상 컬럼, 집계 함수, 출력 형식을 표시합니다.</li>
+                        <li>조건 필터링 후에는 <code>len()</code>이나 <code>head()</code>로 중간 결과가 맞는지 확인합니다.</li>
+                        <li>정답 출력 전에는 <code>round()</code>, <code>int()</code>, <code>floor()</code> 같은 출력 형식을 다시 봅니다.</li>
+                        <li>문제은행에서는 먼저 시간 제한 없이 풀고, 두 번째부터 타이머를 켭니다.</li>
+                    </ul>
+                </section>
+            </div>
+        </main>
+
+        <aside class="ide-panel">
+            <h2>웹 파이썬 실행기</h2>
+            <p class="subtitle">오른쪽에서 패턴을 바꿔보며 직접 실행하세요.</p>
+            <textarea id="python-editor" spellcheck="false">import pandas as pd
+
+df = pd.read_csv('data/titanic.csv')
+tips = pd.read_csv('data/tips.csv')
+
+print(df.groupby('Pclass')['Fare'].mean().round(2))
+print(pd.crosstab(df['Sex'], df['Pclass']))</textarea>
+            <button class="btn" id="run-btn" onclick="runPython()">파이썬 코드 실행</button>
+            <pre id="console-output">대기 중...</pre>
+        </aside>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script>
+        async function runPython() {
+            const code = document.getElementById('python-editor').value;
+            const outputEl = document.getElementById('console-output');
+            const runBtn = document.getElementById('run-btn');
+
+            if (!code.trim()) {
+                outputEl.innerText = '코드를 입력해주세요.';
+                return;
+            }
+
+            runBtn.innerText = '실행 중...';
+            runBtn.disabled = true;
+            outputEl.style.color = '#22c55e';
+            outputEl.innerText = '서버에서 파이썬 코드를 실행 중입니다...';
+
+            try {
+                const response = await fetch('/api/run-python', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code })
+                });
+                const result = await response.json();
+                outputEl.style.color = result.success ? '#22c55e' : '#ef4444';
+                outputEl.innerText = result.output || '실행 성공 (출력 없음)';
+            } catch (error) {
+                outputEl.style.color = '#ef4444';
+                outputEl.innerText = '서버 통신 오류: ' + error.message;
+            } finally {
+                runBtn.innerText = '파이썬 코드 실행';
+                runBtn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

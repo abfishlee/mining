@@ -1,0 +1,112 @@
+{
+  "page": "week6_2_adv_stats.html",
+  "title": "Week 6-2: 고급 데이터 전처리 (VIF & PCA)",
+  "problems": [
+    {
+      "id": "w6_2_vif_total_bill",
+      "type": "code_numeric",
+      "exam": ["ADP"],
+      "topic": ["preprocessing", "vif", "multicollinearity"],
+      "difficulty": "basic",
+      "dataset": "data/tips.csv",
+      "timeLimitMinutes": 12,
+      "prompt": "tips.csv에서 tip_rate = tip / total_bill * 100 파생변수를 만든 뒤 total_bill, tip, size, tip_rate의 VIF를 계산하고 total_bill의 VIF를 소수점 4자리까지 출력하시오.",
+      "expected": {
+        "kind": "numeric_tolerance",
+        "value": 17.6491,
+        "tolerance": 0.01
+      },
+      "rubric": [
+        "tip_rate 파생변수를 올바르게 생성한다.",
+        "total_bill, tip, size, tip_rate를 설명변수로 구성한다.",
+        "variance_inflation_factor를 사용한다.",
+        "total_bill의 VIF를 출력한다.",
+        "VIF가 10 이상이면 다중공선성을 의심한다고 해석한다."
+      ],
+      "commonMistakes": [
+        "종속변수까지 VIF 계산에 무작정 포함한다.",
+        "VIF가 높다는 이유만으로 도메인 검토 없이 변수를 삭제한다.",
+        "VIF를 모델 정확도 지표처럼 해석한다."
+      ]
+    },
+    {
+      "id": "w6_2_vif_tip",
+      "type": "code_numeric",
+      "exam": ["ADP"],
+      "topic": ["preprocessing", "vif", "multicollinearity"],
+      "difficulty": "basic",
+      "dataset": "data/tips.csv",
+      "timeLimitMinutes": 12,
+      "prompt": "tips.csv에서 tip_rate를 만든 뒤 total_bill, tip, size, tip_rate의 VIF를 계산하고 tip의 VIF를 소수점 4자리까지 출력하시오.",
+      "expected": {
+        "kind": "numeric_tolerance",
+        "value": 19.4282,
+        "tolerance": 0.01
+      },
+      "rubric": [
+        "동일한 VIF 계산 대상 변수를 사용한다.",
+        "tip 변수의 VIF를 정확히 추출한다.",
+        "VIF가 높은 변수는 다른 설명변수와 정보가 중복될 수 있다고 해석한다.",
+        "변수 제거, 규제 회귀, 트리 모델 등 대응 방안을 언급한다."
+      ],
+      "commonMistakes": [
+        "tip_rate 생성식을 반대로 계산한다.",
+        "컬럼 순서에 의존해 다른 변수의 VIF를 출력한다.",
+        "VIF가 높으면 예측 모델이 반드시 나쁘다고 단정한다."
+      ]
+    },
+    {
+      "id": "w6_2_pca_iris_explained_sum",
+      "type": "code_numeric",
+      "exam": ["ADP"],
+      "topic": ["preprocessing", "pca", "dimensionality_reduction"],
+      "difficulty": "basic",
+      "dataset": "data/iris.csv",
+      "timeLimitMinutes": 12,
+      "prompt": "iris.csv에서 species를 제외한 4개 변수를 StandardScaler로 표준화한 뒤 PCA(n_components=2)를 수행하고, 두 주성분의 설명분산비율 합을 소수점 4자리까지 출력하시오.",
+      "expected": {
+        "kind": "numeric_tolerance",
+        "value": 0.9581,
+        "tolerance": 0.001
+      },
+      "rubric": [
+        "species 컬럼을 제거한다.",
+        "PCA 전에 StandardScaler를 적용한다.",
+        "PCA(n_components=2)를 수행한다.",
+        "explained_variance_ratio_의 합을 출력한다.",
+        "설명분산비율 합을 정보 보존 정도로 해석한다."
+      ],
+      "commonMistakes": [
+        "표준화 없이 PCA를 수행한다.",
+        "explained_variance_와 explained_variance_ratio_를 혼동한다.",
+        "PCA 주성분을 원래 변수처럼 직접 해석한다."
+      ]
+    },
+    {
+      "id": "w6_2_adp_pca_writeup",
+      "type": "written_rubric",
+      "exam": ["ADP"],
+      "topic": ["pca", "interpretation", "dimensionality_reduction"],
+      "difficulty": "intermediate",
+      "dataset": "data/iris.csv",
+      "timeLimitMinutes": 8,
+      "prompt": "PCA 2개 주성분의 설명분산비율 합이 0.9581이었다. ADP 답안 형식으로 PCA 사용 이유, 결과 해석, 한계를 서술하시오.",
+      "expected": {
+        "kind": "rubric_keywords",
+        "keywords": ["PCA", "표준화", "설명분산비율", "정보", "해석"]
+      },
+      "rubric": [
+        "차원 축소 또는 변수 간 상관성 완화 목적을 설명한다.",
+        "PCA 전에 표준화가 필요하다고 언급한다.",
+        "설명분산비율 합 0.9581을 원 데이터 정보가 대부분 보존된 것으로 해석한다.",
+        "주성분은 원 변수의 조합이라 직접 해석이 어렵다는 한계를 제시한다.",
+        "예측 성능과 해석 가능성의 균형을 고려해야 한다고 쓴다."
+      ],
+      "commonMistakes": [
+        "설명분산비율을 모델 정확도로 해석한다.",
+        "PCA 후 해석력이 낮아지는 한계를 누락한다.",
+        "표준화 필요성을 설명하지 않는다."
+      ]
+    }
+  ]
+}

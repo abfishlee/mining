@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 4-1: 머신러닝 기초 (단일 모델)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --surface-color: rgba(30, 41, 59, 0.7);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .layout-wrapper { display: flex; width: 100vw; height: 100vh; }
+        .content-panel { flex: 1; overflow-y: auto; padding: 40px; background-image: radial-gradient(at 0% 0%, var(--accent) 0px, transparent 80%); background-color: var(--bg-color); }
+        .content-inner { max-width: 800px; margin: 0 auto; }
+        .ide-panel { flex: 1; background: rgba(10, 15, 30, 0.95); border-left: 2px solid var(--glass-border); padding: 30px; display: flex; flex-direction: column; box-shadow: -10px 0 30px rgba(0,0,0,0.5); }
+        .ide-panel h2 { margin-top: 0; border: none; }
+        
+        #python-editor { flex: 1; min-height: 200px; background: #1e1e1e; color: #d4d4d4; font-family: 'Consolas', 'Courier New', monospace; font-size: 15px; border: 1px solid var(--glass-border); border-radius: 8px; padding: 15px; margin-bottom: 20px; resize: none; outline: none; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); }
+        #python-editor:focus { border-color: var(--accent); }
+        #console-output { background: #000; color: #0f0; padding: 15px; border-radius: 8px; height: 250px; font-family: 'Consolas', monospace; white-space: pre-wrap; overflow-y: auto; border: 1px solid #333; }
+
+        .back-link { color: var(--text-muted); text-decoration: none; display: inline-flex; align-items: center; gap: 5px; margin-bottom: 20px; transition: color 0.3s; }
+        .back-link:hover { color: var(--text-main); }
+        header { text-align: center; margin-bottom: 50px; animation: fadeIn 1s ease-out; }
+        h1 { font-size: 2.5rem; margin-bottom: 10px; color: var(--accent); }
+        .card { background: var(--surface-color); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--glass-border); border-radius: 16px; padding: 30px; margin-bottom: 30px; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); transform: translateY(20px); opacity: 0; animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        h2 { border-bottom: 2px solid var(--glass-border); padding-bottom: 10px; margin-top: 0; display: flex; align-items: center; gap: 10px; }
+        .metaphor { background: rgba(255,255,255,0.05); border-left: 4px solid var(--accent); padding: 15px; border-radius: 0 8px 8px 0; font-style: italic; color: #bae6fd; margin-bottom: 20px; }
+        .pro-tip { border-left: 4px solid #f59e0b; background: rgba(245, 158, 11, 0.08); }
+        .pro-tip h2 { border-bottom: none; color: #fbbf24; }
+        pre { border-radius: 8px !important; margin: 20px 0 !important; border: 1px solid var(--glass-border); }
+        .btn { background-color: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: all 0.3s ease; }
+        .btn:hover { background-color: var(--accent-hover); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(255,255,255,0.1); }
+        .answer-box { max-height: 0; overflow: hidden; transition: max-height 0.5s ease; opacity: 0; }
+        .answer-box.show { max-height: 1500px; opacity: 1; transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out 0.2s; }
+        .drill-section { margin-top: 40px; }
+        .drill-item { background: rgba(0, 0, 0, 0.2); padding: 20px; border-radius: 8px; margin-bottom: 15px; border: 1px solid var(--glass-border); }
+        .decision-table { width: 100%; border-collapse: collapse; margin: 18px 0; border-radius: 8px; overflow: hidden; }
+        .decision-table th, .decision-table td { border: 1px solid var(--glass-border); padding: 12px; vertical-align: top; line-height: 1.55; }
+        .decision-table th { background: rgba(59, 130, 246, 0.18); color: #bfdbfe; text-align: left; }
+        .insight-box { background: rgba(20, 184, 166, 0.1); border-left: 4px solid #14b8a6; border-radius: 0 8px 8px 0; padding: 15px; margin: 16px 0; color: #ccfbf1; }
+        .warning-box { background: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444; border-radius: 0 8px 8px 0; padding: 15px; margin: 16px 0; color: #fecaca; }
+        .tag { display: inline-flex; padding: 4px 9px; margin: 2px 4px 2px 0; border: 1px solid var(--glass-border); border-radius: 6px; background: rgba(255,255,255,0.06); color: #dbeafe; font-size: 0.86rem; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { to { transform: translateY(0); opacity: 1; } }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-color); }
+        ::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+    </style>
+</head>
+<body>
+    <div class="layout-wrapper">
+        <div class="content-panel">
+            <div class="content-inner">
+                <a href="index.html" class="back-link">← 대시보드로 돌아가기</a>
+                <header>
+                    <h1>Week 4-1: 머신러닝 기초 (단일 모델)</h1>
+                    <p>데이터의 흐름을 이해하는 가장 직관적인 기초 알고리즘</p>
+                </header>
+
+                <div class="card">
+                    <h2>🧭 0. 머신러닝 문제를 읽는 순서</h2>
+                    <p>머신러닝 문제에서 가장 먼저 할 일은 모델을 고르는 것이 아닙니다. <strong>목표변수의 형태, 데이터 누수 가능성, 평가 지표</strong>를 먼저 확인해야 합니다.</p>
+                    <table class="decision-table">
+                        <thead>
+                            <tr>
+                                <th>확인 질문</th>
+                                <th>판단 기준</th>
+                                <th>시험에서의 의미</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>예측 대상 y가 무엇인가?</td>
+                                <td>범주형이면 분류, 연속형 숫자면 회귀</td>
+                                <td>분류에 RMSE, 회귀에 Accuracy를 쓰면 방향이 틀립니다.</td>
+                            </tr>
+                            <tr>
+                                <td>평가지표가 무엇인가?</td>
+                                <td>Accuracy, F1, ROC-AUC, RMSE, MAE 등</td>
+                                <td>빅분기 작업형 2는 지표에 맞게 예측값 또는 확률을 제출해야 합니다.</td>
+                            </tr>
+                            <tr>
+                                <td>데이터가 불균형한가?</td>
+                                <td>0/1 비율이 한쪽으로 심하게 치우쳤는지 확인</td>
+                                <td>Accuracy가 높아도 실제 양성 탐지가 망가질 수 있습니다.</td>
+                            </tr>
+                            <tr>
+                                <td>스케일링이 필요한 모델인가?</td>
+                                <td>거리/계수 기반 모델은 스케일에 민감</td>
+                                <td>KNN, 로지스틱 회귀는 스케일링을 자주 고려합니다.</td>
+                            </tr>
+                            <tr>
+                                <td>전처리를 train에만 fit 했는가?</td>
+                                <td>test 정보가 전처리에 섞이면 데이터 누수</td>
+                                <td>시험에서는 성능 착시, 실무에서는 배포 후 성능 붕괴로 이어집니다.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="warning-box">
+                        <strong>데이터 누수 금지:</strong> 평균 대체값, 스케일러, 인코더는 train 데이터에서 학습하고 test에는 transform만 적용합니다. 전체 데이터를 먼저 스케일링한 뒤 train/test split을 하면 안 됩니다.
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>📏 0-1. 평가지표 선택법</h2>
+                    <p>모델의 좋고 나쁨은 문제 목적에 맞는 지표로 판단해야 합니다. 특히 ADP 답안에서는 "왜 이 지표가 적절한지"를 써야 점수가 좋아집니다.</p>
+                    <table class="decision-table">
+                        <thead>
+                            <tr>
+                                <th>문제</th>
+                                <th>추천 지표</th>
+                                <th>사용 이유</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>일반 분류</td>
+                                <td>Accuracy</td>
+                                <td>클래스 비율이 균형적일 때 직관적입니다.</td>
+                            </tr>
+                            <tr>
+                                <td>불균형 분류</td>
+                                <td>F1-score, Recall, ROC-AUC</td>
+                                <td>소수 클래스 탐지가 중요한 경우 Accuracy만 보면 위험합니다.</td>
+                            </tr>
+                            <tr>
+                                <td>확률 순위가 중요한 분류</td>
+                                <td>ROC-AUC</td>
+                                <td>양성과 음성을 구분하는 순위 능력을 봅니다. <code>predict_proba()[:, 1]</code>를 사용합니다.</td>
+                            </tr>
+                            <tr>
+                                <td>회귀</td>
+                                <td>RMSE, MAE, R2</td>
+                                <td>RMSE는 큰 오차에 민감하고, MAE는 평균 절대 오차라 해석이 쉽습니다.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="card">
+                    <h2>🎯 1. K-Nearest Neighbors (KNN)</h2>
+                    <div class="metaphor">"당신의 친구 5명이 모두 짜장면을 좋아한다면, 당신도 짜장면을 좋아할 확률이 높습니다! KNN은 '가장 가까운 이웃'들의 성향을 보고 나의 성향을 예측하는 가장 직관적인 알고리즘입니다."</div>
+                    <p>데이터 간의 <strong>거리(Distance)</strong>를 측정하여 분류나 회귀를 수행합니다. 거리를 계산하므로 반드시 <strong>스케일링(StandardScaler 등)</strong>이 선행되어야 합니다!</p>
+                    <p><span class="tag">거리 기반</span><span class="tag">스케일링 필수</span><span class="tag">작은 데이터에 직관적</span><span class="tag">큰 데이터는 느림</span></p>
+                    <p>KNN은 "비슷한 데이터는 비슷한 정답을 가진다"는 생각에 기반합니다. 고객 속성이 비슷하면 같은 상품을 살 가능성이 높고, 꽃잎 길이가 비슷하면 같은 품종일 가능성이 높다는 식입니다.</p>
+                    <div class="insight-box">
+                        <strong>언제 쓰나:</strong> 데이터가 크지 않고, 변수 간 거리 개념이 의미 있으며, 빠른 기준 모델이 필요할 때 좋습니다. <strong>주의:</strong> 변수 단위가 다르면 큰 숫자 단위의 변수가 거리를 지배합니다.
+                    </div>
+                    <pre><code class="language-python">from sklearn.neighbors import KNeighborsClassifier
+# 이웃 5명을 보고 판단하겠다 (n_neighbors=5)
+knn = KNeighborsClassifier(n_neighbors=5)
+knn.fit(X_train_scaled, y_train)</code></pre>
+                </div>
+
+                <div class="card">
+                    <h2>📈 2. 로지스틱 회귀 (Logistic Regression)</h2>
+                    <div class="metaphor">"이름은 '회귀'지만 사실은 '분류' 모델입니다. 타이타닉 호에서 살 확률(0~100%)을 계산하여, 50%가 넘으면 생존(1), 아니면 사망(0)으로 도장을 쾅 찍습니다."</div>
+                    <p>S자 형태의 시그모이드(Sigmoid) 함수를 이용하여 결과를 0과 1 사이의 확률로 변환합니다.</p>
+                    <p><span class="tag">분류</span><span class="tag">확률 출력</span><span class="tag">계수 해석 가능</span><span class="tag">선형 경계</span></p>
+                    <p>로지스틱 회귀는 결과가 0/1인 문제에서 자주 사용합니다. 예측 확률을 제공하므로 ROC-AUC 평가와 잘 맞고, 계수 방향을 통해 어떤 변수가 생존/이탈/부도 가능성을 높이는지 설명할 수 있습니다.</p>
+                    <div class="insight-box">
+                        <strong>ADP 장점:</strong> 단순히 성능만 보는 모델이 아니라 변수 영향 방향을 설명하기 좋습니다. <strong>주의:</strong> 비선형 관계나 복잡한 상호작용이 강하면 트리 계열보다 성능이 낮을 수 있습니다.
+                    </div>
+                    <pre><code class="language-python">from sklearn.linear_model import LogisticRegression
+
+logit = LogisticRegression(max_iter=1000)
+logit.fit(X_train_scaled, y_train)
+
+pred = logit.predict(X_test_scaled)
+proba = logit.predict_proba(X_test_scaled)[:, 1]</code></pre>
+                </div>
+
+                <div class="card">
+                    <h2>🌳 3. 의사결정나무 (Decision Tree)</h2>
+                    <div class="metaphor">"20고개 게임을 아시나요? '나이가 30살 이상인가요?', '성별이 남자인가요?' 이렇게 데이터를 가장 잘 나눌 수 있는 질문(조건)을 찾아 나뭇가지처럼 계속 뻗어 내려가는 알고리즘입니다."</div>
+                    <p>의사결정나무는 사람의 논리 구조와 비슷해서 설명하기(해석력)가 가장 좋습니다. 하지만 가지(Tree)를 너무 깊게 뻗으면(과적합, Overfitting) 오히려 예측력이 떨어지므로 가지치기(Pruning)가 필수입니다.</p>
+                    <p><span class="tag">규칙 기반</span><span class="tag">스케일링 거의 불필요</span><span class="tag">해석 쉬움</span><span class="tag">과적합 주의</span></p>
+                    <p>의사결정나무는 변수의 특정 기준값으로 데이터를 반복 분할합니다. "요금이 얼마 이상인가", "성별이 무엇인가" 같은 규칙으로 설명할 수 있어 보고서에 쓰기 좋습니다.</p>
+                    <div class="warning-box">
+                        나무가 너무 깊으면 훈련 데이터의 잡음까지 외워버립니다. <code>max_depth</code>, <code>min_samples_leaf</code>, <code>min_samples_split</code>로 복잡도를 제한하세요.
+                    </div>
+                    <pre><code class="language-python">from sklearn.tree import DecisionTreeClassifier
+# max_depth=3 으로 나뭇가지의 깊이를 제한하여 과적합을 방지!
+tree_model = DecisionTreeClassifier(max_depth=3, random_state=42)
+tree_model.fit(X_train, y_train)</code></pre>
+                </div>
+
+                <div class="card">
+                    <h2>🧾 4. ADP 모델링 답안 작성 공식</h2>
+                    <p>ADP에서는 모델을 돌린 뒤 성능 수치만 쓰면 부족합니다. 분석 목적, 전처리 이유, 모델 선택 이유, 지표 해석, 한계를 함께 써야 합니다.</p>
+                    <pre><code class="language-text">본 문제는 [목표변수]를 예측하는 [분류/회귀] 문제이다.
+데이터 누수를 방지하기 위해 train/test를 먼저 분리한 뒤, 결측치 처리와 스케일링은 train 기준으로 학습하여 test에 적용하였다.
+[모델명]은 [선택 이유: 해석력/비선형 대응/확률 출력/거리 기반 비교] 때문에 사용하였다.
+평가지표는 [지표명]을 사용했으며, 이는 [문제 특성: 불균형/확률 순위/큰 오차 민감도]에 적합하다.
+분석 결과 [성능 수치]가 나타났고, 이는 [업무적 의미]로 해석할 수 있다.
+다만 [과적합/데이터 불균형/변수 누락/해석력 한계]가 있으므로 추가 검증이 필요하다.</code></pre>
+                </div>
+
+                <div class="card drill-section">
+                    <h2>🚀 드릴 연습문제 (모델 선택과 평가)</h2>
+
+                    <div class="drill-item">
+                        <p><strong>[문제 1: 분류 전체 흐름]</strong> <code>titanic.csv</code>에서 <code>Pclass, Sex, Age, Fare</code>를 사용하여 생존 여부를 예측하세요. 결측치 처리, 원핫 인코딩, train/test split, 로지스틱 회귀, Accuracy와 ROC-AUC 출력까지 수행하세요.</p>
+                        <button class="btn" onclick="toggleAnswer('ans1')">👁️ 정답 보기</button>
+                        <div id="ans1" class="answer-box">
+                            <pre><code class="language-python">import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, roc_auc_score
+
+df = pd.read_csv('data/titanic.csv')
+features = ['Pclass', 'Sex', 'Age', 'Fare']
+
+X = df[features].copy()
+y = df['Survived']
+
+X['Age'] = X['Age'].fillna(X['Age'].median())
+X = pd.get_dummies(X, drop_first=True)
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+model = LogisticRegression(max_iter=1000)
+model.fit(X_train, y_train)
+
+pred = model.predict(X_test)
+proba = model.predict_proba(X_test)[:, 1]
+
+print('Accuracy:', round(accuracy_score(y_test, pred), 4))
+print('ROC-AUC:', round(roc_auc_score(y_test, proba), 4))</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="drill-item">
+                        <p><strong>[문제 2: KNN과 스케일링]</strong> iris 데이터로 KNN 분류를 수행하세요. StandardScaler를 적용한 경우와 적용하지 않은 경우를 비교하고, 왜 스케일링이 필요한지 설명하세요.</p>
+                        <button class="btn" onclick="toggleAnswer('ans2')">👁️ 정답 보기</button>
+                        <div id="ans2" class="answer-box">
+                            <pre><code class="language-python">import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.metrics import accuracy_score
+
+iris = pd.read_csv('data/iris.csv')
+X = iris.drop('species', axis=1)
+y = iris['species']
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+knn_raw = KNeighborsClassifier(n_neighbors=5)
+knn_raw.fit(X_train, y_train)
+raw_pred = knn_raw.predict(X_test)
+
+scaler = StandardScaler()
+X_train_scaled = scaler.fit_transform(X_train)
+X_test_scaled = scaler.transform(X_test)
+
+knn_scaled = KNeighborsClassifier(n_neighbors=5)
+knn_scaled.fit(X_train_scaled, y_train)
+scaled_pred = knn_scaled.predict(X_test_scaled)
+
+print('스케일링 전 Accuracy:', round(accuracy_score(y_test, raw_pred), 4))
+print('스케일링 후 Accuracy:', round(accuracy_score(y_test, scaled_pred), 4))
+print('해석: KNN은 거리 기반 모델이므로 변수 단위 차이가 크면 스케일링이 필요합니다.')</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="drill-item">
+                        <p><strong>[문제 3: 의사결정나무 과적합]</strong> Titanic 데이터로 DecisionTreeClassifier를 학습하되, <code>max_depth=None</code>과 <code>max_depth=3</code>의 train/test accuracy를 비교하세요.</p>
+                        <button class="btn" onclick="toggleAnswer('ans3')">👁️ 정답 보기</button>
+                        <div id="ans3" class="answer-box">
+                            <pre><code class="language-python">import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score
+
+df = pd.read_csv('data/titanic.csv')
+X = df[['Pclass', 'Sex', 'Age', 'Fare']].copy()
+y = df['Survived']
+
+X['Age'] = X['Age'].fillna(X['Age'].median())
+X = pd.get_dummies(X, drop_first=True)
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+for depth in [None, 3]:
+    model = DecisionTreeClassifier(max_depth=depth, random_state=42)
+    model.fit(X_train, y_train)
+    train_pred = model.predict(X_train)
+    test_pred = model.predict(X_test)
+    print('max_depth:', depth)
+    print('train acc:', round(accuracy_score(y_train, train_pred), 4))
+    print('test acc:', round(accuracy_score(y_test, test_pred), 4))
+    print()
+
+print('해석: train 성능만 높고 test 성능이 낮으면 과적합을 의심합니다.')</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="drill-item">
+                        <p><strong>[문제 4: ADP 서술형]</strong> 로지스틱 회귀로 생존 여부를 예측한 결과 ROC-AUC가 0.82라고 가정합니다. 이 모델을 선택한 이유, 지표 해석, 한계를 5문장 이내로 작성하세요.</p>
+                        <button class="btn" onclick="toggleAnswer('ans4')">👁️ 모범 답안 보기</button>
+                        <div id="ans4" class="answer-box">
+                            <pre><code class="language-text">본 문제는 승객의 생존 여부를 예측하는 이진 분류 문제이므로 로지스틱 회귀를 사용하였다.
+로지스틱 회귀는 생존 확률을 산출할 수 있고 변수 영향 방향을 설명할 수 있어 해석력이 필요한 분석에 적합하다.
+ROC-AUC가 0.82라는 것은 임의의 생존자와 비생존자를 비교했을 때 모델이 생존자를 더 높은 확률로 구분할 능력이 비교적 양호함을 의미한다.
+다만 생존/비생존 클래스 비율, 결측치 처리 방식, 포함되지 않은 사회적 변수 등에 따라 성능과 해석이 달라질 수 있다.
+따라서 추가 변수 검토와 교차검증을 통해 일반화 성능을 확인할 필요가 있다.</code></pre>
+                        </div>
+                    </div>
+                </div>
+        
+            </div>
+        </div>
+        <div class="ide-panel">
+            <h2 style="color: var(--accent);">💻 웹 파이썬 실행기</h2>
+            <p style="color: #cbd5e1; font-size: 0.95rem; margin-bottom: 20px;">
+                왼쪽 창의 문제를 보고, 여기서 자유롭게 코딩하세요!<br>
+                💡 <strong>데이터 경로:</strong> <code>pd.read_csv('data/titanic.csv')</code>, <code>pd.read_csv('data/iris.csv')</code>
+            </p>
+            <textarea id="python-editor" spellcheck="false" placeholder="# 여기에 코드를 작성하세요...">import pandas as pd
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, roc_auc_score
+
+df = pd.read_csv('data/titanic.csv')
+
+X = df[['Pclass', 'Sex', 'Age', 'Fare']].copy()
+y = df['Survived']
+
+X['Age'] = X['Age'].fillna(X['Age'].median())
+X = pd.get_dummies(X, drop_first=True)
+
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+model = LogisticRegression(max_iter=1000)
+model.fit(X_train, y_train)
+
+pred = model.predict(X_test)
+proba = model.predict_proba(X_test)[:, 1]
+
+print('Accuracy:', round(accuracy_score(y_test, pred), 4))
+print('ROC-AUC:', round(roc_auc_score(y_test, proba), 4))</textarea>
+            <button class="btn" id="run-btn" onclick="runPython()" style="width: 100%; justify-content: center; font-size: 1.1rem; padding: 15px; margin-bottom: 20px;">
+                ▶ 파이썬 코드 실행
+            </button>
+            <h3 style="color: #94a3b8; font-size: 1rem; margin: 0 0 10px 0;">출력 결과 (Console)</h3>
+            <pre id="console-output">대기 중...</pre>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script>
+        function toggleAnswer(id) {
+            const el = document.getElementById(id);
+            if (el.classList.contains('show')) el.classList.remove('show');
+            else el.classList.add('show');
+        }
+        async function runPython() {
+            const code = document.getElementById('python-editor').value;
+            const outputEl = document.getElementById('console-output');
+            const runBtn = document.getElementById('run-btn');
+            if (!code.trim()) { outputEl.innerText = '코드를 입력해주세요.'; return; }
+            runBtn.innerText = '⏳ 실행 중...'; runBtn.disabled = true;
+            outputEl.innerText = '서버에서 실행 중입니다...';
+            try {
+                const res = await fetch('/api/run-python', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code: code })
+                });
+                const result = await res.json();
+                if (result.success) { outputEl.style.color = '#0f0'; outputEl.innerText = result.output || '실행 성공'; }
+                else { outputEl.style.color = '#ff4444'; outputEl.innerText = result.output; }
+            } catch (err) { outputEl.style.color = '#ff4444'; outputEl.innerText = '오류: ' + err.message; }
+            finally { runBtn.innerText = '▶ 파이썬 코드 실행'; runBtn.disabled = false; }
+        }
+    </script>
+</body>
+</html>

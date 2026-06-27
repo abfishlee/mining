@@ -1,0 +1,1243 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>문제은행 훈련실</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --surface-color: rgba(30, 41, 59, 0.76);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #06b6d4;
+            --accent-hover: #0891b2;
+            --glass-border: rgba(255, 255, 255, 0.12);
+            --danger: #ef4444;
+            --success: #22c55e;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            min-height: 100vh;
+        }
+
+        .page {
+            max-width: 1240px;
+            margin: 0 auto;
+            padding: 34px 22px 56px;
+        }
+
+        .back-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            display: inline-flex;
+            margin-bottom: 22px;
+        }
+
+        .back-link:hover { color: var(--text-main); }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            gap: 24px;
+            align-items: flex-end;
+            margin-bottom: 24px;
+        }
+
+        h1 {
+            margin: 0 0 8px;
+            font-size: 2.35rem;
+            color: #cffafe;
+        }
+
+        .subtitle {
+            margin: 0;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        .toolbar {
+            min-width: 280px;
+        }
+
+        .mode-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-top: 12px;
+            padding: 10px;
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.06);
+            color: #dbeafe;
+            font-size: 0.9rem;
+        }
+
+        .mode-row input {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--accent);
+        }
+
+        label {
+            display: block;
+            color: #cbd5e1;
+            font-size: 0.92rem;
+            margin-bottom: 8px;
+        }
+
+        select, textarea {
+            width: 100%;
+            color: var(--text-main);
+            background: rgba(15, 23, 42, 0.96);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 12px;
+            font: inherit;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 340px minmax(0, 1fr);
+            gap: 20px;
+            align-items: start;
+        }
+
+        .panel {
+            background: var(--surface-color);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 18px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18);
+        }
+
+        .problem-panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .problem-panel-header h2 {
+            margin-bottom: 0;
+        }
+
+        .list-toggle {
+            display: none;
+            white-space: nowrap;
+        }
+
+        .jump-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 14px 0 0;
+        }
+
+        .problem-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .problem-card {
+            border: 1px solid var(--glass-border);
+            background: rgba(0, 0, 0, 0.18);
+            border-radius: 8px;
+            padding: 13px;
+            cursor: pointer;
+            text-align: left;
+            color: inherit;
+        }
+
+        .problem-card:hover,
+        .problem-card.active {
+            border-color: var(--accent);
+            background: rgba(6, 182, 212, 0.12);
+        }
+
+        .problem-card strong {
+            display: block;
+            margin-bottom: 8px;
+            color: #e0f2fe;
+        }
+
+        .meta-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+
+        .tag {
+            display: inline-flex;
+            align-items: center;
+            min-height: 25px;
+            padding: 3px 8px;
+            border-radius: 6px;
+            border: 1px solid var(--glass-border);
+            color: #cffafe;
+            background: rgba(255, 255, 255, 0.06);
+            font-size: 0.78rem;
+        }
+
+        h2, h3 {
+            margin-top: 0;
+            color: #cffafe;
+        }
+
+        .prompt {
+            line-height: 1.7;
+            color: #e2e8f0;
+            background: rgba(6, 182, 212, 0.08);
+            border-left: 4px solid var(--accent);
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .grid-two {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+            margin-top: 18px;
+        }
+
+        .study-details {
+            margin-top: 18px;
+        }
+
+        summary {
+            cursor: pointer;
+            color: #cffafe;
+            font-weight: 800;
+            min-height: 36px;
+        }
+
+        ul {
+            padding-left: 20px;
+            line-height: 1.65;
+            color: #dbeafe;
+        }
+
+        .check-item {
+            display: flex;
+            gap: 10px;
+            align-items: flex-start;
+            margin-bottom: 10px;
+            color: #dbeafe;
+            line-height: 1.55;
+        }
+
+        .check-item input {
+            margin-top: 4px;
+            accent-color: var(--accent);
+        }
+
+        .answer-area {
+            margin-top: 18px;
+        }
+
+        #answer {
+            min-height: 190px;
+            resize: vertical;
+            font-family: Consolas, 'Courier New', monospace;
+            line-height: 1.5;
+        }
+
+        .button-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .btn {
+            border: none;
+            border-radius: 8px;
+            padding: 11px 14px;
+            font-weight: 800;
+            cursor: pointer;
+            color: #042f2e;
+            background: var(--accent);
+        }
+
+        .btn:hover { background: #67e8f9; }
+
+        .btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-main);
+            border: 1px solid var(--glass-border);
+        }
+
+        .console {
+            min-height: 150px;
+            max-height: 260px;
+            overflow: auto;
+            white-space: pre-wrap;
+            background: #020617;
+            color: #22c55e;
+            border: 1px solid #1e293b;
+            border-radius: 8px;
+            padding: 13px;
+            font-family: Consolas, 'Courier New', monospace;
+            margin-top: 14px;
+        }
+
+        .empty {
+            color: var(--text-muted);
+            line-height: 1.7;
+        }
+
+        .status-line {
+            color: var(--text-muted);
+            font-size: 0.92rem;
+            margin-top: 10px;
+        }
+
+        .attempt-summary {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 10px;
+            margin: 16px 0;
+        }
+
+        .attempt-box {
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 11px;
+            background: rgba(255, 255, 255, 0.06);
+        }
+
+        .attempt-box strong {
+            display: block;
+            color: #cffafe;
+            font-size: 1.08rem;
+            margin-bottom: 4px;
+        }
+
+        .attempt-box span {
+            color: var(--text-muted);
+            font-size: 0.82rem;
+        }
+
+        .pass-text { color: var(--success); }
+        .fail-text { color: var(--danger); }
+
+        .timer-card {
+            display: grid;
+            grid-template-columns: minmax(130px, 0.7fr) minmax(0, 1.3fr);
+            gap: 14px;
+            align-items: center;
+            margin: 16px 0;
+            padding: 14px;
+            border: 1px solid rgba(6, 182, 212, 0.32);
+            border-radius: 8px;
+            background: rgba(6, 182, 212, 0.08);
+        }
+
+        .timer-display {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #cffafe;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .timer-card.expired {
+            border-color: rgba(239, 68, 68, 0.55);
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .timer-card.expired .timer-display { color: #fecaca; }
+
+        .timer-meta {
+            color: var(--text-muted);
+            line-height: 1.5;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .timer-actions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .timer-actions .btn {
+            padding: 9px 12px;
+        }
+
+        .review-lock {
+            margin-top: 16px;
+            border: 1px dashed rgba(6, 182, 212, 0.45);
+            border-radius: 8px;
+            padding: 14px;
+            color: #bae6fd;
+            background: rgba(6, 182, 212, 0.08);
+            line-height: 1.6;
+        }
+
+        @media (max-width: 980px) {
+            header { display: block; }
+            .toolbar { min-width: 0; margin-top: 18px; }
+            .layout { grid-template-columns: 1fr; }
+            .problem-panel {
+                position: sticky;
+                top: 0;
+                z-index: 5;
+            }
+            .problem-list {
+                max-height: 42vh;
+                overflow: auto;
+                padding-right: 4px;
+            }
+            .list-toggle { display: inline-flex; align-items: center; }
+            .problem-panel.collapsed .problem-list { display: none; }
+            .problem-panel.collapsed #set-summary { margin-bottom: 0; }
+            .grid-two { grid-template-columns: 1fr; }
+            .attempt-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            .timer-card { grid-template-columns: 1fr; }
+            .button-row {
+                position: sticky;
+                bottom: 0;
+                z-index: 4;
+                padding: 10px 0;
+                background: rgba(30, 41, 59, 0.96);
+                border-top: 1px solid var(--glass-border);
+            }
+            .btn,
+            .problem-card,
+            summary,
+            select {
+                min-height: 44px;
+            }
+        }
+
+        @media (max-width: 720px) {
+            .page { padding: 22px 14px 42px; }
+            h1 { font-size: 1.85rem; }
+            .panel { padding: 14px; }
+            .button-row .btn,
+            .timer-actions .btn {
+                flex: 1 1 140px;
+                min-height: 44px;
+            }
+            #answer { min-height: 240px; }
+        }
+    </style>
+</head>
+<body>
+    <main class="page">
+        <a href="index.html" class="back-link">← 대시보드로 돌아가기</a>
+        <header>
+            <div>
+                <h1>문제은행 훈련실</h1>
+                <p class="subtitle">문제 JSON을 불러와 지문, 루브릭, 흔한 실수, 내 답안을 한 화면에서 관리합니다.</p>
+            </div>
+            <div class="toolbar">
+                <label for="set-select">문제집</label>
+                <select id="set-select"></select>
+                <label class="mode-row" for="review-mode">
+                    <span>최종 리뷰 모드</span>
+                    <input type="checkbox" id="review-mode">
+                </label>
+            </div>
+        </header>
+
+        <section class="layout">
+            <aside class="panel problem-panel" id="problem-panel">
+                <div class="problem-panel-header">
+                    <h2>문제 목록</h2>
+                    <button class="btn secondary list-toggle" id="list-toggle" type="button" aria-expanded="true">접기</button>
+                </div>
+                <div id="set-summary" class="status-line">문제집을 불러오는 중...</div>
+                <div id="problem-list" class="problem-list"></div>
+            </aside>
+
+            <section class="panel">
+                <div id="detail" class="empty">왼쪽에서 문제를 선택하세요.</div>
+            </section>
+        </section>
+    </main>
+
+    <script>
+        const state = {
+            sets: [],
+            currentSetFile: '',
+            currentSet: null,
+            currentProblem: null,
+            lastRunOutput: '',
+            lastRunFiles: [],
+            timerInterval: null,
+            listCollapsed: false,
+            deepLinkProblemId: '',
+            reviewMode: localStorage.getItem('problem-bank:review-mode') === 'true'
+        };
+
+        const $ = (selector) => document.querySelector(selector);
+
+        function storageKey(problemId, suffix) {
+            return `problem-bank:${problemId}:${suffix}`;
+        }
+
+        function emptyStats() {
+            return {
+                runCount: 0,
+                gradeCount: 0,
+                lastRunAt: '',
+                lastGradeAt: '',
+                lastPassed: null,
+                lastOutput: '',
+                lastFiles: [],
+                lastGradeMessage: ''
+            };
+        }
+
+        function loadStats(problemId) {
+            try {
+                return { ...emptyStats(), ...JSON.parse(localStorage.getItem(storageKey(problemId, 'stats')) || '{}') };
+            } catch {
+                return emptyStats();
+            }
+        }
+
+        function saveStats(problemId, stats) {
+            localStorage.setItem(storageKey(problemId, 'stats'), JSON.stringify(stats));
+        }
+
+        function defaultTimer(problem) {
+            return {
+                durationSeconds: Math.max(1, Number(problem.timeLimitMinutes || 0)) * 60,
+                remainingSeconds: Math.max(1, Number(problem.timeLimitMinutes || 0)) * 60,
+                startedAt: '',
+                running: false,
+                expired: false
+            };
+        }
+
+        function loadTimer(problem) {
+            try {
+                const saved = JSON.parse(localStorage.getItem(storageKey(problem.id, 'timer')) || '{}');
+                const timer = { ...defaultTimer(problem), ...saved };
+                if (timer.running && timer.startedAt) {
+                    const elapsed = Math.floor((Date.now() - new Date(timer.startedAt).getTime()) / 1000);
+                    timer.remainingSeconds = Math.max(0, timer.remainingSeconds - elapsed);
+                    timer.startedAt = new Date().toISOString();
+                    if (timer.remainingSeconds === 0) {
+                        timer.running = false;
+                        timer.expired = true;
+                    }
+                    saveTimer(problem.id, timer);
+                }
+                return timer;
+            } catch {
+                return defaultTimer(problem);
+            }
+        }
+
+        function saveTimer(problemId, timer) {
+            localStorage.setItem(storageKey(problemId, 'timer'), JSON.stringify(timer));
+        }
+
+        function formatSeconds(seconds) {
+            const safeSeconds = Math.max(0, Number(seconds || 0));
+            const minutes = Math.floor(safeSeconds / 60);
+            const rest = safeSeconds % 60;
+            return `${String(minutes).padStart(2, '0')}:${String(rest).padStart(2, '0')}`;
+        }
+
+        function stopTimerTick() {
+            if (state.timerInterval) {
+                clearInterval(state.timerInterval);
+                state.timerInterval = null;
+            }
+        }
+
+        function isTabletLayout() {
+            return window.matchMedia('(max-width: 980px)').matches;
+        }
+
+        function setProblemListCollapsed(collapsed) {
+            state.listCollapsed = collapsed;
+            const panel = $('#problem-panel');
+            const toggle = $('#list-toggle');
+            if (!panel || !toggle) return;
+            panel.classList.toggle('collapsed', collapsed);
+            toggle.innerText = collapsed ? '펼치기' : '접기';
+            toggle.setAttribute('aria-expanded', String(!collapsed));
+        }
+
+        function focusDetailOnTablet() {
+            if (!isTabletLayout()) return;
+            setProblemListCollapsed(true);
+            $('#detail')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        function scrollToAnswer() {
+            $('#answer-area')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            $('#answer')?.focus();
+        }
+
+        function getDeepLinkTarget() {
+            const params = new URLSearchParams(window.location.search);
+            return {
+                setFile: params.get('set') || '',
+                problemId: params.get('problem') || ''
+            };
+        }
+
+        function setReviewMode(enabled) {
+            state.reviewMode = enabled;
+            localStorage.setItem('problem-bank:review-mode', String(enabled));
+            const checkbox = $('#review-mode');
+            if (checkbox) checkbox.checked = enabled;
+            if (state.currentProblem) renderProblem(state.currentProblem);
+        }
+
+        function formatDateTime(value) {
+            if (!value) return '-';
+            return new Date(value).toLocaleString('ko-KR', {
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function escapeHtml(value) {
+            return String(value)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function tags(values) {
+            return values.map((value) => `<span class="tag">${escapeHtml(value)}</span>`).join('');
+        }
+
+        function statusTag(problem) {
+            const stats = loadStats(problem.id);
+            if (stats.lastPassed === true) return '<span class="tag pass-text">통과</span>';
+            if (stats.lastPassed === false) return '<span class="tag fail-text">미통과</span>';
+            return '<span class="tag">미시도</span>';
+        }
+
+        function renderAttemptSummary(stats) {
+            const status = stats.lastPassed === true ? '통과' : stats.lastPassed === false ? '미통과' : '미시도';
+            const statusClass = stats.lastPassed === true ? 'pass-text' : stats.lastPassed === false ? 'fail-text' : '';
+
+            return `
+                <div class="attempt-box">
+                    <strong>${escapeHtml(stats.runCount)}</strong>
+                    <span>코드 실행</span>
+                </div>
+                <div class="attempt-box">
+                    <strong>${escapeHtml(stats.gradeCount)}</strong>
+                    <span>채점 시도</span>
+                </div>
+                <div class="attempt-box">
+                    <strong class="${statusClass}">${status}</strong>
+                    <span>마지막 결과</span>
+                </div>
+                <div class="attempt-box">
+                    <strong>${escapeHtml(formatDateTime(stats.lastGradeAt || stats.lastRunAt))}</strong>
+                    <span>마지막 활동</span>
+                </div>
+            `;
+        }
+
+        function renderTimer() {
+            const container = $('#timer-card');
+            if (!container || !state.currentProblem) return;
+
+            const timer = loadTimer(state.currentProblem);
+            const totalMinutes = state.currentProblem.timeLimitMinutes || Math.ceil(timer.durationSeconds / 60);
+            container.innerHTML = `
+                <div class="timer-card ${timer.expired ? 'expired' : ''}">
+                    <div>
+                        <div class="timer-display">${formatSeconds(timer.remainingSeconds)}</div>
+                        <div class="timer-meta">${timer.expired ? '시간 종료' : timer.running ? '실전 풀이 중' : '대기 중'} · 권장 ${escapeHtml(totalMinutes)}분</div>
+                    </div>
+                    <div>
+                        <div class="timer-meta">시작하면 문제별 제한 시간이 저장됩니다. 다른 문제로 이동했다 돌아와도 남은 시간이 이어집니다.</div>
+                        <div class="timer-actions">
+                            <button class="btn" id="timer-start">${timer.running ? '진행 중' : timer.expired ? '다시 시작' : '시작'}</button>
+                            <button class="btn secondary" id="timer-pause">일시정지</button>
+                            <button class="btn secondary" id="timer-reset">초기화</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            $('#timer-start').addEventListener('click', startTimer);
+            $('#timer-pause').addEventListener('click', pauseTimer);
+            $('#timer-reset').addEventListener('click', resetTimer);
+
+            if (timer.running) startTimerTick();
+        }
+
+        function startTimer() {
+            if (!state.currentProblem) return;
+            const timer = loadTimer(state.currentProblem);
+            if (timer.remainingSeconds <= 0) {
+                const reset = defaultTimer(state.currentProblem);
+                reset.running = true;
+                reset.startedAt = new Date().toISOString();
+                saveTimer(state.currentProblem.id, reset);
+            } else {
+                timer.running = true;
+                timer.expired = false;
+                timer.startedAt = new Date().toISOString();
+                saveTimer(state.currentProblem.id, timer);
+            }
+            renderTimer();
+            startTimerTick();
+        }
+
+        function pauseTimer() {
+            if (!state.currentProblem) return;
+            const timer = loadTimer(state.currentProblem);
+            timer.running = false;
+            timer.startedAt = '';
+            saveTimer(state.currentProblem.id, timer);
+            stopTimerTick();
+            renderTimer();
+        }
+
+        function resetTimer() {
+            if (!state.currentProblem) return;
+            const timer = defaultTimer(state.currentProblem);
+            saveTimer(state.currentProblem.id, timer);
+            stopTimerTick();
+            renderTimer();
+        }
+
+        function startTimerTick() {
+            stopTimerTick();
+            state.timerInterval = setInterval(() => {
+                if (!state.currentProblem) return;
+                const timer = loadTimer(state.currentProblem);
+                if (!timer.running) {
+                    stopTimerTick();
+                    renderTimer();
+                    return;
+                }
+                if (timer.remainingSeconds === 0) {
+                    timer.running = false;
+                    timer.expired = true;
+                    stopTimerTick();
+                }
+                saveTimer(state.currentProblem.id, timer);
+                renderTimer();
+            }, 1000);
+        }
+
+        function refreshAttemptSummary() {
+            const summary = $('#attempt-summary');
+            if (!summary || !state.currentProblem) return;
+            summary.innerHTML = renderAttemptSummary(loadStats(state.currentProblem.id));
+            renderProblemList();
+            document.querySelectorAll('.problem-card').forEach((button) => {
+                button.classList.toggle('active', button.dataset.id === state.currentProblem.id);
+            });
+        }
+
+        async function loadSets() {
+            const response = await fetch('/api/problem-sets');
+            const data = await response.json();
+            state.sets = data.sets || [];
+
+            const select = $('#set-select');
+            select.innerHTML = state.sets.map((set) => (
+                `<option value="${escapeHtml(set.file)}">${escapeHtml(set.title)} (${set.problemCount})</option>`
+            )).join('');
+
+            if (state.sets.length === 0) {
+                $('#set-summary').innerText = '등록된 문제집이 없습니다.';
+                return;
+            }
+
+            select.addEventListener('change', () => loadProblemSet(select.value));
+            $('#list-toggle').addEventListener('click', () => setProblemListCollapsed(!state.listCollapsed));
+            $('#review-mode').checked = state.reviewMode;
+            $('#review-mode').addEventListener('change', (event) => setReviewMode(event.target.checked));
+            window.addEventListener('resize', () => {
+                if (!isTabletLayout()) setProblemListCollapsed(false);
+            });
+            const target = getDeepLinkTarget();
+            const initialSet = state.sets.some((set) => set.file === target.setFile)
+                ? target.setFile
+                : state.sets[0].file;
+            state.deepLinkProblemId = target.problemId;
+            select.value = initialSet;
+            await loadProblemSet(initialSet);
+        }
+
+        async function loadProblemSet(file) {
+            state.currentSetFile = file;
+            const response = await fetch(`/api/problem-sets/${encodeURIComponent(file)}`);
+            state.currentSet = await response.json();
+            $('#set-summary').innerText = `${state.currentSet.title} · ${state.currentSet.problems.length}문제`;
+            renderProblemList();
+            const deepLinkedProblem = state.deepLinkProblemId
+                ? state.currentSet.problems.find((problem) => problem.id === state.deepLinkProblemId)
+                : null;
+            renderProblem(deepLinkedProblem || state.currentSet.problems[0]);
+            state.deepLinkProblemId = '';
+        }
+
+        function renderProblemList() {
+            const list = $('#problem-list');
+            list.innerHTML = state.currentSet.problems.map((problem) => `
+                <button class="problem-card" data-id="${escapeHtml(problem.id)}">
+                    <strong>${escapeHtml(problem.prompt)}</strong>
+                    <div class="meta-row">
+                        ${tags(problem.exam)}
+                        ${tags(problem.topic)}
+                        <span class="tag">${escapeHtml(problem.difficulty)}</span>
+                        <span class="tag">${escapeHtml(problem.timeLimitMinutes || '-')}분</span>
+                        ${statusTag(problem)}
+                    </div>
+                </button>
+            `).join('');
+
+            list.querySelectorAll('.problem-card').forEach((button) => {
+                button.addEventListener('click', () => {
+                    const problem = state.currentSet.problems.find((item) => item.id === button.dataset.id);
+                    renderProblem(problem);
+                    focusDetailOnTablet();
+                });
+            });
+        }
+
+        function renderProblem(problem) {
+            stopTimerTick();
+            state.currentProblem = problem;
+            document.querySelectorAll('.problem-card').forEach((button) => {
+                button.classList.toggle('active', button.dataset.id === problem.id);
+            });
+
+            const savedAnswer = localStorage.getItem(storageKey(problem.id, 'answer')) || '';
+            const savedChecks = JSON.parse(localStorage.getItem(storageKey(problem.id, 'checks')) || '{}');
+            const stats = loadStats(problem.id);
+            state.lastRunOutput = stats.lastOutput || '';
+            state.lastRunFiles = stats.lastFiles || [];
+            const expectedText = JSON.stringify(problem.expected, null, 2);
+            const lockStudyAids = state.reviewMode && stats.lastPassed == null && (stats.gradeCount || 0) === 0;
+            const studyDetailsOpen = state.reviewMode ? '' : 'open';
+            const expectedDetails = lockStudyAids
+                ? `<div class="review-lock">최종 리뷰 모드에서는 채점 전까지 정답 조건을 숨깁니다. 먼저 답안을 작성하고 코드 실행/자동 채점을 진행하세요.</div>`
+                : `<details style="margin-top: 16px;"><summary>정답 조건 보기</summary><pre class="console" style="color:#e2e8f0;">${escapeHtml(expectedText)}</pre></details>`;
+
+            $('#detail').innerHTML = `
+                <h2>${escapeHtml(problem.id)}</h2>
+                <div class="meta-row">
+                    ${tags(problem.exam)}
+                    ${tags(problem.topic)}
+                    <span class="tag">${escapeHtml(problem.type)}</span>
+                    <span class="tag">${escapeHtml(problem.dataset)}</span>
+                    <span class="tag">${escapeHtml(problem.timeLimitMinutes || '-')}분</span>
+                </div>
+
+                <h3 style="margin-top: 18px;">문제</h3>
+                <div class="prompt">${escapeHtml(problem.prompt)}</div>
+                <div class="jump-row">
+                    <button class="btn secondary" id="jump-answer" type="button">코드 작성으로 이동</button>
+                </div>
+
+                <div id="timer-card"></div>
+
+                <div class="attempt-summary" id="attempt-summary">
+                    ${renderAttemptSummary(stats)}
+                </div>
+
+                ${state.reviewMode ? '<div class="review-lock">최종 리뷰 모드: 루브릭과 흔한 실수는 접힌 상태로 시작합니다. 시험처럼 먼저 풀고 필요할 때만 열어보세요.</div>' : ''}
+                <details class="study-details" ${studyDetailsOpen}>
+                    <summary>채점 루브릭과 흔한 실수</summary>
+                    <div class="grid-two">
+                        <div>
+                            <h3>채점 루브릭</h3>
+                            <div id="rubric-list">
+                                ${problem.rubric.map((item, index) => `
+                                    <label class="check-item">
+                                        <input type="checkbox" data-check="${index}" ${savedChecks[index] ? 'checked' : ''}>
+                                        <span>${escapeHtml(item)}</span>
+                                    </label>
+                                `).join('')}
+                            </div>
+                        </div>
+                        <div>
+                            <h3>흔한 실수</h3>
+                            <ul>${problem.commonMistakes.map((item) => `<li>${escapeHtml(item)}</li>`).join('')}</ul>
+                        </div>
+                    </div>
+                </details>
+
+                ${expectedDetails}
+
+                <div class="answer-area" id="answer-area">
+                    <label for="answer">내 답안 / 코드</label>
+                    <textarea id="answer" spellcheck="false">${escapeHtml(savedAnswer)}</textarea>
+                    <div class="button-row">
+                        <button class="btn" id="save-answer">답안 저장</button>
+                        <button class="btn" id="run-answer">코드 실행</button>
+                        <button class="btn" id="grade-answer">자동 채점</button>
+                        <button class="btn secondary" id="clear-answer">현재 답안 지우기</button>
+                    </div>
+                    <div id="save-status" class="status-line"></div>
+                    <pre id="run-output" class="console">${escapeHtml(stats.lastOutput || '실행 대기 중...')}</pre>
+                    <pre id="grade-output" class="console" style="color:${stats.lastPassed === true ? '#22c55e' : stats.lastPassed === false ? '#ef4444' : '#e2e8f0'};">${escapeHtml(stats.lastGradeMessage || '채점 대기 중...')}</pre>
+                </div>
+            `;
+
+            $('#answer').addEventListener('input', saveAnswer);
+            $('#save-answer').addEventListener('click', saveAnswer);
+            $('#clear-answer').addEventListener('click', clearAnswer);
+            $('#run-answer').addEventListener('click', runAnswer);
+            $('#grade-answer').addEventListener('click', gradeAnswer);
+            $('#jump-answer').addEventListener('click', scrollToAnswer);
+            document.querySelectorAll('[data-check]').forEach((input) => {
+                input.addEventListener('change', saveChecks);
+            });
+            renderTimer();
+        }
+
+        function saveAnswer() {
+            localStorage.setItem(storageKey(state.currentProblem.id, 'answer'), $('#answer').value);
+            $('#save-status').innerText = '저장됨';
+        }
+
+        function saveChecks() {
+            const checks = {};
+            document.querySelectorAll('[data-check]').forEach((input) => {
+                checks[input.dataset.check] = input.checked;
+            });
+            localStorage.setItem(storageKey(state.currentProblem.id, 'checks'), JSON.stringify(checks));
+            $('#save-status').innerText = '체크리스트 저장됨';
+        }
+
+        function clearAnswer() {
+            $('#answer').value = '';
+            saveAnswer();
+            state.lastRunOutput = '';
+            state.lastRunFiles = [];
+            $('#run-output').innerText = '실행 대기 중...';
+            $('#grade-output').style.color = '#e2e8f0';
+            $('#grade-output').innerText = '채점 대기 중...';
+        }
+
+        function expectedCollectFiles(expected) {
+            if (!expected || expected.kind !== 'csv_submission' || !expected.file) return [];
+            return [expected.file];
+        }
+
+        function formatCollectedFiles(files) {
+            if (!files || files.length === 0) return '';
+
+            return files.map((file) => {
+                if (!file.exists) return `\n\n[파일 검사] ${file.name}: 생성되지 않음`;
+                if (file.error) return `\n\n[파일 검사] ${file.name}: ${file.error}`;
+                const csv = file.csv || {};
+                const columns = (csv.columns || []).join(', ');
+                return [
+                    `\n\n[파일 검사] ${file.name}`,
+                    `행 수: ${csv.rowCount ?? '-'}`,
+                    `컬럼: ${columns || '-'}`
+                ].join('\n');
+            }).join('');
+        }
+
+        async function runAnswer() {
+            const code = $('#answer').value.trim();
+            const output = $('#run-output');
+
+            if (!code) {
+                output.style.color = '#ef4444';
+                output.innerText = '실행할 코드가 없습니다.';
+                return;
+            }
+
+            output.style.color = '#22c55e';
+            output.innerText = '서버에서 실행 중입니다...';
+
+            try {
+                const response = await fetch('/api/run-python', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        code,
+                        collectFiles: expectedCollectFiles(state.currentProblem.expected)
+                    })
+                });
+                const result = await response.json();
+                const fileSummary = formatCollectedFiles(result.files || []);
+                output.style.color = result.success ? '#22c55e' : '#ef4444';
+                output.innerText = (result.output || '실행 성공 (출력 없음)') + fileSummary;
+                state.lastRunOutput = result.output || '';
+                state.lastRunFiles = result.files || [];
+
+                const stats = loadStats(state.currentProblem.id);
+                stats.runCount += 1;
+                stats.lastRunAt = new Date().toISOString();
+                stats.lastOutput = output.innerText;
+                stats.lastFiles = state.lastRunFiles;
+                saveStats(state.currentProblem.id, stats);
+                refreshAttemptSummary();
+            } catch (error) {
+                output.style.color = '#ef4444';
+                output.innerText = '서버 통신 오류: ' + error.message;
+                state.lastRunOutput = '';
+                state.lastRunFiles = [];
+            }
+        }
+
+        function extractNumbers(text) {
+            return (text.match(/[-+]?(?:\d*\.\d+|\d+)(?:[eE][-+]?\d+)?/g) || []).map(Number);
+        }
+
+        function isClose(actual, expected, tolerance) {
+            return Math.abs(actual - expected) <= tolerance;
+        }
+
+        function findLabeledNumber(output, label) {
+            const escaped = label.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+            const pattern = new RegExp(`${escaped}[^-+0-9]*([-+]?(?:\\d*\\.\\d+|\\d+)(?:[eE][-+]?\\d+)?)`, 'i');
+            const match = output.match(pattern);
+            return match ? Number(match[1]) : null;
+        }
+
+        function gradeNumeric(output, expected) {
+            const numbers = extractNumbers(output);
+            const match = numbers.find((value) => isClose(value, expected.value, expected.tolerance));
+
+            return {
+                passed: match != null,
+                lines: [
+                    `기대값: ${expected.value} ± ${expected.tolerance}`,
+                    `출력 숫자: ${numbers.length ? numbers.join(', ') : '없음'}`,
+                    match != null ? `통과: ${match} 값이 허용 오차 안에 있습니다.` : '미통과: 허용 오차 안의 숫자를 찾지 못했습니다.'
+                ]
+            };
+        }
+
+        function gradeMultipleNumeric(output, expected) {
+            const numbers = extractNumbers(output);
+            const lines = [`허용 오차: ±${expected.tolerance}`];
+            let passed = true;
+
+            Object.entries(expected.values).forEach(([label, expectedValue]) => {
+                const labeled = findLabeledNumber(output, label);
+                const fallback = numbers.find((value) => isClose(value, expectedValue, expected.tolerance));
+                const actual = labeled ?? fallback;
+                const ok = actual != null && isClose(actual, expectedValue, expected.tolerance);
+                passed = passed && ok;
+                lines.push(`${label}: 기대 ${expectedValue}, ${actual == null ? '출력값 없음' : `출력 ${actual}`} -> ${ok ? '통과' : '미통과'}`);
+            });
+
+            return { passed, lines };
+        }
+
+        function gradeKeywordAnswer(answer, expected) {
+            const missing = expected.keywords.filter((keyword) => !answer.includes(keyword));
+            return {
+                passed: missing.length === 0,
+                lines: [
+                    `필수 키워드: ${expected.keywords.join(', ')}`,
+                    missing.length === 0 ? '통과: 필수 키워드가 모두 포함되어 있습니다.' : `미통과: 누락 키워드 - ${missing.join(', ')}`
+                ]
+            };
+        }
+
+        function gradeCsvSubmission(files, expected) {
+            const file = (files || []).find((item) => item.name === expected.file);
+            const lines = [`제출 파일: ${expected.file}`];
+            let passed = true;
+
+            if (!file || !file.exists) {
+                return {
+                    passed: false,
+                    lines: [...lines, '미통과: 제출 CSV 파일이 생성되지 않았습니다.']
+                };
+            }
+
+            if (file.error) {
+                return {
+                    passed: false,
+                    lines: [...lines, `미통과: ${file.error}`]
+                };
+            }
+
+            const csv = file.csv || {};
+            const columns = csv.columns || [];
+            const rowCount = csv.rowCount ?? 0;
+            const nullCounts = csv.nullCounts || {};
+            const numericStats = csv.numericStats || {};
+
+            if (expected.rowCount != null) {
+                const ok = rowCount === expected.rowCount;
+                passed = passed && ok;
+                lines.push(`행 수: 기대 ${expected.rowCount}, 제출 ${rowCount} -> ${ok ? '통과' : '미통과'}`);
+            }
+
+            if (expected.columns) {
+                const missing = expected.columns.filter((column) => !columns.includes(column));
+                const extra = columns.filter((column) => !expected.columns.includes(column));
+                const sameOrder = expected.columns.every((column, index) => columns[index] === column);
+                const ok = missing.length === 0 && (!expected.requireExactColumns || (extra.length === 0 && sameOrder));
+                passed = passed && ok;
+                lines.push(`컬럼: ${columns.join(', ') || '없음'} -> ${ok ? '통과' : '미통과'}`);
+                if (missing.length) lines.push(`누락 컬럼: ${missing.join(', ')}`);
+                if (expected.requireExactColumns && extra.length) lines.push(`불필요한 컬럼: ${extra.join(', ')}`);
+                if (expected.requireExactColumns && !sameOrder) lines.push('컬럼 순서가 기대 순서와 다릅니다.');
+            }
+
+            (expected.nonNullColumns || []).forEach((column) => {
+                const nullCount = nullCounts[column];
+                const ok = nullCount === 0;
+                passed = passed && ok;
+                lines.push(`${column} 결측치: ${nullCount == null ? '컬럼 없음' : nullCount} -> ${ok ? '통과' : '미통과'}`);
+            });
+
+            Object.entries(expected.numericColumns || {}).forEach(([column, rule]) => {
+                const stats = numericStats[column];
+                if (!stats) {
+                    passed = false;
+                    lines.push(`${column}: 숫자형 값이 확인되지 않음 -> 미통과`);
+                    return;
+                }
+
+                let ok = true;
+                if (rule.min != null) ok = ok && stats.min >= rule.min;
+                if (rule.max != null) ok = ok && stats.max <= rule.max;
+                if (rule.countEqualsRowCount) ok = ok && stats.count === rowCount;
+                if (rule.unique) ok = ok && stats.uniqueCount === rowCount;
+                if (rule.minDistinct != null) ok = ok && stats.uniqueCount >= rule.minDistinct;
+                if (rule.first != null) ok = ok && stats.first === rule.first;
+                if (rule.last != null) ok = ok && stats.last === rule.last;
+                if (rule.strictlyIncreasing) ok = ok && stats.strictlyIncreasing === true;
+                passed = passed && ok;
+                lines.push(`${column}: min ${stats.min.toFixed(4)}, max ${stats.max.toFixed(4)}, unique ${stats.uniqueCount}, numeric ${stats.count}/${rowCount} -> ${ok ? '통과' : '미통과'}`);
+                if (rule.first != null || rule.last != null) lines.push(`${column} 순서 확인: first ${stats.first}, last ${stats.last}`);
+                if (rule.strictlyIncreasing) lines.push(`${column} 엄격 증가: ${stats.strictlyIncreasing ? '통과' : '미통과'}`);
+            });
+
+            return { passed, lines };
+        }
+
+        function buildRetryGuide(problem, result) {
+            if (result.passed) {
+                return [
+                    '',
+                    '다음 단계',
+                    '- 같은 문제를 타이머를 켜고 다시 풀어보세요.',
+                    '- 코드 없이 풀이 순서를 말로 설명할 수 있으면 다음 문제로 넘어가도 좋습니다.'
+                ];
+            }
+
+            const guide = ['', '오답 점검'];
+            const failedLines = result.lines.filter((line) => line.includes('미통과') || line.includes('없음') || line.includes('누락'));
+
+            if (failedLines.length > 0) {
+                guide.push('- 채점 실패 지점: ' + failedLines.slice(0, 3).join(' / '));
+            }
+
+            if (problem.expected.kind === 'numeric_tolerance' || problem.expected.kind === 'multiple_numeric_tolerance') {
+                guide.push('- 숫자형 문제는 마지막에 정답 숫자가 print로 출력되어야 합니다.');
+                guide.push('- 반올림 자리, 필터 조건, 경계값 포함 여부를 먼저 확인하세요.');
+            }
+
+            if (problem.expected.kind === 'csv_submission') {
+                guide.push('- CSV 제출 문제는 파일명, 컬럼명, 행 수, 확률 범위가 모두 맞아야 합니다.');
+                guide.push('- ROC-AUC 제출형은 predict가 아니라 predict_proba의 양성 클래스 확률을 사용했는지 확인하세요.');
+            }
+
+            if (problem.expected.kind === 'rubric_keywords') {
+                guide.push('- 서술형 문제는 정답 방향뿐 아니라 필수 표현이 답안에 들어가야 합니다.');
+                guide.push('- 검정 선택 이유, 판단 기준, 한계 문장을 빠뜨리지 않았는지 확인하세요.');
+            }
+
+            if (problem.commonMistakes && problem.commonMistakes.length > 0) {
+                guide.push('');
+                guide.push('흔한 실수 다시 보기');
+                problem.commonMistakes.slice(0, 4).forEach((mistake) => guide.push(`- ${mistake}`));
+            }
+
+            if (problem.rubric && problem.rubric.length > 0) {
+                guide.push('');
+                guide.push('다시 풀 때 체크할 루브릭');
+                problem.rubric.slice(0, 4).forEach((item) => guide.push(`- ${item}`));
+            }
+
+            return guide;
+        }
+
+        function gradeAnswer() {
+            const output = $('#grade-output');
+            const problem = state.currentProblem;
+            const expected = problem.expected;
+            const answer = $('#answer').value;
+            let result;
+
+            if (expected.kind === 'numeric_tolerance') {
+                if (!state.lastRunOutput.trim()) {
+                    output.style.color = '#ef4444';
+                    output.innerText = '먼저 코드를 실행한 뒤 자동 채점을 누르세요.';
+                    return;
+                }
+                result = gradeNumeric(state.lastRunOutput, expected);
+            } else if (expected.kind === 'multiple_numeric_tolerance') {
+                if (!state.lastRunOutput.trim()) {
+                    output.style.color = '#ef4444';
+                    output.innerText = '먼저 코드를 실행한 뒤 자동 채점을 누르세요.';
+                    return;
+                }
+                result = gradeMultipleNumeric(state.lastRunOutput, expected);
+            } else if (expected.kind === 'rubric_keywords') {
+                result = gradeKeywordAnswer(answer, expected);
+            } else if (expected.kind === 'csv_submission') {
+                if (!state.lastRunFiles || state.lastRunFiles.length === 0) {
+                    output.style.color = '#ef4444';
+                    output.innerText = '먼저 코드를 실행해 제출 CSV 파일을 생성한 뒤 자동 채점을 누르세요.';
+                    return;
+                }
+                result = gradeCsvSubmission(state.lastRunFiles, expected);
+            } else {
+                output.style.color = '#ef4444';
+                output.innerText = `아직 지원하지 않는 채점 방식입니다: ${expected.kind}`;
+                return;
+            }
+
+            output.style.color = result.passed ? '#22c55e' : '#ef4444';
+            const retryGuide = buildRetryGuide(problem, result);
+            const gradeMessage = `${result.passed ? '자동 채점 통과' : '자동 채점 미통과'}\n\n${result.lines.join('\n')}\n${retryGuide.join('\n')}`;
+            output.innerText = gradeMessage;
+            localStorage.setItem(storageKey(problem.id, 'grade'), JSON.stringify({
+                passed: result.passed,
+                checkedAt: new Date().toISOString(),
+                lines: result.lines,
+                retryGuide
+            }));
+
+            const stats = loadStats(problem.id);
+            stats.gradeCount += 1;
+            stats.lastGradeAt = new Date().toISOString();
+            stats.lastPassed = result.passed;
+            stats.lastGradeMessage = gradeMessage;
+            saveStats(problem.id, stats);
+            refreshAttemptSummary();
+        }
+
+        loadSets().catch((error) => {
+            $('#set-summary').innerText = '문제은행을 불러오지 못했습니다.';
+            $('#detail').innerHTML = `<div class="empty">${escapeHtml(error.message)}</div>`;
+        });
+    </script>
+</body>
+</html>

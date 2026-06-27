@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Week 6-1: 비지도학습 & 연관 분석</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --surface-color: rgba(30, 41, 59, 0.7);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #10b981;
+            --accent-hover: #059669;
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden;
+        }
+        
+        .layout-wrapper { display: flex; width: 100vw; height: 100vh; }
+        .content-panel { flex: 1; overflow-y: auto; padding: 40px; background-image: radial-gradient(at 0% 0%, var(--accent) 0px, transparent 80%); background-color: var(--bg-color); }
+        .content-inner { max-width: 800px; margin: 0 auto; }
+        .ide-panel { flex: 1; background: rgba(10, 15, 30, 0.95); border-left: 2px solid var(--glass-border); padding: 30px; display: flex; flex-direction: column; box-shadow: -10px 0 30px rgba(0,0,0,0.5); }
+        .ide-panel h2 { margin-top: 0; border: none; }
+        
+        #python-editor { flex: 1; min-height: 200px; background: #1e1e1e; color: #d4d4d4; font-family: 'Consolas', 'Courier New', monospace; font-size: 15px; border: 1px solid var(--glass-border); border-radius: 8px; padding: 15px; margin-bottom: 20px; resize: none; outline: none; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); }
+        #python-editor:focus { border-color: var(--accent); }
+        #console-output { background: #000; color: #0f0; padding: 15px; border-radius: 8px; height: 250px; font-family: 'Consolas', monospace; white-space: pre-wrap; overflow-y: auto; border: 1px solid #333; }
+
+        .back-link { color: var(--text-muted); text-decoration: none; display: inline-flex; align-items: center; gap: 5px; margin-bottom: 20px; transition: color 0.3s; }
+        .back-link:hover { color: var(--text-main); }
+        header { text-align: center; margin-bottom: 50px; animation: fadeIn 1s ease-out; }
+        h1 { font-size: 2.5rem; margin-bottom: 10px; color: var(--accent); }
+        .card { background: var(--surface-color); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border: 1px solid var(--glass-border); border-radius: 16px; padding: 30px; margin-bottom: 30px; box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1); transform: translateY(20px); opacity: 0; animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        h2 { border-bottom: 2px solid var(--glass-border); padding-bottom: 10px; margin-top: 0; display: flex; align-items: center; gap: 10px; }
+        .metaphor { background: rgba(255,255,255,0.05); border-left: 4px solid var(--accent); padding: 15px; border-radius: 0 8px 8px 0; font-style: italic; color: #bae6fd; margin-bottom: 20px; }
+        .pro-tip { border-left: 4px solid #f59e0b; background: rgba(245, 158, 11, 0.08); }
+        .pro-tip h2 { border-bottom: none; color: #fbbf24; }
+        pre { border-radius: 8px !important; margin: 20px 0 !important; border: 1px solid var(--glass-border); }
+        .btn { background-color: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9rem; transition: all 0.3s ease; }
+        .btn:hover { background-color: var(--accent-hover); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(255,255,255,0.1); }
+        .answer-box { max-height: 0; overflow: hidden; transition: max-height 0.5s ease; opacity: 0; }
+        .answer-box.show { max-height: 2200px; opacity: 1; transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out 0.2s; }
+        .drill-section { margin-top: 40px; }
+        .drill-item { background: rgba(0, 0, 0, 0.2); padding: 20px; border-radius: 8px; margin-bottom: 15px; border: 1px solid var(--glass-border); }
+        .decision-table { width: 100%; border-collapse: collapse; margin: 18px 0; border-radius: 8px; overflow: hidden; }
+        .decision-table th, .decision-table td { border: 1px solid var(--glass-border); padding: 12px; vertical-align: top; line-height: 1.55; }
+        .decision-table th { background: rgba(16, 185, 129, 0.18); color: #bbf7d0; text-align: left; }
+        .insight-box { background: rgba(59, 130, 246, 0.09); border-left: 4px solid #60a5fa; border-radius: 0 8px 8px 0; padding: 15px; margin: 16px 0; color: #dbeafe; }
+        .warning-box { background: rgba(239, 68, 68, 0.1); border-left: 4px solid #ef4444; border-radius: 0 8px 8px 0; padding: 15px; margin: 16px 0; color: #fecaca; }
+        .tag { display: inline-flex; padding: 4px 9px; margin: 2px 4px 2px 0; border: 1px solid var(--glass-border); border-radius: 6px; background: rgba(255,255,255,0.06); color: #dcfce7; font-size: 0.86rem; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { to { transform: translateY(0); opacity: 1; } }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-color); }
+        ::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+    </style>
+</head>
+<body>
+    <div class="layout-wrapper">
+        <div class="content-panel">
+            <div class="content-inner">
+                <a href="index.html" class="back-link">← 대시보드로 돌아가기</a>
+                <header>
+                    <h1>Week 6-1: 비지도학습 & 연관 분석</h1>
+                    <p>정답 없는 데이터에서 숨겨진 보물(패턴) 찾기</p>
+                </header>
+
+                <div class="card">
+                    <h2>🧭 0. 비지도학습은 언제 쓰는가?</h2>
+                    <p>비지도학습은 정답 라벨이 없을 때 데이터 내부의 구조를 찾는 방법입니다. 예측 정확도를 바로 계산하기 어렵기 때문에, <strong>분석 목적과 해석 가능성</strong>이 특히 중요합니다.</p>
+                    <table class="decision-table">
+                        <thead>
+                            <tr>
+                                <th>목표</th>
+                                <th>대표 기법</th>
+                                <th>활용 예시</th>
+                                <th>주의점</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>비슷한 대상을 묶고 싶다</td>
+                                <td>K-Means, 계층적 군집화</td>
+                                <td>고객 세분화, 제품 유형 분류, 지역 패턴 구분</td>
+                                <td>정답이 없으므로 군집 해석과 검증이 중요</td>
+                            </tr>
+                            <tr>
+                                <td>군집 수를 탐색하고 싶다</td>
+                                <td>엘보우, 실루엣 점수, 덴드로그램</td>
+                                <td>몇 개의 고객군으로 나눌지 판단</td>
+                                <td>점수만 보지 말고 업무적으로 설명 가능한 K인지 확인</td>
+                            </tr>
+                            <tr>
+                                <td>함께 발생하는 규칙을 찾고 싶다</td>
+                                <td>연관규칙 분석</td>
+                                <td>장바구니 분석, 교차판매, 추천 규칙</td>
+                                <td>지지도만 높으면 흔한 상품 조합일 수 있음</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="warning-box">
+                        비지도학습은 “정답률”이 없기 때문에 결과를 과신하기 쉽습니다. ADP에서는 군집별 특징, 군집 수 선택 근거, 실무 활용 가능성, 한계를 함께 써야 합니다.
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>🧩 1. K-Means와 실루엣 스코어 (Silhouette Score)</h2>
+                    <div class="metaphor">"K-Means로 나눈 조별 과제 그룹이 얼마나 똘똘 뭉쳐있는지(응집도), 다른 조원들과는 얼마나 멀리 떨어져 있는지(분리도)를 -1에서 1 사이의 점수로 평가합니다. 1에 가까울수록 완벽한 군집!"</div>
+                    <p><span class="tag">거리 기반</span><span class="tag">스케일링 필수</span><span class="tag">K 사전 지정</span><span class="tag">군집 해석 필요</span></p>
+                    <p>K-Means는 각 데이터를 가장 가까운 중심점에 배정하고, 다시 중심점을 갱신하는 과정을 반복합니다. 거리 기반 알고리즘이므로 변수 단위가 다르면 큰 단위의 변수가 군집을 지배합니다.</p>
+                    <div class="insight-box">
+                        <strong>K 선택법:</strong> 엘보우는 군집 내 오차가 급격히 줄어드는 지점을 보고, 실루엣 점수는 군집 내부 응집도와 군집 간 분리도를 함께 봅니다. 단, 점수가 가장 높은 K가 항상 실무적으로 좋은 K는 아닙니다.
+                    </div>
+                    <pre><code class="language-python">from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
+
+kmeans = KMeans(n_clusters=3, random_state=42, n_init=10)
+cluster = kmeans.fit_predict(X_scaled)
+
+score = silhouette_score(X_scaled, cluster)
+print("실루엣 점수:", score)</code></pre>
+                </div>
+
+                <div class="card">
+                    <h2>🌳 2. 계층적 군집화 (Hierarchical Clustering)</h2>
+                    <div class="metaphor">"가장 가까운 두 명을 먼저 짝지어주고, 그 다음 가까운 사람을 붙여주면서 거대한 토너먼트 대진표(Dendrogram)를 그리는 방식입니다. K(군집 개수)를 미리 정하지 않아도 되는 장점이 있습니다."</div>
+                    <p><span class="tag">덴드로그램</span><span class="tag">군집 수 탐색</span><span class="tag">작은 데이터 해석 좋음</span></p>
+                    <p>계층적 군집화는 가까운 데이터끼리 단계적으로 묶어 나갑니다. 덴드로그램을 보면 어떤 지점에서 군집을 자르는 것이 자연스러운지 시각적으로 판단할 수 있습니다.</p>
+                    <table class="decision-table">
+                        <thead>
+                            <tr>
+                                <th>연결 기준</th>
+                                <th>의미</th>
+                                <th>특징</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>single</td>
+                                <td>가장 가까운 점끼리 거리</td>
+                                <td>길게 이어지는 체인 형태가 생길 수 있음</td>
+                            </tr>
+                            <tr>
+                                <td>complete</td>
+                                <td>가장 먼 점끼리 거리</td>
+                                <td>군집을 더 조밀하게 만드는 경향</td>
+                            </tr>
+                            <tr>
+                                <td>ward</td>
+                                <td>군집 내 분산 증가를 최소화</td>
+                                <td>연속형 수치 데이터 군집화에서 자주 사용</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="warning-box">
+                        계층적 군집화는 데이터가 커지면 계산량과 시각화 해석이 어려워집니다. 대규모 데이터에서는 K-Means로 빠르게 군집화하고, 샘플 데이터로 계층 구조를 보조 확인하는 식이 현실적입니다.
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>🛒 3. 연관 분석 (Association Rule Mining, Apriori)</h2>
+                    <div class="metaphor">"기저귀를 산 아빠들이 맥주도 같이 산다는 전설의 마케팅 분석법입니다! 'A를 사면 B도 산다'는 규칙을 찾아냅니다."</div>
+                    <p>지지도(Support), 신뢰도(Confidence), 향상도(Lift)라는 3가지 지표를 이용해 규칙의 강도를 판단합니다. 특히 <strong>향상도(Lift)가 1보다 커야</strong> 진짜 의미 있는 연관성입니다.</p>
+                    <table class="decision-table">
+                        <thead>
+                            <tr>
+                                <th>지표</th>
+                                <th>의미</th>
+                                <th>주의사항</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Support</td>
+                                <td>A와 B가 함께 등장하는 전체 비율</td>
+                                <td>너무 낮으면 규칙이 희귀해서 활용하기 어려움</td>
+                            </tr>
+                            <tr>
+                                <td>Confidence</td>
+                                <td>A가 있을 때 B도 있을 조건부 확률</td>
+                                <td>B 자체가 흔하면 과대평가될 수 있음</td>
+                            </tr>
+                            <tr>
+                                <td>Lift</td>
+                                <td>A가 B 발생을 얼마나 끌어올리는지</td>
+                                <td>1보다 크면 양의 연관, 1이면 독립에 가까움</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="insight-box">
+                        <strong>실무 활용:</strong> 교차판매, 패키지 구성, 추천 규칙, 진열 최적화에 사용합니다. 단, 연관규칙은 인과관계가 아니라 동시 발생 패턴입니다.
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>🧾 4. ADP 비지도학습 답안 작성 공식</h2>
+                    <pre><code class="language-text">본 문제는 정답 라벨 없이 데이터 내부의 유사한 구조를 파악하는 것이 목적이므로 비지도학습을 사용하였다.
+거리 기반 군집화의 특성상 변수 단위 차이를 제거하기 위해 표준화를 수행하였다.
+군집 수는 [엘보우/실루엣/덴드로그램] 결과와 해석 가능성을 함께 고려하여 선택하였다.
+군집별 주요 변수 평균을 비교한 결과 [군집 특성]으로 해석할 수 있다.
+다만 군집 결과는 정답이 아니며, 초기값과 변수 선택에 따라 달라질 수 있으므로 업무적 검증이 필요하다.</code></pre>
+                </div>
+
+                <div class="card drill-section">
+                    <h2>🚀 드릴 연습문제 (비지도학습 실전)</h2>
+
+                    <div class="drill-item">
+                        <p><strong>[문제 1: K-Means 기본]</strong> <code>iris.csv</code>에서 species를 제외하고 표준화 후 K-Means로 3개 군집을 만드세요. 실루엣 점수를 출력하고 군집별 평균을 비교하세요.</p>
+                        <button class="btn" onclick="toggleAnswer('ans1')">👁️ 정답 보기</button>
+                        <div id="ans1" class="answer-box">
+                            <pre><code class="language-python">import pandas as pd
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
+
+iris = pd.read_csv('data/iris.csv')
+X = iris.drop('species', axis=1)
+
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+kmeans = KMeans(n_clusters=3, random_state=42, n_init=10)
+iris['cluster'] = kmeans.fit_predict(X_scaled)
+
+score = silhouette_score(X_scaled, iris['cluster'])
+print('silhouette:', round(score, 4))
+print(iris.groupby('cluster')[X.columns].mean())</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="drill-item">
+                        <p><strong>[문제 2: K 선택]</strong> K를 2부터 6까지 바꾸며 실루엣 점수를 비교하세요. 가장 높은 점수의 K와, 해석 가능한 K가 반드시 같은지 생각해보세요.</p>
+                        <button class="btn" onclick="toggleAnswer('ans2')">👁️ 정답 보기</button>
+                        <div id="ans2" class="answer-box">
+                            <pre><code class="language-python">for k in range(2, 7):
+    model = KMeans(n_clusters=k, random_state=42, n_init=10)
+    labels = model.fit_predict(X_scaled)
+    score = silhouette_score(X_scaled, labels)
+    print('k:', k, 'silhouette:', round(score, 4))
+
+print('해석: 점수와 업무적 설명 가능성을 함께 고려해 K를 선택합니다.')</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="drill-item">
+                        <p><strong>[문제 3: 연관규칙 수작업]</strong> 아래 거래 데이터에서 A를 샀을 때 B도 사는 규칙의 support, confidence, lift를 직접 계산하세요.</p>
+                        <button class="btn" onclick="toggleAnswer('ans3')">👁️ 정답 보기</button>
+                        <div id="ans3" class="answer-box">
+                            <pre><code class="language-python">transactions = [
+    {'A', 'B', 'C'},
+    {'A', 'B'},
+    {'A', 'C'},
+    {'B', 'C'},
+    {'A', 'B', 'D'}
+]
+
+n = len(transactions)
+support_a = sum('A' in t for t in transactions) / n
+support_b = sum('B' in t for t in transactions) / n
+support_ab = sum(('A' in t and 'B' in t) for t in transactions) / n
+
+confidence = support_ab / support_a
+lift = confidence / support_b
+
+print('support(A,B):', round(support_ab, 4))
+print('confidence(A->B):', round(confidence, 4))
+print('lift(A->B):', round(lift, 4))
+
+if lift > 1:
+    print('해석: A 구매는 B 구매 가능성을 평균보다 높이는 양의 연관을 보입니다.')</code></pre>
+                        </div>
+                    </div>
+
+                    <div class="drill-item">
+                        <p><strong>[문제 4: ADP 서술형]</strong> K-Means 결과 실루엣 점수가 0.46이고, 3개 군집이 각각 소형/중형/대형 고객군으로 해석된다고 가정합니다. 군집화 선택 이유, 결과 해석, 한계를 5문장 이내로 작성하세요.</p>
+                        <button class="btn" onclick="toggleAnswer('ans4')">👁️ 모범 답안 보기</button>
+                        <div id="ans4" class="answer-box">
+                            <pre><code class="language-text">본 문제는 정답 라벨 없이 고객의 유사한 특성을 기준으로 집단을 구분하는 것이 목적이므로 K-Means 군집화를 사용하였다.
+K-Means는 거리 기반 방법이므로 변수 단위 차이를 제거하기 위해 표준화를 수행하였다.
+실루엣 점수 0.46은 군집 구조가 어느 정도 존재하지만 매우 뚜렷하다고 보기는 어려운 수준으로 해석된다.
+군집별 평균을 비교한 결과 소형, 중형, 대형 고객군으로 해석 가능하며, 마케팅 전략 차별화에 활용할 수 있다.
+다만 군집 수와 초기값, 변수 선택에 따라 결과가 달라질 수 있으므로 추가 검증과 업무 전문가의 해석이 필요하다.</code></pre>
+                        </div>
+                    </div>
+                </div>
+        
+            </div>
+        </div>
+        <div class="ide-panel">
+            <h2 style="color: var(--accent);">💻 웹 파이썬 실행기</h2>
+            <p style="color: #cbd5e1; font-size: 0.95rem; margin-bottom: 20px;">
+                왼쪽 창의 문제를 보고, 여기서 자유롭게 코딩하세요!<br>
+                💡 <strong>데이터 경로:</strong> <code>pd.read_csv('data/iris.csv')</code>, <code>pd.read_csv('data/tips.csv')</code>
+            </p>
+            <textarea id="python-editor" spellcheck="false" placeholder="# 여기에 코드를 작성하세요...">import pandas as pd
+from sklearn.preprocessing import StandardScaler
+from sklearn.cluster import KMeans
+from sklearn.metrics import silhouette_score
+
+iris = pd.read_csv('data/iris.csv')
+X = iris.drop('species', axis=1)
+
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+kmeans = KMeans(n_clusters=3, random_state=42, n_init=10)
+iris['cluster'] = kmeans.fit_predict(X_scaled)
+
+score = silhouette_score(X_scaled, iris['cluster'])
+
+print('silhouette:', round(score, 4))
+print()
+print('cluster means')
+print(iris.groupby('cluster')[X.columns].mean())</textarea>
+            <button class="btn" id="run-btn" onclick="runPython()" style="width: 100%; justify-content: center; font-size: 1.1rem; padding: 15px; margin-bottom: 20px;">
+                ▶ 파이썬 코드 실행
+            </button>
+            <h3 style="color: #94a3b8; font-size: 1rem; margin: 0 0 10px 0;">출력 결과 (Console)</h3>
+            <pre id="console-output">대기 중...</pre>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    <script>
+        function toggleAnswer(id) {
+            const el = document.getElementById(id);
+            if (el.classList.contains('show')) el.classList.remove('show');
+            else el.classList.add('show');
+        }
+        async function runPython() {
+            const code = document.getElementById('python-editor').value;
+            const outputEl = document.getElementById('console-output');
+            const runBtn = document.getElementById('run-btn');
+            if (!code.trim()) { outputEl.innerText = '코드를 입력해주세요.'; return; }
+            runBtn.innerText = '⏳ 실행 중...'; runBtn.disabled = true;
+            outputEl.innerText = '서버에서 실행 중입니다...';
+            try {
+                const res = await fetch('/api/run-python', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code: code })
+                });
+                const result = await res.json();
+                if (result.success) { outputEl.style.color = '#0f0'; outputEl.innerText = result.output || '실행 성공'; }
+                else { outputEl.style.color = '#ff4444'; outputEl.innerText = result.output; }
+            } catch (err) { outputEl.style.color = '#ff4444'; outputEl.innerText = '오류: ' + err.message; }
+            finally { runBtn.innerText = '▶ 파이썬 코드 실행'; runBtn.disabled = false; }
+        }
+    </script>
+</body>
+</html>

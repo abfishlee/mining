@@ -1,0 +1,209 @@
+{
+  "page": "pandas_preprocessing_patterns.html",
+  "title": "Pandas 전처리/EDA 실전 패턴",
+  "problems": [
+    {
+      "id": "pd_sort_top_fare_passenger",
+      "type": "code_numeric",
+      "exam": ["BigData", "ADP"],
+      "topic": ["pandas", "sorting", "iloc"],
+      "difficulty": "basic",
+      "dataset": "data/titanic.csv",
+      "timeLimitMinutes": 7,
+      "prompt": "titanic.csv에서 Fare가 가장 큰 행의 PassengerId를 출력하시오.",
+      "expected": {
+        "kind": "numeric_tolerance",
+        "value": 680,
+        "tolerance": 0
+      },
+      "rubric": [
+        "Fare 기준으로 내림차순 정렬한다.",
+        "정렬 후 첫 번째 행을 선택한다.",
+        "PassengerId 값을 출력한다."
+      ],
+      "commonMistakes": [
+        "Fare 최댓값 자체를 출력한다.",
+        "오름차순으로 정렬해 가장 작은 Fare 행을 선택한다.",
+        "정렬 전 iloc[0]을 사용한다."
+      ]
+    },
+    {
+      "id": "pd_multi_condition_count",
+      "type": "code_numeric",
+      "exam": ["BigData", "ADP"],
+      "topic": ["pandas", "filtering", "multiple_conditions"],
+      "difficulty": "basic",
+      "dataset": "data/titanic.csv",
+      "timeLimitMinutes": 8,
+      "prompt": "titanic.csv에서 Sex가 female이고 Pclass가 1이며 Survived가 1인 행의 개수를 출력하시오.",
+      "expected": {
+        "kind": "numeric_tolerance",
+        "value": 91,
+        "tolerance": 0
+      },
+      "rubric": [
+        "세 조건을 각각 괄호로 감싼다.",
+        "조건 사이를 & 연산자로 연결한다.",
+        "필터링된 행의 개수를 len 또는 shape[0]로 계산한다."
+      ],
+      "commonMistakes": [
+        "and를 사용해 Pandas 조건 오류를 낸다.",
+        "female을 Female로 잘못 작성한다.",
+        "Pclass 조건을 빠뜨린다."
+      ]
+    },
+    {
+      "id": "pd_embarked_mode",
+      "type": "code_numeric",
+      "exam": ["BigData", "ADP"],
+      "topic": ["pandas", "value_counts", "mode"],
+      "difficulty": "basic",
+      "dataset": "data/titanic.csv",
+      "timeLimitMinutes": 6,
+      "prompt": "titanic.csv에서 Embarked의 최빈값을 구하고, S=1, C=2, Q=3으로 변환해 출력하시오.",
+      "expected": {
+        "kind": "numeric_tolerance",
+        "value": 1,
+        "tolerance": 0
+      },
+      "rubric": [
+        "Embarked 컬럼의 최빈값을 구한다.",
+        "mode()[0] 또는 value_counts().idxmax()를 사용한다.",
+        "문제의 변환 규칙에 따라 S를 1로 출력한다."
+      ],
+      "commonMistakes": [
+        "최빈값 문자열 S를 그대로 출력해 숫자 채점에 실패한다.",
+        "결측치를 임의 값으로 먼저 채워 최빈값 계산을 바꾼다.",
+        "value_counts의 빈도 수를 출력한다."
+      ]
+    },
+    {
+      "id": "pd_crosstab_male_pclass3",
+      "type": "code_numeric",
+      "exam": ["BigData", "ADP"],
+      "topic": ["pandas", "crosstab", "categorical_eda"],
+      "difficulty": "intermediate",
+      "dataset": "data/titanic.csv",
+      "timeLimitMinutes": 8,
+      "prompt": "titanic.csv에서 Sex와 Pclass의 교차표를 만들고, male이면서 Pclass가 3인 빈도를 출력하시오.",
+      "expected": {
+        "kind": "numeric_tolerance",
+        "value": 347,
+        "tolerance": 0
+      },
+      "rubric": [
+        "pd.crosstab으로 Sex와 Pclass의 교차표를 만든다.",
+        "행 male, 열 3에 해당하는 값을 선택한다.",
+        "해당 빈도를 정수로 출력한다."
+      ],
+      "commonMistakes": [
+        "Pclass가 3인 전체 인원만 출력한다.",
+        "male/female 행과 Pclass 열 위치를 혼동한다.",
+        "교차표가 아니라 groupby 평균을 계산한다."
+      ]
+    },
+    {
+      "id": "pd_tips_sun_total_bill_mean",
+      "type": "code_numeric",
+      "exam": ["BigData", "ADP"],
+      "topic": ["pandas", "filtering", "aggregation"],
+      "difficulty": "basic",
+      "dataset": "data/tips.csv",
+      "timeLimitMinutes": 7,
+      "prompt": "tips.csv에서 day가 Sun인 행만 골라 total_bill 평균을 소수점 둘째 자리까지 출력하시오.",
+      "expected": {
+        "kind": "numeric_tolerance",
+        "value": 21.41,
+        "tolerance": 0.01
+      },
+      "rubric": [
+        "day == 'Sun' 조건으로 필터링한다.",
+        "total_bill 컬럼의 평균을 계산한다.",
+        "소수점 둘째 자리까지 출력한다."
+      ],
+      "commonMistakes": [
+        "Sunday로 필터링한다.",
+        "전체 total_bill 평균을 출력한다.",
+        "tip 평균을 계산한다."
+      ]
+    },
+    {
+      "id": "pd_tips_groupby_max_day_mean",
+      "type": "code_numeric",
+      "exam": ["BigData", "ADP"],
+      "topic": ["pandas", "groupby", "idxmax"],
+      "difficulty": "intermediate",
+      "dataset": "data/tips.csv",
+      "timeLimitMinutes": 8,
+      "prompt": "tips.csv에서 day별 total_bill 평균을 구했을 때 평균이 가장 큰 요일의 평균값을 소수점 둘째 자리까지 출력하시오.",
+      "expected": {
+        "kind": "numeric_tolerance",
+        "value": 21.41,
+        "tolerance": 0.01
+      },
+      "rubric": [
+        "day별로 groupby한다.",
+        "total_bill 평균을 계산한다.",
+        "가장 큰 평균값을 max 또는 idxmax 후 선택으로 구한다.",
+        "소수점 둘째 자리까지 출력한다."
+      ],
+      "commonMistakes": [
+        "가장 큰 요일 이름만 출력한다.",
+        "요일별 합계를 계산한다.",
+        "개별 행의 total_bill 최댓값을 출력한다."
+      ]
+    },
+    {
+      "id": "pd_tips_tip_rate_mean",
+      "type": "code_numeric",
+      "exam": ["BigData", "ADP"],
+      "topic": ["pandas", "feature_engineering", "ratio"],
+      "difficulty": "basic",
+      "dataset": "data/tips.csv",
+      "timeLimitMinutes": 8,
+      "prompt": "tips.csv에서 tip_rate = tip / total_bill * 100 파생변수를 만들고 tip_rate 평균을 소수점 둘째 자리까지 출력하시오.",
+      "expected": {
+        "kind": "numeric_tolerance",
+        "value": 16.08,
+        "tolerance": 0.01
+      },
+      "rubric": [
+        "tip을 total_bill로 나눈 뒤 100을 곱한다.",
+        "tip_rate 파생변수를 만든다.",
+        "tip_rate 평균을 계산한다.",
+        "소수점 둘째 자리까지 출력한다."
+      ],
+      "commonMistakes": [
+        "total_bill / tip으로 반대로 계산한다.",
+        "100을 곱하지 않는다.",
+        "평균이 아니라 행별 tip_rate 전체를 출력한다."
+      ]
+    },
+    {
+      "id": "pd_tips_smoker_dinner_count",
+      "type": "code_numeric",
+      "exam": ["BigData", "ADP"],
+      "topic": ["pandas", "filtering", "multiple_conditions"],
+      "difficulty": "basic",
+      "dataset": "data/tips.csv",
+      "timeLimitMinutes": 7,
+      "prompt": "tips.csv에서 smoker가 Yes이고 time이 Dinner인 행의 개수를 출력하시오.",
+      "expected": {
+        "kind": "numeric_tolerance",
+        "value": 70,
+        "tolerance": 0
+      },
+      "rubric": [
+        "smoker == 'Yes' 조건을 사용한다.",
+        "time == 'Dinner' 조건을 사용한다.",
+        "두 조건을 &로 연결한다.",
+        "필터링된 행의 개수를 출력한다."
+      ],
+      "commonMistakes": [
+        "yes를 소문자로 작성한다.",
+        "Lunch 조건으로 필터링한다.",
+        "조건 중 하나만 적용한다."
+      ]
+    }
+  ]
+}

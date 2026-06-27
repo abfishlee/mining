@@ -1,0 +1,152 @@
+{
+  "page": "week4_2_ensemble.html",
+  "title": "Week 4-2: 앙상블과 부스팅",
+  "problems": [
+    {
+      "id": "w4_2_rf_titanic",
+      "type": "code_numeric",
+      "exam": ["ADP", "BigData"],
+      "topic": ["machine_learning", "ensemble", "random_forest", "roc_auc"],
+      "difficulty": "basic",
+      "dataset": "data/titanic.csv",
+      "timeLimitMinutes": 15,
+      "prompt": "titanic.csv에서 Pclass, Sex, Age, Fare로 Survived를 예측하는 RandomForestClassifier(n_estimators=200, max_depth=5, random_state=42)를 학습하고 Accuracy와 ROC-AUC를 출력하시오.",
+      "expected": {
+        "kind": "multiple_numeric_tolerance",
+        "values": {
+          "Accuracy": 0.8212,
+          "ROC-AUC": 0.8357
+        },
+        "tolerance": 0.01
+      },
+      "rubric": [
+        "지정된 4개 변수를 선택한다.",
+        "Age 결측치를 중앙값으로 대체한다.",
+        "Sex를 원핫 인코딩한다.",
+        "train_test_split(test_size=0.2, random_state=42, stratify=y)을 사용한다.",
+        "RandomForestClassifier(n_estimators=200, max_depth=5, random_state=42)를 학습한다.",
+        "Accuracy와 ROC-AUC를 모두 출력한다."
+      ],
+      "commonMistakes": [
+        "ROC-AUC에 predict_proba가 아니라 predict 결과를 사용한다.",
+        "random_state나 max_depth를 다르게 설정해 결과가 흔들린다.",
+        "Sex를 인코딩하지 않는다.",
+        "랜덤포레스트에도 반드시 스케일링이 필요하다고 오해한다."
+      ]
+    },
+    {
+      "id": "w4_2_rf_feature_importance",
+      "type": "code_numeric",
+      "exam": ["ADP"],
+      "topic": ["machine_learning", "random_forest", "feature_importance", "interpretation"],
+      "difficulty": "basic",
+      "dataset": "data/titanic.csv",
+      "timeLimitMinutes": 12,
+      "prompt": "위 랜덤포레스트 모델의 변수 중요도를 계산하고 Sex_male 변수의 중요도를 소수점 4자리까지 출력하시오.",
+      "expected": {
+        "kind": "numeric_tolerance",
+        "value": 0.4715,
+        "tolerance": 0.01
+      },
+      "rubric": [
+        "랜덤포레스트 모델을 동일 조건으로 학습한다.",
+        "feature_importances_를 사용한다.",
+        "X 컬럼명과 중요도를 매핑한다.",
+        "Sex_male의 중요도를 출력한다.",
+        "변수 중요도는 인과관계가 아니라 모델 활용도라는 점을 해석한다."
+      ],
+      "commonMistakes": [
+        "변수 중요도를 인과 효과로 해석한다.",
+        "원핫 인코딩 후 컬럼명이 Sex_male로 바뀐 것을 놓친다.",
+        "중요도 순위만 보고 수치를 출력하지 않는다."
+      ]
+    },
+    {
+      "id": "w4_2_rf_overfit_compare",
+      "type": "code_numeric",
+      "exam": ["ADP"],
+      "topic": ["machine_learning", "random_forest", "overfitting"],
+      "difficulty": "intermediate",
+      "dataset": "data/titanic.csv",
+      "timeLimitMinutes": 15,
+      "prompt": "RandomForestClassifier(n_estimators=200, random_state=42)에서 max_depth=None인 경우의 train Accuracy와 test Accuracy를 출력하시오. 같은 train/test split 조건을 사용하시오.",
+      "expected": {
+        "kind": "multiple_numeric_tolerance",
+        "values": {
+          "train acc": 0.9803,
+          "test acc": 0.8268
+        },
+        "tolerance": 0.01
+      },
+      "rubric": [
+        "동일한 전처리와 train/test split을 사용한다.",
+        "max_depth=None인 랜덤포레스트를 학습한다.",
+        "train Accuracy와 test Accuracy를 모두 출력한다.",
+        "train 성능이 매우 높고 test와 차이가 나면 과적합 가능성을 언급한다.",
+        "max_depth, min_samples_leaf, max_features 등으로 복잡도를 제어할 수 있음을 설명한다."
+      ],
+      "commonMistakes": [
+        "test 성능만 보고 과적합을 판단한다.",
+        "train과 test를 같은 데이터로 평가한다.",
+        "max_depth 제한 모델과 None 모델을 혼동한다."
+      ]
+    },
+    {
+      "id": "w4_2_xgboost_titanic",
+      "type": "code_numeric",
+      "exam": ["ADP"],
+      "topic": ["machine_learning", "boosting", "xgboost", "roc_auc"],
+      "difficulty": "intermediate",
+      "dataset": "data/titanic.csv",
+      "timeLimitMinutes": 18,
+      "prompt": "titanic.csv 전처리 후 XGBClassifier(n_estimators=80, learning_rate=0.05, max_depth=3, subsample=0.9, random_state=42, eval_metric='logloss')를 학습하고 Accuracy와 ROC-AUC를 출력하시오.",
+      "expected": {
+        "kind": "multiple_numeric_tolerance",
+        "values": {
+          "Accuracy": 0.7765,
+          "ROC-AUC": 0.823
+        },
+        "tolerance": 0.02
+      },
+      "rubric": [
+        "동일한 Titanic 전처리와 train/test split을 사용한다.",
+        "XGBClassifier를 지정된 하이퍼파라미터로 학습한다.",
+        "Accuracy와 ROC-AUC를 모두 출력한다.",
+        "부스팅은 이전 모델의 오차를 순차적으로 보완한다고 설명한다.",
+        "learning_rate, max_depth, subsample이 과적합과 학습 속도에 영향을 준다고 해석한다."
+      ],
+      "commonMistakes": [
+        "eval_metric 설정을 빠뜨려 경고나 결과 차이를 만든다.",
+        "부스팅을 배깅과 같은 병렬 투표 방식으로 설명한다.",
+        "하이퍼파라미터를 과도하게 키워 과적합을 만든다."
+      ]
+    },
+    {
+      "id": "w4_2_adp_rf_writeup",
+      "type": "written_rubric",
+      "exam": ["ADP"],
+      "topic": ["machine_learning", "ensemble", "interpretation", "feature_importance"],
+      "difficulty": "intermediate",
+      "dataset": "data/titanic.csv",
+      "timeLimitMinutes": 8,
+      "prompt": "랜덤포레스트의 ROC-AUC가 0.85이고 가장 중요한 변수가 Fare로 나타났다고 가정한다. ADP 답안 형식으로 모델 선택 이유, 성능 해석, 변수 중요도 해석의 주의점을 서술하시오.",
+      "expected": {
+        "kind": "rubric_keywords",
+        "keywords": ["랜덤포레스트", "배깅", "ROC-AUC", "변수 중요도", "인과"]
+      },
+      "rubric": [
+        "랜덤포레스트가 여러 의사결정나무를 배깅 방식으로 결합한다고 설명한다.",
+        "단일 나무보다 예측 안정성과 과적합 완화에 장점이 있음을 언급한다.",
+        "ROC-AUC 0.85를 생존자와 비생존자를 구분하는 능력이 양호한 것으로 해석한다.",
+        "변수 중요도가 높다는 것은 모델 예측에 많이 활용되었다는 뜻이라고 설명한다.",
+        "변수 중요도를 인과관계로 단정할 수 없다는 한계를 언급한다."
+      ],
+      "commonMistakes": [
+        "변수 중요도를 원인 효과로 단정한다.",
+        "ROC-AUC를 정확도와 같은 의미로 쓴다.",
+        "랜덤포레스트와 부스팅의 학습 방식을 혼동한다.",
+        "성능 수치만 말하고 모델 선택 이유를 쓰지 않는다."
+      ]
+    }
+  ]
+}

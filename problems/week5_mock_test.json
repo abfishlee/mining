@@ -1,0 +1,140 @@
+{
+  "page": "week5_mock_test.html",
+  "title": "Week 5: 빅데이터분석기사 실전 모의고사",
+  "problems": [
+    {
+      "id": "w5_type1_fare_age_mean",
+      "type": "code_numeric",
+      "exam": ["BigData"],
+      "topic": ["preprocessing", "missing_values", "quantile", "aggregation"],
+      "difficulty": "basic",
+      "dataset": "data/titanic.csv",
+      "timeLimitMinutes": 10,
+      "prompt": "titanic.csv에서 Fare의 상위 10% 기준값을 구하시오. Age 결측치는 전체 Age 평균으로 대체한 뒤, Fare가 해당 기준값 이상인 승객의 Age 평균을 소수점 둘째 자리까지 출력하시오.",
+      "expected": {
+        "kind": "numeric_tolerance",
+        "value": 33.87,
+        "tolerance": 0.01
+      },
+      "rubric": [
+        "Age 결측치를 전체 Age 평균으로 대체한다.",
+        "Fare의 0.9 분위수를 기준값으로 사용한다.",
+        "Fare가 기준값 이상인 행만 필터링한다.",
+        "필터링된 행의 Age 평균을 계산한다.",
+        "소수점 둘째 자리까지 반올림해 출력한다."
+      ],
+      "commonMistakes": [
+        "Age 결측치를 제거해 평균 대상이 달라진다.",
+        "상위 10개 행으로 오해하고 nlargest를 사용한다.",
+        "Fare 기준을 초과(>)로만 잡아 경계값 포함 조건을 놓친다.",
+        "전체 데이터의 Age 평균을 출력한다."
+      ]
+    },
+    {
+      "id": "w5_type1_family_variance",
+      "type": "code_numeric",
+      "exam": ["BigData"],
+      "topic": ["feature_engineering", "variance", "indexing"],
+      "difficulty": "basic",
+      "dataset": "data/titanic.csv",
+      "timeLimitMinutes": 10,
+      "prompt": "titanic.csv에서 Family = SibSp + Parch 파생변수를 만들고, 전체 데이터의 앞쪽 80% 행만 사용해 Family의 표본분산을 구하시오. 결과는 소수점 이하를 버리고 정수로 출력하시오.",
+      "expected": {
+        "kind": "numeric_tolerance",
+        "value": 2,
+        "tolerance": 0.001
+      },
+      "rubric": [
+        "SibSp와 Parch를 더해 Family 변수를 만든다.",
+        "int(len(df) * 0.8)로 앞쪽 80% 행 개수를 계산한다.",
+        "iloc을 사용해 앞에서부터 행을 자른다.",
+        "pandas var()의 표본분산을 사용한다.",
+        "math.floor 또는 trunc로 소수점 이하를 버린다."
+      ],
+      "commonMistakes": [
+        "데이터를 무작위로 섞거나 train_test_split을 사용한다.",
+        "Population variance(ddof=0)와 sample variance(ddof=1)를 혼동한다.",
+        "Family를 SibSp와 Parch 중 하나만 사용해 만든다.",
+        "round를 사용해 반올림한다."
+      ]
+    },
+    {
+      "id": "w5_type2_titanic_submission_plan",
+      "type": "code_csv",
+      "exam": ["BigData"],
+      "topic": ["classification", "random_forest", "submission", "roc_auc"],
+      "difficulty": "intermediate",
+      "dataset": "data/titanic.csv",
+      "timeLimitMinutes": 25,
+      "prompt": "titanic.csv를 앞쪽 700개 train, 나머지 191개 test로 나눈 뒤 RandomForestClassifier로 test 생존 확률을 예측해 result.csv를 저장하는 코드를 작성하시오. 제출 파일은 PassengerId와 Survived_Probability 컬럼을 포함해야 한다.",
+      "expected": {
+        "kind": "csv_submission",
+        "file": "result.csv",
+        "columns": ["PassengerId", "Survived_Probability"],
+        "requireExactColumns": true,
+        "rowCount": 191,
+        "nonNullColumns": ["PassengerId", "Survived_Probability"],
+        "numericColumns": {
+          "PassengerId": {
+            "first": 701,
+            "last": 891,
+            "unique": true,
+            "strictlyIncreasing": true,
+            "countEqualsRowCount": true
+          },
+          "Survived_Probability": {
+            "min": 0,
+            "max": 1,
+            "minDistinct": 5,
+            "countEqualsRowCount": true
+          }
+        }
+      },
+      "rubric": [
+        "iloc[:700]과 iloc[700:]으로 train/test를 분리한다.",
+        "train 기준으로 Age 결측치 대체값을 정하고 test에도 같은 값을 적용한다.",
+        "Sex 같은 범주형 변수를 인코딩하고 train/test 컬럼을 맞춘다.",
+        "RandomForestClassifier를 학습한다.",
+        "predict_proba의 생존 클래스 확률을 사용한다.",
+        "PassengerId와 Survived_Probability 컬럼으로 result.csv를 저장한다.",
+        "ROC-AUC 평가지표에서는 확률 제출이 필요하다는 점을 이해한다."
+      ],
+      "commonMistakes": [
+        "predict_proba가 아니라 predict 결과를 제출한다.",
+        "test 데이터의 Survived를 사용해 누수를 만든다.",
+        "train과 test를 따로 get_dummies해 컬럼 불일치가 생긴다.",
+        "PassengerId 없이 확률만 저장한다.",
+        "결측치 대체를 test 전체 통계로 따로 계산한다."
+      ]
+    },
+    {
+      "id": "w5_type3_one_sample_ttest",
+      "type": "code_numeric",
+      "exam": ["BigData", "ADP"],
+      "topic": ["hypothesis_test", "one_sample_ttest", "p_value"],
+      "difficulty": "basic",
+      "dataset": "data/titanic.csv",
+      "timeLimitMinutes": 12,
+      "prompt": "titanic.csv에서 Pclass가 1인 승객의 Fare 평균이 80이라고 볼 수 있는지 단일표본 t-검정을 수행하고, p-value를 소수점 넷째 자리까지 출력하시오.",
+      "expected": {
+        "kind": "numeric_tolerance",
+        "value": 0.4368,
+        "tolerance": 0.0001
+      },
+      "rubric": [
+        "Pclass가 1인 승객만 필터링한다.",
+        "Fare 결측치를 제거한다.",
+        "scipy.stats.ttest_1samp를 사용한다.",
+        "검정 기준 평균을 80으로 설정한다.",
+        "p-value를 소수점 넷째 자리까지 출력한다.",
+        "p-value가 0.05보다 크면 평균이 80과 다르다고 보기 어렵다고 해석한다."
+      ],
+      "commonMistakes": [
+        "전체 승객의 Fare로 검정한다.",
+        "독립표본 t-검정이나 대응표본 t-검정을 사용한다.",
+        "t-statistic을 p-value로 착각해 출력한다.",
+        "p-value가 크다는 것을 귀무가설이 참으로 증명됐다고 해석한다."
+      ]
+    }
+  ]
+}

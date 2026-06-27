@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1주차: Pandas 기초 튜토리얼</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --surface-color: rgba(30, 41, 59, 0.7);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --glass-border: rgba(255, 255, 255, 0.1);
+        }
+        
+        
+
+        
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            animation: fadeIn 1s ease-out;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            background: linear-gradient(to right, #60a5fa, #c084fc);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .card {
+            background: var(--surface-color);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+            transform: translateY(20px);
+            opacity: 0;
+            animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .card:nth-child(2) { animation-delay: 0.1s; }
+        .card:nth-child(3) { animation-delay: 0.2s; }
+        .card:nth-child(4) { animation-delay: 0.3s; }
+
+        h2 {
+            border-bottom: 2px solid var(--glass-border);
+            padding-bottom: 10px;
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .metaphor {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 4px solid var(--accent);
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            font-style: italic;
+            color: #bae6fd;
+            margin-bottom: 20px;
+        }
+
+        pre {
+            border-radius: 8px !important;
+            margin: 20px 0 !important;
+            border: 1px solid var(--glass-border);
+        }
+
+        .btn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            background-color: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+        }
+
+        .answer-box {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s cubic-bezier(0, 1, 0, 1);
+            opacity: 0;
+        }
+
+        .answer-box.show {
+            max-height: 500px;
+            opacity: 1;
+            transition: max-height 0.5s ease-in-out, opacity 0.5s ease-in-out 0.2s;
+        }
+
+        .drill-section {
+            margin-top: 40px;
+        }
+
+        .drill-item {
+            background: rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            border: 1px solid var(--glass-border);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* 스크롤바 커스텀 */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-color); }
+        ::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+    
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            overflow: hidden; /* 전체 페이지 스크롤 방지 */
+        }
+        
+        .layout-wrapper {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+        }
+
+        .content-panel {
+            flex: 1;
+            overflow-y: auto;
+            padding: 40px;
+            /* 기존 바디에 있던 배경 효과를 이쪽으로 옮김 */
+            background-image: radial-gradient(at 0% 0%, var(--accent) 0px, transparent 80%);
+            background-color: var(--bg-color);
+        }
+
+        .content-inner {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .ide-panel {
+            flex: 1;
+            background: rgba(10, 15, 30, 0.95);
+            border-left: 2px solid var(--glass-border);
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: -10px 0 30px rgba(0,0,0,0.5);
+        }
+
+        .ide-panel h2 { margin-top: 0; border: none; }
+        
+        #python-editor {
+            flex: 1;
+            min-height: 200px;
+            background: #1e1e1e; color: #d4d4d4; 
+            font-family: 'Consolas', 'Courier New', monospace; font-size: 15px;
+            border: 1px solid var(--glass-border); border-radius: 8px; 
+            padding: 15px; margin-bottom: 20px; resize: none; outline: none;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
+        }
+
+        #python-editor:focus {
+            border-color: var(--accent);
+        }
+
+        #console-output {
+            background: #000; color: #0f0; 
+            padding: 15px; border-radius: 8px; 
+            height: 250px; font-family: 'Consolas', monospace; 
+            white-space: pre-wrap; overflow-y: auto; border: 1px solid #333;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="layout-wrapper">
+
+    <div class="content-panel">
+        <div class="content-inner">
+        <header>
+            <h1>데이터 요리 교실: Pandas 기초</h1>
+            <p>직접 클릭하고 확인하며 배우는 1주차 튜토리얼 🍳</p>
+        </header>
+
+        <div class="card">
+            <h2>🛒 1. 데이터 불러오기 (장보기)</h2>
+            <div class="metaphor">
+                "판다스의 <code>read_csv()</code>는 마트에서 장을 봐서 도마(DataFrame) 위로 재료를 올려놓는 과정입니다."
+            </div>
+            <p>파이썬을 열고 제일 먼저 해야 할 일은 판다스를 불러오고 데이터를 가져오는 것입니다.</p>
+            <pre><code class="language-python">import pandas as pd
+
+# 타이타닉 데이터를 df라는 이름의 도마(DataFrame)에 올립니다.
+df = pd.read_csv('../data/titanic.csv')
+
+# 도마 위의 재료 중 위쪽 5개만 슬쩍 맛봅니다.
+print(df.head())</code></pre>
+        </div>
+
+        <div class="card">
+            <h2>🔍 2. 데이터 상태 확인 (재료 신선도 체크)</h2>
+            <div class="metaphor">
+                "요리를 시작하기 전, 재료가 몇 개나 있는지, 썩은 부분(결측치)은 없는지 매의 눈으로 확인합니다."
+            </div>
+            <pre><code class="language-python"># 전체 재료의 행 개수와 빈칸 유무, 데이터 타입을 요약해서 보여줍니다.
+df.info()
+
+# 열(Column)별로 빈칸이 몇 개씩 있는지 정확히 세어봅니다.
+print(df.isnull().sum())</code></pre>
+        </div>
+
+        <div class="card">
+            <h2>🔪 3. 결측치 처리 (썩은 채소 잘라내기/새살 채우기)</h2>
+            <div class="metaphor">
+                "나이(Age) 정보가 없는 빈칸이 많네요. 이 빈칸들을 사람들의 '평균 나이'로 꾹꾹 채워 넣어 봅시다."
+            </div>
+            <pre><code class="language-python"># 나이의 평균을 구합니다.
+mean_age = df['Age'].mean()
+
+# fillna() 함수를 이용해 빈칸을 평균값으로 덮어씁니다.
+df['Age'] = df['Age'].fillna(mean_age)</code></pre>
+        </div>
+
+        <div class="card drill-section">
+            <h2>🚀 드릴 연습문제 10제</h2>
+            <p>에디터(또는 주피터 노트북)를 열고, 아래 문제들을 직접 코딩해 보세요. 막힐 때만 정답 보기 버튼을 눌러주세요!</p>
+
+            <div class="drill-item">
+                <p><strong>[문제 1]</strong> df에서 아래쪽 끝 3개의 데이터를 슬쩍 맛보세요. (힌트: tail)</p>
+                <button class="btn" onclick="toggleAnswer('ans1')">👁️ 정답 보기</button>
+                <div id="ans1" class="answer-box">
+                    <pre><code class="language-python">print(df.tail(3))</code></pre>
+                </div>
+            </div>
+
+            <div class="drill-item">
+                <p><strong>[문제 2]</strong> df의 'Fare'(요금) 열만 따로 떼어서 요금의 "평균"을 구해보세요.</p>
+                <button class="btn" onclick="toggleAnswer('ans2')">👁️ 정답 보기</button>
+                <div id="ans2" class="answer-box">
+                    <pre><code class="language-python">print(df['Fare'].mean())</code></pre>
+                </div>
+            </div>
+
+            <div class="drill-item">
+                <p><strong>[문제 3]</strong> df의 'Cabin'(객실 번호) 열은 결측치(빈칸)가 너무 많습니다. 이 열을 도마에서 완전히 버리세요. (힌트: drop)</p>
+                <button class="btn" onclick="toggleAnswer('ans3')">👁️ 정답 보기</button>
+                <div id="ans3" class="answer-box">
+                    <pre><code class="language-python"># axis=1은 '열(Column)'을 버리겠다는 의미입니다.
+df = df.drop('Cabin', axis=1)</code></pre>
+                </div>
+            </div>
+
+            <div class="drill-item">
+                <p><strong>[문제 4]</strong> 'Survived'(생존 여부) 열을 기준으로, 생존자(1)와 사망자(0)가 각각 몇 명인지 세어보세요.</p>
+                <button class="btn" onclick="toggleAnswer('ans4')">👁️ 정답 보기</button>
+                <div id="ans4" class="answer-box">
+                    <pre><code class="language-python">print(df['Survived'].value_counts())</code></pre>
+                </div>
+            </div>
+
+            <div class="drill-item">
+                <p><strong>[문제 5]</strong> 성별('Sex') 값이 'male' 인 사람만 필터링해보세요.</p>
+                <button class="btn" onclick="toggleAnswer('ans5')">👁️ 정답 보기</button>
+                <div id="ans5" class="answer-box">
+                    <pre><code class="language-python">male_df = df[df['Sex'] == 'male']
+print(male_df.head())</code></pre>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+        </div>
+
+        <div class="ide-panel">
+            <h2 style="color: var(--accent);">💻 웹 파이썬 실행기</h2>
+            <p style="color: #cbd5e1; font-size: 0.95rem; margin-bottom: 20px;">
+                왼쪽 창의 설명을 보면서 자유롭게 코딩해 보세요!<br>
+                💡 <strong>데이터 경로:</strong> <code>pd.read_csv('data/titanic.csv')</code> (../ 생략)
+            </p>
+            
+            <textarea id="python-editor" spellcheck="false" placeholder="# 여기에 파이썬 코드를 작성하세요...
+import pandas as pd
+df = pd.read_csv('data/titanic.csv')
+print(df.head())"></textarea>
+            
+            <button class="btn" id="run-btn" onclick="runPython()" style="width: 100%; justify-content: center; font-size: 1.1rem; padding: 15px; margin-bottom: 20px;">
+                ▶ 파이썬 코드 실행
+            </button>
+
+            <h3 style="color: #94a3b8; font-size: 1rem; margin: 0 0 10px 0;">출력 결과 (Console)</h3>
+            <pre id="console-output">대기 중...</pre>
+        </div>
+
+    </div>
+
+<!-- 구문 강조를 위한 Prism.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    
+    <script>
+        function toggleAnswer(id) {
+            const el = document.getElementById(id);
+            if (el.classList.contains('show')) {
+                el.classList.remove('show');
+            } else {
+                el.classList.add('show');
+            }
+        }
+
+        async function runPython() {
+            const code = document.getElementById('python-editor').value;
+            const outputEl = document.getElementById('console-output');
+            const runBtn = document.getElementById('run-btn');
+            
+            if (!code.trim()) {
+                outputEl.innerText = '코드를 입력해주세요.';
+                return;
+            }
+
+            runBtn.innerText = '⏳ 실행 중...';
+            runBtn.style.opacity = '0.7';
+            runBtn.disabled = true;
+            outputEl.innerText = '서버에서 파이썬 코드를 실행 중입니다...';
+
+            try {
+                const response = await fetch('/api/run-python', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ code: code })
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    outputEl.style.color = '#0f0';
+                    outputEl.innerText = result.output || '실행 성공 (출력 없음)';
+                } else {
+                    outputEl.style.color = '#ff4444';
+                    outputEl.innerText = result.output;
+                }
+            } catch (error) {
+                outputEl.style.color = '#ff4444';
+                outputEl.innerText = '서버 통신 오류: ' + error.message;
+            } finally {
+                runBtn.innerText = '▶ 파이썬 코드 실행';
+                runBtn.style.opacity = '1';
+                runBtn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

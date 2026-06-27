@@ -1,0 +1,90 @@
+{
+  "page": "week6_1_unsupervised.html",
+  "title": "Week 6-1: 비지도학습 & 연관 분석",
+  "problems": [
+    {
+      "id": "w6_1_kmeans_iris",
+      "type": "code_numeric",
+      "exam": ["ADP"],
+      "topic": ["clustering", "kmeans", "silhouette"],
+      "difficulty": "basic",
+      "dataset": "data/iris.csv",
+      "timeLimitMinutes": 12,
+      "prompt": "iris.csv에서 species를 제외한 4개 변수를 표준화한 뒤 K-Means(n_clusters=3)를 수행하고 실루엣 점수를 출력하시오.",
+      "expected": {
+        "kind": "numeric_tolerance",
+        "value": 0.4599,
+        "tolerance": 0.01
+      },
+      "rubric": [
+        "species 컬럼을 제거한다.",
+        "StandardScaler로 표준화한다.",
+        "KMeans에 n_clusters=3, random_state=42, n_init=10을 사용한다.",
+        "silhouette_score를 계산한다.",
+        "점수의 의미를 응집도와 분리도 관점에서 해석한다."
+      ],
+      "commonMistakes": [
+        "species 문자열 컬럼을 포함해 K-Means를 실행한다.",
+        "스케일링 없이 거리 기반 군집화를 수행한다.",
+        "실루엣 점수를 정확도처럼 해석한다.",
+        "군집 번호를 실제 품종 정답처럼 단정한다."
+      ]
+    },
+    {
+      "id": "w6_1_association_manual",
+      "type": "code_numeric",
+      "exam": ["ADP"],
+      "topic": ["association_rules", "support", "confidence", "lift"],
+      "difficulty": "basic",
+      "dataset": "inline",
+      "timeLimitMinutes": 10,
+      "prompt": "주어진 거래 목록에서 A -> B 규칙의 support, confidence, lift를 직접 계산하시오.",
+      "expected": {
+        "kind": "multiple_numeric_tolerance",
+        "values": {
+          "support": 0.6,
+          "confidence": 0.75,
+          "lift": 0.9375
+        },
+        "tolerance": 0.001
+      },
+      "rubric": [
+        "전체 거래 수를 기준으로 support를 계산한다.",
+        "A가 포함된 거래 중 B도 포함된 비율로 confidence를 계산한다.",
+        "confidence를 support(B)로 나누어 lift를 계산한다.",
+        "lift가 1보다 작은 경우 양의 연관이 아니라고 해석한다."
+      ],
+      "commonMistakes": [
+        "confidence와 support를 혼동한다.",
+        "lift를 confidence 자체로 해석한다.",
+        "lift가 1보다 작아도 강한 연관이라고 결론낸다."
+      ]
+    },
+    {
+      "id": "w6_1_adp_cluster_writeup",
+      "type": "written_rubric",
+      "exam": ["ADP"],
+      "topic": ["clustering", "interpretation"],
+      "difficulty": "intermediate",
+      "dataset": "data/iris.csv",
+      "timeLimitMinutes": 8,
+      "prompt": "K-Means 결과 실루엣 점수가 0.46이고 3개 군집으로 나뉘었다. ADP 답안 형식으로 군집화 선택 이유, 결과 해석, 한계를 서술하시오.",
+      "expected": {
+        "kind": "rubric_keywords",
+        "keywords": ["정답 라벨", "표준화", "실루엣", "군집별", "한계"]
+      },
+      "rubric": [
+        "정답 라벨이 없는 구조 탐색 문제라 비지도학습을 사용했다고 설명한다.",
+        "거리 기반 방법이므로 표준화가 필요하다고 언급한다.",
+        "실루엣 점수 0.46을 중간 수준의 군집 구조로 해석한다.",
+        "군집별 평균 비교를 통해 군집 특성을 해석한다고 쓴다.",
+        "초기값, 변수 선택, K 선택에 따라 결과가 달라질 수 있음을 한계로 제시한다."
+      ],
+      "commonMistakes": [
+        "군집 결과를 실제 정답처럼 단정한다.",
+        "실루엣 점수를 높고 낮음만 말하고 업무 해석을 하지 않는다.",
+        "스케일링 필요성을 누락한다."
+      ]
+    }
+  ]
+}

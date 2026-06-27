@@ -1,0 +1,37 @@
+customer_id,tenure,monthly_charges,total_charges,contract,payment_method,support_calls,churn
+C001,2,78.5,157.0,Month-to-month,Credit card,4,1
+C002,14,52.0,728.0,One year,Bank transfer,1,0
+C003,5,89.9,449.5,Month-to-month,Electronic check,5,1
+C004,32,61.2,1958.4,Two year,Credit card,0,0
+C005,8,75.3,602.4,Month-to-month,Electronic check,3,1
+C006,45,48.7,2191.5,Two year,Bank transfer,0,0
+C007,11,69.1,760.1,Month-to-month,Credit card,2,0
+C008,3,95.0,285.0,Month-to-month,Electronic check,6,1
+C009,28,55.5,1554.0,One year,Bank transfer,1,0
+C010,6,83.2,499.2,Month-to-month,Electronic check,4,1
+C011,52,64.0,3328.0,Two year,Credit card,0,0
+C012,18,72.4,1303.2,One year,Electronic check,2,0
+C013,1,70.0,70.0,Month-to-month,Electronic check,5,1
+C014,24,58.6,1406.4,One year,Credit card,1,0
+C015,9,91.3,821.7,Month-to-month,Electronic check,4,1
+C016,40,49.9,1996.0,Two year,Bank transfer,0,0
+C017,7,66.8,467.6,Month-to-month,Credit card,3,0
+C018,12,88.1,1057.2,Month-to-month,Electronic check,5,1
+C019,36,57.0,2052.0,One year,Bank transfer,1,0
+C020,4,92.5,370.0,Month-to-month,Electronic check,6,1
+C021,60,62.3,3738.0,Two year,Credit card,0,0
+C022,16,74.6,1193.6,One year,Electronic check,2,0
+C023,10,80.4,804.0,Month-to-month,Credit card,3,1
+C024,30,54.2,1626.0,One year,Bank transfer,1,0
+C025,2,85.7,171.4,Month-to-month,Electronic check,5,1
+C026,48,46.5,2232.0,Two year,Bank transfer,0,0
+C027,13,67.9,882.7,Month-to-month,Credit card,2,0
+C028,5,90.8,454.0,Month-to-month,Electronic check,4,1
+C029,34,59.5,2023.0,One year,Credit card,1,0
+C030,20,77.2,1544.0,One year,Electronic check,3,0
+C031,3,82.9,248.7,Month-to-month,Electronic check,5,1
+C032,55,51.4,2827.0,Two year,Bank transfer,0,0
+C033,15,73.8,1107.0,Month-to-month,Credit card,2,0
+C034,6,87.6,525.6,Month-to-month,Electronic check,4,1
+C035,42,56.8,2385.6,Two year,Credit card,0,0
+C036,22,68.3,1502.6,One year,Bank transfer,1,0

@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>최종 사용 가이드</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #0f172a;
+            --surface-color: rgba(30, 41, 59, 0.78);
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --accent: #22d3ee;
+            --glass-border: rgba(255, 255, 255, 0.12);
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-color);
+            background-image: radial-gradient(at 0% 0%, rgba(34, 211, 238, 0.16) 0, transparent 55%);
+            color: var(--text-main);
+            margin: 0;
+            padding: 34px 20px 56px;
+            line-height: 1.7;
+        }
+
+        .container {
+            max-width: 980px;
+            margin: 0 auto;
+        }
+
+        .back-link {
+            color: var(--text-muted);
+            text-decoration: none;
+            display: inline-flex;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            margin: 0 0 10px;
+            color: #cffafe;
+            font-size: 2.55rem;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            margin: 0 0 28px;
+            font-size: 1.08rem;
+        }
+
+        .card {
+            background: var(--surface-color);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 18px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.18);
+        }
+
+        h2, h3 {
+            color: #cffafe;
+            margin-top: 0;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 14px;
+        }
+
+        .mini {
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            padding: 14px;
+            background: rgba(0, 0, 0, 0.18);
+        }
+
+        ul, ol {
+            color: #dbeafe;
+            padding-left: 22px;
+        }
+
+        code {
+            font-family: Consolas, 'Courier New', monospace;
+            color: #bae6fd;
+        }
+
+        .cta-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .btn {
+            border-radius: 8px;
+            padding: 10px 13px;
+            background: rgba(34, 211, 238, 0.18);
+            border: 1px solid rgba(103, 232, 249, 0.35);
+            color: #e0f2fe;
+            text-decoration: none;
+            font-weight: 800;
+        }
+
+        @media (max-width: 760px) {
+            .grid { grid-template-columns: 1fr; }
+            h1 { font-size: 2rem; }
+        }
+    </style>
+</head>
+<body>
+    <main class="container">
+        <a href="index.html" class="back-link">← 대시보드로 돌아가기</a>
+        <h1>최종 사용 가이드</h1>
+        <p class="subtitle">이 시스템만 믿고 공부할 수 있도록, 매일 무엇을 열고 어떤 순서로 풀지 정리한 운영 매뉴얼입니다.</p>
+
+        <section class="card">
+            <h2>매일 공부 루틴</h2>
+            <ol>
+                <li><strong>환경/패키지 점검</strong>을 열어 import와 데이터 경로가 정상인지 확인합니다.</li>
+                <li><strong>대시보드</strong>에서 약점 토픽과 추천 문제를 확인합니다.</li>
+                <li><strong>문제은행 훈련실</strong>에서 추천 문제를 타이머 없이 1회 풉니다.</li>
+                <li>틀린 문제는 오답 점검, 흔한 실수, 루브릭을 읽고 바로 재도전합니다.</li>
+                <li>같은 문제를 한 번 더 풀 때는 최종 리뷰 모드와 타이머를 켭니다.</li>
+            </ol>
+            <div class="cta-row">
+                <a class="btn" href="environment_check.html">환경 점검</a>
+                <a class="btn" href="problem_bank.html">문제은행</a>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>기초가 흔들릴 때 돌아갈 곳</h2>
+            <div class="grid">
+                <div class="mini"><strong>Python/Pandas 기초</strong><br>경로, print, 결측치, 필터링이 막힐 때 봅니다.</div>
+                <div class="mini"><strong>Pandas 전처리/EDA</strong><br>groupby, 정렬, crosstab, 파생변수 문제를 반복합니다.</div>
+                <div class="mini"><strong>통계 기초</strong><br>검정 선택과 p-value 해석이 헷갈릴 때 봅니다.</div>
+                <div class="mini"><strong>데이터 마이닝/ML</strong><br>모델 선택 이유, 지표, 과적합, 해석 문장을 훈련합니다.</div>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>시험 7일 전</h2>
+            <ul>
+                <li>문제은행에서 미시도 문제를 우선 풀고, 대시보드 약점 토픽을 매일 확인합니다.</li>
+                <li>작업형 1은 숫자 출력 형식, 작업형 2는 CSV 컬럼/행 수/확률, 작업형 3은 p-value 해석을 분리해서 복습합니다.</li>
+                <li>ADP는 서술형 문제에서 검정 선택 이유, 한계, 실무 활용 문장을 반드시 포함하는 연습을 합니다.</li>
+            </ul>
+        </section>
+
+        <section class="card">
+            <h2>시험 3일 전</h2>
+            <ul>
+                <li>최종 리뷰 모드를 켜고 정답 조건 없이 풉니다.</li>
+                <li>오답은 새 문제를 더 풀기보다 같은 문제를 다시 풀어 통과 상태로 만듭니다.</li>
+                <li>환경 점검 페이지를 실행해 패키지와 데이터 경로 감각을 유지합니다.</li>
+            </ul>
+        </section>
+
+        <section class="card">
+            <h2>시험 당일</h2>
+            <ul>
+                <li>먼저 <code>import pandas as pd</code>, <code>pd.read_csv()</code>, <code>print(df.head())</code>가 되는지 확인합니다.</li>
+                <li>작업형 1은 중간 출력으로 조건 필터링이 맞는지 확인한 뒤 마지막 숫자만 출력합니다.</li>
+                <li>작업형 2는 <code>predict_proba</code>, 제출 컬럼명, <code>to_csv(index=False)</code>를 마지막에 다시 봅니다.</li>
+                <li>통계 문제는 귀무가설, p-value 기준, 결론, 한계를 짧게라도 반드시 씁니다.</li>
+            </ul>
+        </section>
+
+        <section class="card">
+            <h2>완성 기준</h2>
+            <p>이 시스템은 현재 콘텐츠 보강, 문제은행, 자동 채점, CSV 제출 검사, 타이머, 태블릿 UI, 약점 진단, 추천 딥링크, 오답 점검, 최종 리뷰 모드, 환경 점검까지 갖췄습니다. 이제 공부의 중심은 새 자료를 찾는 것이 아니라, 이 안에서 반복하고 기록을 쌓는 것입니다.</p>
+        </section>
+    </main>
+</body>
+</html>

@@ -1,0 +1,186 @@
+{
+  "page": "customer_churn_practice.html",
+  "title": "고객 이탈 데이터 실전 연습",
+  "problems": [
+    {
+      "id": "churn_overall_rate",
+      "type": "code_numeric",
+      "exam": ["BigData", "ADP"],
+      "topic": ["eda", "classification", "churn_rate"],
+      "difficulty": "basic",
+      "dataset": "data/customer_churn.csv",
+      "timeLimitMinutes": 6,
+      "prompt": "customer_churn.csv에서 전체 고객의 churn 평균, 즉 전체 이탈률을 소수점 넷째 자리까지 출력하시오.",
+      "expected": {
+        "kind": "numeric_tolerance",
+        "value": 0.3889,
+        "tolerance": 0.0001
+      },
+      "rubric": [
+        "customer_churn.csv를 올바르게 불러온다.",
+        "churn 컬럼 평균을 계산한다.",
+        "소수점 넷째 자리까지 출력한다."
+      ],
+      "commonMistakes": [
+        "churn 합계를 출력한다.",
+        "이탈하지 않은 고객 비율을 출력한다.",
+        "소수점 처리 없이 너무 많은 값을 출력한다."
+      ]
+    },
+    {
+      "id": "churn_month_contract_rate",
+      "type": "code_numeric",
+      "exam": ["BigData", "ADP"],
+      "topic": ["eda", "groupby", "churn_rate"],
+      "difficulty": "basic",
+      "dataset": "data/customer_churn.csv",
+      "timeLimitMinutes": 7,
+      "prompt": "contract가 Month-to-month인 고객의 이탈률을 소수점 넷째 자리까지 출력하시오.",
+      "expected": {
+        "kind": "numeric_tolerance",
+        "value": 0.7778,
+        "tolerance": 0.0001
+      },
+      "rubric": [
+        "contract == 'Month-to-month' 조건으로 필터링한다.",
+        "필터링된 데이터의 churn 평균을 계산한다.",
+        "소수점 넷째 자리까지 출력한다.",
+        "월별 계약 고객의 이탈 위험이 높다고 해석한다."
+      ],
+      "commonMistakes": [
+        "Month-to-month 문자열을 다르게 작성한다.",
+        "전체 이탈률을 출력한다.",
+        "count를 출력하고 비율로 바꾸지 않는다."
+      ]
+    },
+    {
+      "id": "churn_electronic_check_count",
+      "type": "code_numeric",
+      "exam": ["BigData", "ADP"],
+      "topic": ["eda", "filtering", "multiple_conditions"],
+      "difficulty": "basic",
+      "dataset": "data/customer_churn.csv",
+      "timeLimitMinutes": 7,
+      "prompt": "payment_method가 Electronic check이고 churn이 1인 고객 수를 출력하시오.",
+      "expected": {
+        "kind": "numeric_tolerance",
+        "value": 12,
+        "tolerance": 0
+      },
+      "rubric": [
+        "payment_method == 'Electronic check' 조건을 사용한다.",
+        "churn == 1 조건을 함께 사용한다.",
+        "두 조건을 &로 연결한다.",
+        "행 개수를 출력한다."
+      ],
+      "commonMistakes": [
+        "and를 사용해 Pandas 조건 오류를 낸다.",
+        "Electronic check 문자열을 틀리게 쓴다.",
+        "전자결제 고객 전체 수를 출력한다."
+      ]
+    },
+    {
+      "id": "churn_high_risk_count",
+      "type": "code_numeric",
+      "exam": ["BigData", "ADP"],
+      "topic": ["eda", "feature_rule", "risk_segment"],
+      "difficulty": "basic",
+      "dataset": "data/customer_churn.csv",
+      "timeLimitMinutes": 8,
+      "prompt": "tenure가 6 이하이고 monthly_charges가 80 이상인 고객을 고위험군으로 정의할 때, 고위험군 고객 수를 출력하시오.",
+      "expected": {
+        "kind": "numeric_tolerance",
+        "value": 8,
+        "tolerance": 0
+      },
+      "rubric": [
+        "tenure <= 6 조건을 사용한다.",
+        "monthly_charges >= 80 조건을 사용한다.",
+        "두 조건을 &로 연결한다.",
+        "고위험군 행 개수를 출력한다."
+      ],
+      "commonMistakes": [
+        "경계값 6 또는 80을 포함하지 않는다.",
+        "monthly_charges 대신 total_charges를 사용한다.",
+        "조건 중 하나만 적용한다."
+      ]
+    },
+    {
+      "id": "churn_support_calls_mean",
+      "type": "code_numeric",
+      "exam": ["BigData", "ADP"],
+      "topic": ["eda", "aggregation", "business_interpretation"],
+      "difficulty": "basic",
+      "dataset": "data/customer_churn.csv",
+      "timeLimitMinutes": 7,
+      "prompt": "churn이 1인 고객의 support_calls 평균을 소수점 둘째 자리까지 출력하시오.",
+      "expected": {
+        "kind": "numeric_tolerance",
+        "value": 4.5,
+        "tolerance": 0.01
+      },
+      "rubric": [
+        "churn == 1 조건으로 이탈 고객을 필터링한다.",
+        "support_calls 평균을 계산한다.",
+        "소수점 둘째 자리까지 출력한다.",
+        "문의 횟수가 이탈 위험 신호일 수 있다고 해석한다."
+      ],
+      "commonMistakes": [
+        "전체 고객의 support_calls 평균을 출력한다.",
+        "churn == 0 고객을 필터링한다.",
+        "평균이 아니라 합계를 출력한다."
+      ]
+    },
+    {
+      "id": "churn_contract_monthly_max_mean",
+      "type": "code_numeric",
+      "exam": ["BigData", "ADP"],
+      "topic": ["eda", "groupby", "aggregation"],
+      "difficulty": "intermediate",
+      "dataset": "data/customer_churn.csv",
+      "timeLimitMinutes": 8,
+      "prompt": "contract별 monthly_charges 평균을 계산했을 때 가장 큰 평균값을 소수점 둘째 자리까지 출력하시오.",
+      "expected": {
+        "kind": "numeric_tolerance",
+        "value": 81.6,
+        "tolerance": 0.01
+      },
+      "rubric": [
+        "contract별로 groupby한다.",
+        "monthly_charges 평균을 계산한다.",
+        "그중 가장 큰 평균값을 출력한다.",
+        "소수점 둘째 자리까지 출력한다."
+      ],
+      "commonMistakes": [
+        "가장 큰 contract 이름만 출력한다.",
+        "monthly_charges 최댓값을 출력한다.",
+        "이탈률 평균을 출력한다."
+      ]
+    },
+    {
+      "id": "churn_adp_writeup",
+      "type": "written_rubric",
+      "exam": ["ADP"],
+      "topic": ["eda", "churn", "business_interpretation"],
+      "difficulty": "intermediate",
+      "dataset": "data/customer_churn.csv",
+      "timeLimitMinutes": 10,
+      "prompt": "customer_churn 데이터에서 Month-to-month 계약 고객의 이탈률이 0.7778이고 전체 이탈률이 0.3889였다. ADP 답안 형식으로 관찰 결과, 가능한 원인, 실무 대응, 분석상 한계를 서술하시오.",
+      "expected": {
+        "kind": "rubric_keywords",
+        "keywords": ["Month-to-month", "이탈률", "전체", "원인", "한계"]
+      },
+      "rubric": [
+        "Month-to-month 계약 고객의 이탈률이 전체 이탈률보다 높다고 비교한다.",
+        "단기 계약, 전환 비용 낮음, 가격 민감도 등 가능한 원인을 제시한다.",
+        "장기 계약 전환 혜택, 초기 온보딩, 선제 케어 등 실무 대응을 제안한다.",
+        "표본 크기, 교란 변수, 인과관계 한계를 언급한다."
+      ],
+      "commonMistakes": [
+        "관찰된 상관을 인과관계로 단정한다.",
+        "전체 이탈률과 비교하지 않는다.",
+        "실무 대응 없이 숫자만 나열한다."
+      ]
+    }
+  ]
+}
