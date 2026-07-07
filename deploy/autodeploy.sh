@@ -58,7 +58,7 @@ fi
 # ===== 기본: 수동 배포 (pull + 필요 시에만 재시작) =====
 cd "$APP_DIR" || exit 1
 OLD=$(git rev-parse HEAD)
-git pull --ff-only 2>&1 | tee -a "$DEPLOY_LOG"
+git pull --ff-only origin main 2>&1 | tee -a "$DEPLOY_LOG"
 NEW=$(git rev-parse HEAD)
 
 if [ "$OLD" = "$NEW" ]; then
