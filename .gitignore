@@ -5,3 +5,6 @@ __pycache__/
 .env
 .DS_Store
 home-server.config.json
+app.log
+app.pid
+deploy.log
