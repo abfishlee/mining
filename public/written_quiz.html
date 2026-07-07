@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>필기 빈출 개념 문제풀이</title>
+<style>
+:root{--bg-color:#0f172a;--surface-color:rgba(30,41,59,.7);--text-main:#f8fafc;--text-muted:#94a3b8;--accent:#3b82f6;--ok:#22c55e;--bad:#ef4444;--glass-border:rgba(255,255,255,.1)}
+body{font-family:'Inter',sans-serif;background:var(--bg-color);color:var(--text-main);margin:0;padding:0 0 60px}
+.topbar{position:sticky;top:0;z-index:10;padding:12px 16px;background:rgba(15,23,42,.94);backdrop-filter:blur(10px);border-bottom:1px solid var(--glass-border)}
+.topbar a{color:var(--text-muted);text-decoration:none;font-size:.9rem}
+.topbar h1{font-size:1.05rem;margin:6px 0 10px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tabs button{padding:8px 14px;border-radius:999px;border:1px solid var(--glass-border);background:var(--surface-color);color:var(--text-main);font-size:.85rem;cursor:pointer}
+.tabs button.on{background:var(--accent);border-color:var(--accent)}
+.score{max-width:820px;margin:14px auto 0;padding:0 16px;font-size:.85rem;color:var(--text-muted)}
+.list{max-width:820px;margin:0 auto;padding:10px 16px}
+.q{background:var(--surface-color);border:1px solid var(--glass-border);border-radius:14px;padding:18px;margin-bottom:16px}
+.q .meta{font-size:.75rem;color:var(--text-muted);margin-bottom:6px}
+.q .stem{font-size:.98rem;line-height:1.55;margin-bottom:12px;white-space:pre-line}
+.opt{display:block;width:100%;text-align:left;margin-bottom:8px;padding:12px 14px;border-radius:10px;border:1px solid var(--glass-border);background:rgba(15,23,42,.5);color:var(--text-main);font-size:.92rem;cursor:pointer;line-height:1.4}
+.opt:disabled{cursor:default;opacity:.9}
+.opt.correct{border-color:var(--ok);background:rgba(34,197,94,.14)}
+.opt.wrong{border-color:var(--bad);background:rgba(239,68,68,.14)}
+.exp{display:none;margin-top:10px;padding:12px 14px;border-radius:10px;background:rgba(59,130,246,.1);border:1px solid rgba(59,130,246,.35);font-size:.87rem;line-height:1.6;color:#cbd5e1;white-space:pre-line}
+.exp.show{display:block}
+.tag{display:inline-block;padding:2px 9px;border-radius:999px;font-size:.72rem;margin-left:6px}
+.tag.pass{background:rgba(34,197,94,.18);color:#86efac}
+.tag.fail{background:rgba(239,68,68,.18);color:#fca5a5}
+.controls{max-width:820px;margin:0 auto;padding:4px 16px 10px;display:flex;gap:10px}
+.controls button{padding:9px 14px;border-radius:10px;border:1px solid var(--glass-border);background:var(--surface-color);color:var(--text-muted);font-size:.83rem;cursor:pointer}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <a href="written.html">← 필기 홈</a>
+  <h1>빈출 개념 문제풀이 <span id="prog"></span></h1>
+  <div class="tabs" id="tabs"></div>
+</div>
+<div class="score" id="score"></div>
+<div class="controls">
+  <button id="wrongonly">오답만 보기</button>
+  <button id="resetall">기록 초기화</button>
+</div>
+<div class="list" id="list"></div>
+<script src="written_questions.js"></script>
+<script>
+var KEY = 'written_quiz_v1';
+var state = {};
+try { state = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { state = {}; }
+var SUBJECTS = ['전체', '1과목 기획', '2과목 탐색', '3과목 모델링', '4과목 결과해석'];
+var curTab = 0, wrongOnly = false;
+
+function save(){ localStorage.setItem(KEY, JSON.stringify(state)); }
+
+function renderTabs(){
+  var t = document.getElementById('tabs'); t.innerHTML = '';
+  SUBJECTS.forEach(function(name, i){
+    var b = document.createElement('button');
+    b.textContent = name; if (i === curTab) b.className = 'on';
+    b.addEventListener('click', function(){ curTab = i; wrongOnly = false; render(); });
+    t.appendChild(b);
+  });
+}
+
+function renderScore(){
+  var per = [0,0,0,0], perOk = [0,0,0,0], total = 0, ok = 0;
+  QUESTIONS.forEach(function(q, idx){
+    var st = state[idx];
+    if (st != null) { per[q.s-1]++; total++; if (st === q.a) { perOk[q.s-1]++; ok++; } }
+  });
+  var parts = [];
+  for (var i = 0; i < 4; i++) parts.push((i+1) + '과목 ' + perOk[i] + '/' + per[i]);
+  document.getElementById('score').textContent =
+    '푼 문제 ' + total + '/' + QUESTIONS.length + ' · 정답 ' + ok +
+    (total ? ' (' + Math.round(ok/total*100) + '%)' : '') + '  |  ' + parts.join(' · ');
+  document.getElementById('prog').textContent = '(' + total + '/' + QUESTIONS.length + ')';
+}
+
+function render(){
+  renderTabs(); renderScore();
+  var list = document.getElementById('list'); list.innerHTML = '';
+  QUESTIONS.forEach(function(q, idx){
+    if (curTab !== 0 && q.s !== curTab) return;
+    var answered = state[idx] != null;
+    if (wrongOnly && (!answered || state[idx] === q.a)) return;
+    var box = document.createElement('div'); box.className = 'q';
+    var meta = document.createElement('div'); meta.className = 'meta';
+    meta.innerHTML = 'Q' + (idx+1) + ' · ' + SUBJECTS[q.s] + ' · ' + q.t +
+      (answered ? (state[idx] === q.a ? ' <span class="tag pass">정답</span>' : ' <span class="tag fail">오답</span>') : '');
+    var stem = document.createElement('div'); stem.className = 'stem'; stem.textContent = q.q;
+    box.appendChild(meta); box.appendChild(stem);
+    var exp = document.createElement('div'); exp.className = 'exp' + (answered ? ' show' : '');
+    exp.textContent = '해설: ' + q.e;
+    q.c.forEach(function(choice, ci){
+      var btn = document.createElement('button'); btn.className = 'opt';
+      btn.textContent = (ci+1) + '. ' + choice;
+      if (answered) {
+        btn.disabled = true;
+        if (ci === q.a) btn.className += ' correct';
+        else if (ci === state[idx]) btn.className += ' wrong';
+      } else {
+        btn.addEventListener('click', function(){
+          state[idx] = ci; save(); render();
+        });
+      }
+      box.appendChild(btn);
+    });
+    box.appendChild(exp);
+    list.appendChild(box);
+  });
+  if (!list.children.length) list.innerHTML = '<p style="color:var(--text-muted)">표시할 문제가 없습니다.</p>';
+}
+
+document.getElementById('wrongonly').addEventListener('click', function(){ wrongOnly = !wrongOnly; this.textContent = wrongOnly ? '전체 보기' : '오답만 보기'; render(); });
+document.getElementById('resetall').addEventListener('click', function(){ if (confirm('모든 풀이 기록을 초기화할까요?')) { state = {}; save(); wrongOnly = false; render(); } });
+render();
+</script>
+</body>
+</html>

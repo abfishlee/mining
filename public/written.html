@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>빅데이터분석기사 필기 대비</title>
+<style>
+:root{--bg-color:#0f172a;--surface-color:rgba(30,41,59,.7);--text-main:#f8fafc;--text-muted:#94a3b8;--accent:#3b82f6;--glass-border:rgba(255,255,255,.1)}
+body{font-family:'Inter',sans-serif;background-color:var(--bg-color);background-image:radial-gradient(at 0% 0%,rgba(59,130,246,.15) 0,transparent 50%),radial-gradient(at 100% 100%,rgba(139,92,246,.15) 0,transparent 50%);background-attachment:fixed;color:var(--text-main);margin:0;padding:32px 18px}
+.container{max-width:900px;margin:0 auto}
+a.back{color:var(--text-muted);text-decoration:none;font-size:.9rem}
+h1{margin:12px 0 6px}
+.sub{color:var(--text-muted);margin-bottom:28px}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:30px}
+@media(max-width:640px){.cards{grid-template-columns:1fr}}
+.card{background:var(--surface-color);border:1px solid var(--glass-border);border-radius:16px;padding:26px;text-decoration:none;color:var(--text-main);backdrop-filter:blur(12px);transition:border-color .15s;display:block}
+.card:hover{border-color:var(--accent)}
+.card h2{margin:0 0 8px;font-size:1.15rem}
+.card p{color:var(--text-muted);margin:0;font-size:.9rem}
+.info{background:var(--surface-color);border:1px solid var(--glass-border);border-radius:16px;padding:22px 26px}
+.info h3{margin:0 0 12px;font-size:1rem}
+.info table{width:100%;border-collapse:collapse;font-size:.88rem}
+.info td,.info th{padding:7px 8px;border-bottom:1px solid var(--glass-border);text-align:left}
+.info th{color:var(--text-muted);font-weight:600}
+.hot{margin-top:18px;font-size:.88rem;line-height:1.7;color:#cbd5e1}
+.hot b{color:#93c5fd}
+</style>
+</head>
+<body>
+<div class="container">
+  <a class="back" href="gateway.html">← 시작 화면</a>
+  <h1>📖 필기 대비</h1>
+  <p class="sub">핵심요약본으로 개념을 잡고, 빈출 개념 문제로 확인하세요</p>
+  <div class="cards">
+    <a class="card" href="written_summary.html">
+      <h2>① 핵심요약본 전체 보기</h2>
+      <p>4과목 핵심이론 원본 19페이지 · 목차 점프 · 태블릿 최적화 뷰어</p>
+    </a>
+    <a class="card" href="written_quiz.html">
+      <h2>② 빈출 개념 문제풀이</h2>
+      <p>과목별 객관식 40문항 · 즉시 채점 + 해설 · 오답 다시풀기 · 진행 저장</p>
+    </a>
+  </div>
+  <div class="info">
+    <h3>시험 구성 & 전략</h3>
+    <table>
+      <tr><th>과목</th><th>문항</th><th>핵심 범위</th></tr>
+      <tr><td>1. 빅데이터 분석 기획</td><td>20</td><td>5V·DIKW·방법론(CRISP-DM/KDD)·하둡·NoSQL·개인정보</td></tr>
+      <tr><td>2. 빅데이터 탐색</td><td>20</td><td>결측/이상치·척도·표본추출·확률분포·추정·가설검정</td></tr>
+      <tr><td>3. 빅데이터 모델링</td><td>20</td><td>회귀·분류·군집·연관·시계열·딥러닝·앙상블</td></tr>
+      <tr><td>4. 빅데이터 결과해석</td><td>20</td><td>혼동행렬·ROC·과대적합 방지·최적화·시각화·모형운영</td></tr>
+    </table>
+    <div class="hot">
+      <b>최신 경향 메모</b> — 계산보다 <b>이론·개념 응용</b> 비중 증가 추세. 매회 반복되는 축:
+      <b>3V/5V</b>, <b>CRISP-DM 6단계 순서</b>, <b>암묵지·형식지 SECI(공통화→표출화→연결화→내면화)</b>,
+      하둡 생태계(HDFS 3중복제·MapReduce), NoSQL 4유형, 결측치 MCAR/MAR/MNAR,
+      1·2종 오류와 p-value, 지지도·신뢰도·<b>향상도=1이면 독립</b>, 혼동행렬 지표 공식, L1(Lasso)·L2(Ridge) 규제.
+      합격선: 과목 40점 미만 과락 없이 <b>평균 60점</b>.
+    </div>
+  </div>
+</div>
+</body>
+</html>

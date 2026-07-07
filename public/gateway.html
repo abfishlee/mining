@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ADP · 빅데이터분석기사 학습 시스템</title>
+<style>
+:root{--bg-color:#0f172a;--surface-color:rgba(30,41,59,.7);--text-main:#f8fafc;--text-muted:#94a3b8;--accent:#3b82f6;--accent-hover:#2563eb;--glass-border:rgba(255,255,255,.1)}
+body{font-family:'Inter','Pretendard',sans-serif;background-color:var(--bg-color);background-image:radial-gradient(at 0% 0%,rgba(59,130,246,.15) 0,transparent 50%),radial-gradient(at 100% 100%,rgba(139,92,246,.15) 0,transparent 50%);background-attachment:fixed;color:var(--text-main);margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;box-sizing:border-box}
+.wrap{max-width:860px;width:100%;text-align:center}
+h1{font-size:2rem;margin:0 0 8px}
+.sub{color:var(--text-muted);margin-bottom:40px}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+@media(max-width:640px){.cards{grid-template-columns:1fr}}
+.card{background:var(--surface-color);border:1px solid var(--glass-border);border-radius:20px;padding:40px 28px;text-decoration:none;color:var(--text-main);backdrop-filter:blur(12px);transition:transform .15s,border-color .15s;display:block}
+.card:hover{transform:translateY(-4px);border-color:var(--accent)}
+.card:active{transform:scale(.98)}
+.icon{font-size:3rem;margin-bottom:14px}
+.card h2{margin:0 0 10px;font-size:1.4rem}
+.card p{color:var(--text-muted);margin:0;font-size:.95rem;line-height:1.55}
+.badge{display:inline-block;margin-top:16px;padding:6px 14px;border-radius:999px;font-size:.8rem;background:rgba(59,130,246,.18);color:#93c5fd}
+footer{margin-top:36px;color:var(--text-muted);font-size:.8rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>ADP · 빅데이터분석기사 학습 시스템</h1>
+  <p class="sub">오늘 공부할 영역을 선택하세요</p>
+  <div class="cards">
+    <a class="card" href="written.html">
+      <div class="icon">📖</div>
+      <h2>필기 대비</h2>
+      <p>핵심요약본 전체 열람 + 빈출 개념 문제풀이<br>4과목 × 20문항 · 평균 60점 합격 · 과목 40점 과락</p>
+      <span class="badge">이론 · 개념 중심 최신 경향</span>
+    </a>
+    <a class="card" href="index.html">
+      <div class="icon">💻</div>
+      <h2>실기 대비</h2>
+      <p>파이썬 러너 · 문제은행 자동채점 · 진행률 대시보드<br>작업형 1 · 2 · 3유형 실전 훈련</p>
+      <span class="badge">statsmodels 3유형 집중 세트 신규</span>
+    </a>
+  </div>
+  <footer>커밋하면 홈서버로 자동 배포 · 태블릿 학습 최적화</footer>
+</div>
+</body>
+</html>

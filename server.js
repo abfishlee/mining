@@ -11,7 +11,7 @@ const PROBLEMS_DIR = path.join(__dirname, 'problems');
 const MAX_COLLECTED_FILE_BYTES = 1024 * 1024;
 
 // 정적 파일 제공 (HTML, CSS, JS 등)
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public'), { index: 'gateway.html' }));
 // JSON 파싱 미들웨어 추가
 app.use(express.json());
 
