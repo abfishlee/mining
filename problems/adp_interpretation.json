@@ -1,0 +1,146 @@
+{
+  "page": "adp_interpretation",
+  "title": "ADP 해석·서술 집중: 진단통계와 답안 작성",
+  "problems": [
+    {
+      "id": "adp_vif_check",
+      "type": "code_numeric",
+      "exam": ["ADP"],
+      "topic": ["vif", "multicollinearity", "regression_diagnostics"],
+      "difficulty": "intermediate",
+      "dataset": "data/tips.csv",
+      "timeLimitMinutes": 10,
+      "prompt": "tips.csv에서 회귀모형 tip ~ total_bill + size의 독립변수 다중공선성을 VIF로 진단하시오. 상수항을 포함해 계산하고 total_bill의 VIF를 소수점 셋째 자리까지 출력하시오.",
+      "expected": { "kind": "numeric_tolerance", "value": 1.558, "tolerance": 0.005 },
+      "rubric": [
+        "statsmodels variance_inflation_factor를 사용하고 상수항(const)을 추가한다.",
+        "VIF 1.558 < 10(관행 기준 5~10) -> 다중공선성 문제 없음으로 판단한다.",
+        "ADP 서술: 'VIF가 기준 미만으로 공선성 우려가 낮아 회귀계수 해석이 안정적'."
+      ],
+      "commonMistakes": [
+        "상수항 없이 계산해 VIF가 다르게 나온다.",
+        "VIF가 1보다 크기만 하면 문제라고 오해한다(기준은 5~10).",
+        "종속변수 tip을 VIF 계산에 포함한다."
+      ]
+    },
+    {
+      "id": "adp_coef_writeup",
+      "type": "written_rubric",
+      "exam": ["ADP"],
+      "topic": ["regression", "interpretation", "writing"],
+      "difficulty": "intermediate",
+      "dataset": "data/tips.csv",
+      "timeLimitMinutes": 12,
+      "prompt": "회귀모형 tip ~ total_bill + size의 결과(결정계수 0.468, total_bill 계수 0.0927 유의, size 계수 유의 p=0.0249)를 바탕으로 ADP 답안 형식으로 서술하시오: 방법 선택 이유, 계수 해석, 적합성 확인, 한계와 보완.",
+      "expected": {
+        "kind": "rubric_keywords",
+        "keywords": ["결정계수", "회귀계수", "유의", "잔차", "다중공선성", "한계"]
+      },
+      "rubric": [
+        "연속형 종속변수 예측·설명 목적이므로 다중선형회귀를 선택했다고 쓴다.",
+        "total_bill 1달러 증가 시 팁이 평균 0.0927달러 증가(다른 변수 고정)로 해석한다.",
+        "결정계수 0.468 -> 변동의 약 47%를 설명한다고 쓴다.",
+        "잔차 정규성·등분산·독립성, VIF 확인으로 적합성을 점검했다고 쓴다.",
+        "한계: 인과 아님·생략변수 가능 -> 변수 추가/비선형항 검토를 보완으로 제시한다."
+      ],
+      "commonMistakes": [
+        "계수를 인과효과로 단정한다.",
+        "결정계수를 '예측 정확도 47%'로 잘못 표현한다.",
+        "한계·보완 문단을 빠뜨린다(ADP 감점 포인트)."
+      ]
+    },
+    {
+      "id": "adp_durbin_watson",
+      "type": "code_numeric",
+      "exam": ["ADP"],
+      "topic": ["regression_diagnostics", "durbin_watson", "residuals"],
+      "difficulty": "intermediate",
+      "dataset": "data/tips.csv",
+      "timeLimitMinutes": 8,
+      "prompt": "회귀모형 tip ~ total_bill + size의 잔차 독립성을 Durbin-Watson 통계량으로 진단하고 값을 소수점 셋째 자리까지 출력하시오. 판단 기준도 주석으로 쓰시오.",
+      "expected": { "kind": "numeric_tolerance", "value": 2.1, "tolerance": 0.01 },
+      "rubric": [
+        "statsmodels.stats.stattools.durbin_watson(model.resid)를 사용한다.",
+        "DW는 0~4 범위, 2 부근이면 자기상관 없음(0쪽 양의, 4쪽 음의 자기상관).",
+        "2.100 -> 잔차 독립성 가정 충족으로 판단한다."
+      ],
+      "commonMistakes": [
+        "DW를 p-value처럼 0.05와 비교한다.",
+        "summary 표에서 눈으로 옮기다 자릿수를 틀린다."
+      ]
+    },
+    {
+      "id": "adp_ts_writeup",
+      "type": "written_rubric",
+      "exam": ["ADP"],
+      "topic": ["timeseries", "stationarity", "writing"],
+      "difficulty": "advanced",
+      "dataset": "data/daily_sales.csv",
+      "timeLimitMinutes": 12,
+      "prompt": "daily_sales 분석 결과(상승 추세, lag-7 자기상관 0.662, 원계열 ADF p=0.845, 1차 차분 후 p<0.001)를 바탕으로 시계열 모델링 전략을 ADP 답안 형식으로 서술하시오.",
+      "expected": {
+        "kind": "rubric_keywords",
+        "keywords": ["추세", "계절성", "정상성", "차분", "ARIMA", "검증"]
+      },
+      "rubric": [
+        "상승 추세와 lag-7 자기상관 -> 주간 계절성이 존재한다고 진단한다.",
+        "ADF p=0.845 -> 비정상, 1차 차분 후 정상 -> d=1 근거를 쓴다.",
+        "계절성을 고려한 SARIMA(주기 7) 또는 계절 더미 활용을 제안한다.",
+        "시간 순서를 보존한 train/test 분리(임의 셔플 금지)와 예측 성능 검증을 쓴다.",
+        "프로모션 효과(외생변수)를 회귀항으로 포함하는 SARIMAX 확장을 언급한다."
+      ],
+      "commonMistakes": [
+        "시계열을 무작위로 셔플해 교차검증한다고 쓴다.",
+        "차분 근거 없이 ARIMA 차수를 임의로 정한다.",
+        "계절성 주기를 확인 절차 없이 단정한다."
+      ]
+    },
+    {
+      "id": "adp_logit_auc",
+      "type": "code_numeric",
+      "exam": ["ADP", "BigData"],
+      "topic": ["logistic_regression", "roc_auc", "evaluation"],
+      "difficulty": "advanced",
+      "dataset": "data/titanic.csv",
+      "timeLimitMinutes": 12,
+      "prompt": "titanic.csv에서 Age 결측 제거 후 로지스틱 회귀 Survived ~ Age + Fare + Sex_male(statsmodels logit)을 적합하고, 학습 데이터에 대한 예측확률로 ROC-AUC를 소수점 넷째 자리까지 출력하시오. (sklearn.metrics.roc_auc_score 사용)",
+      "expected": { "kind": "numeric_tolerance", "value": 0.8253, "tolerance": 0.002 },
+      "rubric": [
+        "model.predict()가 확률을 반환함을 안다(임계값 분류 전 단계).",
+        "roc_auc_score(실제값, 예측확률)의 인자 순서를 지킨다.",
+        "in-sample AUC의 한계(과대평가 가능) -> 홀드아웃/교차검증 필요성을 주석으로 쓴다."
+      ],
+      "commonMistakes": [
+        "예측확률 대신 0/1 분류 결과를 넣어 AUC가 달라진다.",
+        "인자 순서를 바꿔 넣는다.",
+        "in-sample 성능을 일반화 성능으로 단정한다."
+      ]
+    },
+    {
+      "id": "adp_imbalance_writeup",
+      "type": "written_rubric",
+      "exam": ["ADP"],
+      "topic": ["imbalanced_data", "evaluation", "writing"],
+      "difficulty": "intermediate",
+      "dataset": "data/customer_churn.csv",
+      "timeLimitMinutes": 10,
+      "prompt": "이탈 고객이 소수인 불균형 분류 문제에서 '정확도 90%' 모델을 보고받았다. 이 성과 보고의 문제점과 올바른 평가·대응 전략을 ADP 답안 형식으로 서술하시오.",
+      "expected": {
+        "kind": "rubric_keywords",
+        "keywords": ["불균형", "정확도", "재현율", "F1", "SMOTE", "임계값"]
+      },
+      "rubric": [
+        "다수 클래스만 맞혀도 정확도가 높게 나오는 함정을 지적한다.",
+        "재현율·정밀도·F1·ROC-AUC 등 불균형에 강한 지표로 평가해야 한다고 쓴다.",
+        "데이터 수준 대응: 오버샘플링(SMOTE)·언더샘플링을 제시한다.",
+        "알고리즘 수준 대응: 클래스 가중치, 분류 임계값 조정을 제시한다.",
+        "비즈니스 관점: 이탈 미탐(FN) 비용이 크면 재현율 우선 전략을 쓴다."
+      ],
+      "commonMistakes": [
+        "정확도 수치만으로 모델 우수성을 인정한다.",
+        "SMOTE를 테스트 데이터에도 적용한다고 쓴다(누수).",
+        "임계값 0.5를 고정 상수로 취급한다."
+      ]
+    }
+  ]
+}

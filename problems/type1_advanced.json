@@ -1,0 +1,178 @@
+{
+  "page": "type1_advanced",
+  "title": "1유형 고난도: 복합 전처리·집계 (최근 난이도 상승 대비)",
+  "problems": [
+    {
+      "id": "t1a_group_survival_pivot",
+      "type": "code_numeric",
+      "exam": ["BigData", "ADP"],
+      "topic": ["groupby", "pivot", "aggregation"],
+      "difficulty": "intermediate",
+      "dataset": "data/titanic.csv",
+      "timeLimitMinutes": 8,
+      "prompt": "titanic.csv에서 Pclass와 Sex로 그룹화한 생존율(Survived 평균) 중 가장 높은 값을 소수점 셋째 자리까지 출력하시오.",
+      "expected": { "kind": "numeric_tolerance", "value": 0.968, "tolerance": 0.001 },
+      "rubric": [
+        "groupby(['Pclass','Sex'])['Survived'].mean()으로 그룹별 생존율을 구한다.",
+        ".max()로 최댓값을 뽑는다 (1등석 여성 그룹).",
+        "count가 아닌 mean이 '비율'임을 이해한다."
+      ],
+      "commonMistakes": [
+        "sum을 써서 생존자 수를 출력한다.",
+        "한 변수로만 그룹화한다.",
+        "idxmax로 그룹 이름을 출력하고 값을 안 낸다."
+      ]
+    },
+    {
+      "id": "t1a_fare_top20_female",
+      "type": "code_numeric",
+      "exam": ["BigData"],
+      "topic": ["quantile", "filtering", "ratio"],
+      "difficulty": "intermediate",
+      "dataset": "data/titanic.csv",
+      "timeLimitMinutes": 8,
+      "prompt": "titanic.csv에서 Fare 상위 20%(0.8 분위수 이상) 승객 중 여성의 비율을 소수점 셋째 자리까지 출력하시오.",
+      "expected": { "kind": "numeric_tolerance", "value": 0.516, "tolerance": 0.001 },
+      "rubric": [
+        "quantile(0.8)로 기준값을 구한다.",
+        "기준값 '이상(>=)'으로 필터링한다.",
+        "(Sex=='female').mean()이 곧 비율임을 활용한다."
+      ],
+      "commonMistakes": [
+        "상위 20명으로 오해한다.",
+        "초과(>)로 잘라 경계 승객이 빠진다.",
+        "여성 수만 세고 비율로 나누지 않는다."
+      ]
+    },
+    {
+      "id": "t1a_age_impute_median_by_class",
+      "type": "code_numeric",
+      "exam": ["BigData", "ADP"],
+      "topic": ["missing_values", "groupby_transform", "imputation"],
+      "difficulty": "advanced",
+      "dataset": "data/titanic.csv",
+      "timeLimitMinutes": 10,
+      "prompt": "titanic.csv에서 Age 결측치를 '해당 승객 Pclass의 Age 중앙값'으로 대치한 뒤, 전체 Age 평균을 소수점 둘째 자리까지 출력하시오. [실무 표준: 그룹 조건부 대치]",
+      "expected": { "kind": "numeric_tolerance", "value": 29.07, "tolerance": 0.01 },
+      "rubric": [
+        "groupby('Pclass')['Age'].transform으로 그룹별 중앙값을 행 단위에 브로드캐스트한다.",
+        "fillna를 transform 결과로 수행한다.",
+        "전체 평균 대치보다 그룹 조건부 대치가 분포 왜곡이 적음을 안다."
+      ],
+      "commonMistakes": [
+        "전체 중앙값 하나로 대치해 29.07이 아닌 다른 값이 나온다.",
+        "apply와 transform을 혼동해 shape 오류가 난다.",
+        "대치 전에 평균을 계산한다."
+      ]
+    },
+    {
+      "id": "t1a_pivot_daytime_bill",
+      "type": "code_numeric",
+      "exam": ["BigData"],
+      "topic": ["pivot_table", "aggregation"],
+      "difficulty": "intermediate",
+      "dataset": "data/tips.csv",
+      "timeLimitMinutes": 8,
+      "prompt": "tips.csv에서 요일(day)×시간대(time) 피벗테이블로 total_bill 평균을 구하고, 그중 최댓값을 소수점 둘째 자리까지 출력하시오.",
+      "expected": { "kind": "numeric_tolerance", "value": 21.41, "tolerance": 0.01 },
+      "rubric": [
+        "pivot_table(index='day', columns='time', values='total_bill', aggfunc='mean')을 사용한다.",
+        "피벗 결과에서 .max().max()로 전체 최댓값을 얻는다.",
+        "NaN 셀(해당 조합 없음)은 max 계산에서 자동 제외됨을 안다."
+      ],
+      "commonMistakes": [
+        "aggfunc 기본값(mean)을 sum으로 바꿔 계산한다.",
+        ".max()를 한 번만 호출해 Series를 출력한다.",
+        "groupby 결과와 피벗을 혼동한다."
+      ]
+    },
+    {
+      "id": "t1a_name_title_miss",
+      "type": "code_numeric",
+      "exam": ["BigData", "ADP"],
+      "topic": ["string_processing", "regex", "feature_engineering"],
+      "difficulty": "advanced",
+      "dataset": "data/titanic.csv",
+      "timeLimitMinutes": 10,
+      "prompt": "titanic.csv의 Name 컬럼에서 호칭(쉼표 뒤, 마침표 앞 단어)을 추출하여 호칭이 'Miss'인 승객 수를 출력하시오. 예: 'Braund, Mr. Owen Harris' -> Mr",
+      "expected": { "kind": "numeric_tolerance", "value": 182, "tolerance": 0.5 },
+      "rubric": [
+        "str.extract(r',\\s*([^\\.]+)\\.')처럼 정규식으로 호칭을 뽑는다.",
+        "공백 처리(strip 또는 \\s*)를 정확히 한다.",
+        "(추출값=='Miss').sum()으로 개수를 센다."
+      ],
+      "commonMistakes": [
+        "split('.')만 써서 공백이 붙은 ' Miss'가 되어 매칭에 실패한다.",
+        "contains('Miss')로 'Mlle' 등 다른 호칭까지는 아니지만 부분일치 위험을 만든다.",
+        "대소문자를 일치시키지 않는다."
+      ]
+    },
+    {
+      "id": "t1a_churn_contract_rate",
+      "type": "code_numeric",
+      "exam": ["BigData", "ADP"],
+      "topic": ["groupby", "business_metric", "churn"],
+      "difficulty": "basic",
+      "dataset": "data/customer_churn.csv",
+      "timeLimitMinutes": 6,
+      "prompt": "customer_churn.csv에서 계약유형(contract)별 이탈률(churn 평균)을 구하고, 가장 높은 이탈률을 소수점 셋째 자리까지 출력하시오. [실무: 세그먼트별 KPI]",
+      "expected": { "kind": "numeric_tolerance", "value": 0.778, "tolerance": 0.001 },
+      "rubric": [
+        "groupby('contract')['churn'].mean()으로 세그먼트 이탈률을 구한다.",
+        "Month-to-month가 최고 위험군임을 결과에서 읽는다.",
+        "비즈니스 해석: 월단위 계약 고객 대상 리텐션 캠페인 우선순위."
+      ],
+      "commonMistakes": [
+        "count로 이탈자 수만 세고 비율을 내지 않는다.",
+        "전체 이탈률을 출력한다."
+      ]
+    },
+    {
+      "id": "t1a_family_group_rate",
+      "type": "code_numeric",
+      "exam": ["BigData", "ADP"],
+      "topic": ["feature_engineering", "cut", "binning"],
+      "difficulty": "advanced",
+      "dataset": "data/titanic.csv",
+      "timeLimitMinutes": 12,
+      "prompt": "titanic.csv에서 가족규모 = SibSp + Parch + 1 파생변수를 만들고, 1인(=1) / 소가족(2~4) / 대가족(5+) 구간으로 나눈 뒤 (1) 소가족 생존율과 (2) 대가족 생존율을 각각 소수점 셋째 자리까지 출력하시오.",
+      "expected": {
+        "kind": "multiple_numeric_tolerance",
+        "values": { "소가족": 0.579, "대가족": 0.161 },
+        "tolerance": 0.001
+      },
+      "rubric": [
+        "파생변수 가족규모를 먼저 만든다(+1 포함).",
+        "pd.cut(bins=[0,1,4,20])처럼 구간 경계를 정확히 잡는다.",
+        "groupby(구간)['Survived'].mean()으로 생존율을 구한다.",
+        "해석: 소가족이 유리, 대가족·1인은 불리 — 파생변수의 예측력 확인."
+      ],
+      "commonMistakes": [
+        "+1을 빠뜨려 구간이 밀린다.",
+        "cut 경계를 (1,4] 대신 [1,4)로 잡아 4인 가족이 대가족으로 간다.",
+        "qcut(분위수 구간)과 cut(값 구간)을 혼동한다."
+      ]
+    },
+    {
+      "id": "t1a_fare_iqr_outliers",
+      "type": "code_numeric",
+      "exam": ["BigData"],
+      "topic": ["outlier", "iqr"],
+      "difficulty": "basic",
+      "dataset": "data/titanic.csv",
+      "timeLimitMinutes": 8,
+      "prompt": "titanic.csv에서 Fare의 IQR 기준 이상치(Q1-1.5*IQR 미만 또는 Q3+1.5*IQR 초과) 개수를 출력하시오.",
+      "expected": { "kind": "numeric_tolerance", "value": 116, "tolerance": 0.5 },
+      "rubric": [
+        "quantile(0.25), quantile(0.75)로 Q1·Q3를 구한다.",
+        "경계 '미만/초과' 조건을 정확히 쓴다(이상/이하 아님).",
+        "불리언 합(sum)으로 개수를 센다."
+      ],
+      "commonMistakes": [
+        "<=, >=로 경계를 포함해 개수가 달라진다.",
+        "IQR에 1.5를 곱하지 않는다.",
+        "이상치를 제거한 뒤 남은 행 수를 출력한다."
+      ]
+    }
+  ]
+}

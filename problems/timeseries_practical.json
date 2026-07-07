@@ -1,0 +1,127 @@
+{
+  "page": "timeseries_practical",
+  "title": "시계열 실무·ADP 대비: 이동평균·리샘플·정상성",
+  "problems": [
+    {
+      "id": "ts_rolling7_max",
+      "type": "code_numeric",
+      "exam": ["ADP", "BigData"],
+      "topic": ["timeseries", "rolling", "moving_average"],
+      "difficulty": "basic",
+      "dataset": "data/daily_sales.csv",
+      "timeLimitMinutes": 8,
+      "prompt": "daily_sales.csv에서 sales의 7일 이동평균을 구하고 그 최댓값을 소수점 둘째 자리까지 출력하시오. [실무: 주간 스무딩으로 추세 확인]",
+      "expected": { "kind": "numeric_tolerance", "value": 165.79, "tolerance": 0.01 },
+      "rubric": [
+        "rolling(7).mean()으로 이동평균을 만든다.",
+        "앞 6개 행이 NaN이 되는 이유(윈도 미충족)를 안다.",
+        ".max()로 최댓값을 출력한다."
+      ],
+      "commonMistakes": [
+        "rolling(window=7, min_periods=1)로 바꿔 값이 달라진다.",
+        "누적평균 expanding과 혼동한다."
+      ]
+    },
+    {
+      "id": "ts_monthly_mean_max",
+      "type": "code_numeric",
+      "exam": ["ADP", "BigData"],
+      "topic": ["timeseries", "resample", "datetime"],
+      "difficulty": "intermediate",
+      "dataset": "data/daily_sales.csv",
+      "timeLimitMinutes": 8,
+      "prompt": "daily_sales.csv에서 date를 날짜형으로 변환·인덱스 설정 후 월 단위 sales 평균으로 리샘플하고, 월평균 중 최댓값을 소수점 둘째 자리까지 출력하시오.",
+      "expected": { "kind": "numeric_tolerance", "value": 160.66, "tolerance": 0.01 },
+      "rubric": [
+        "pd.read_csv(..., parse_dates=['date']) 또는 pd.to_datetime으로 변환한다.",
+        "set_index('date') 후 resample('ME')['sales'].mean()을 쓴다(구버전은 'M').",
+        "idxmax로 어느 달인지도 확인해 본다(2025-06)."
+      ],
+      "commonMistakes": [
+        "날짜형 변환 없이 resample을 호출해 오류가 난다.",
+        "groupby(월 문자열)로 정렬이 어긋난 채 계산한다.",
+        "sum과 mean을 혼동한다."
+      ]
+    },
+    {
+      "id": "ts_promo_effect",
+      "type": "code_numeric",
+      "exam": ["ADP"],
+      "topic": ["timeseries", "ab_comparison", "business_metric"],
+      "difficulty": "basic",
+      "dataset": "data/daily_sales.csv",
+      "timeLimitMinutes": 6,
+      "prompt": "daily_sales.csv에서 프로모션이 있었던 날(promo=1)과 없었던 날(promo=0)의 sales 평균 차이(있음-없음)를 소수점 둘째 자리까지 출력하시오. [실무: 캠페인 효과 1차 추정]",
+      "expected": { "kind": "numeric_tolerance", "value": 21.63, "tolerance": 0.01 },
+      "rubric": [
+        "조건 필터 또는 groupby('promo')['sales'].mean()으로 두 평균을 구한다.",
+        "차이의 방향(있음-없음)을 문제대로 지킨다.",
+        "해석 주의: 단순 평균차는 인과효과가 아니며 t-검정·통제 필요."
+      ],
+      "commonMistakes": [
+        "방향을 반대로 빼서 부호가 반전된다.",
+        "평균차를 곧바로 '프로모션 효과 확정'으로 해석한다."
+      ]
+    },
+    {
+      "id": "ts_adf_raw",
+      "type": "code_numeric",
+      "exam": ["ADP"],
+      "topic": ["timeseries", "stationarity", "adf"],
+      "difficulty": "advanced",
+      "dataset": "data/daily_sales.csv",
+      "timeLimitMinutes": 10,
+      "prompt": "daily_sales.csv의 sales 원계열에 ADF(Augmented Dickey-Fuller) 검정을 수행하고 p-value를 소수점 넷째 자리까지 출력하시오. 정상성 여부도 주석으로 판단하시오.",
+      "expected": { "kind": "numeric_tolerance", "value": 0.8453, "tolerance": 0.002 },
+      "rubric": [
+        "statsmodels.tsa.stattools.adfuller(series)를 사용한다.",
+        "반환 튜플의 [1]이 p-value임을 안다.",
+        "p=0.845 > 0.05 -> 단위근 존재 기각 못함 -> 비정상 계열로 판단한다."
+      ],
+      "commonMistakes": [
+        "반환값 [0](검정통계량)을 p-value로 출력한다.",
+        "귀무가설 방향을 반대로 해석한다(ADF의 H0는 '비정상(단위근 있음)')."
+      ]
+    },
+    {
+      "id": "ts_adf_diff",
+      "type": "code_numeric",
+      "exam": ["ADP"],
+      "topic": ["timeseries", "differencing", "adf"],
+      "difficulty": "advanced",
+      "dataset": "data/daily_sales.csv",
+      "timeLimitMinutes": 8,
+      "prompt": "sales를 1차 차분(diff)하고 결측 제거 후 ADF 검정 p-value를 소수점 넷째 자리까지 출력하시오. (차분으로 정상성이 확보되는지 확인)",
+      "expected": { "kind": "numeric_tolerance", "value": 0.0, "tolerance": 0.001 },
+      "rubric": [
+        "diff().dropna() 순서를 지킨다(차분 첫 값은 NaN).",
+        "p-value가 사실상 0 -> 정상성 확보 -> ARIMA의 d=1 근거가 된다.",
+        "원계열 vs 차분 계열의 검정 결과를 비교 서술할 수 있어야 한다."
+      ],
+      "commonMistakes": [
+        "dropna 없이 adfuller에 NaN을 넣어 오류가 난다.",
+        "2차 차분까지 해버린다."
+      ]
+    },
+    {
+      "id": "ts_autocorr_lag7",
+      "type": "code_numeric",
+      "exam": ["ADP"],
+      "topic": ["timeseries", "autocorrelation", "seasonality"],
+      "difficulty": "intermediate",
+      "dataset": "data/daily_sales.csv",
+      "timeLimitMinutes": 8,
+      "prompt": "sales의 lag-7 자기상관계수를 소수점 셋째 자리까지 출력하시오. 값이 큰 이유(주 단위 패턴)를 주석으로 설명하시오.",
+      "expected": { "kind": "numeric_tolerance", "value": 0.662, "tolerance": 0.005 },
+      "rubric": [
+        "Series.autocorr(lag=7)을 사용한다.",
+        "높은 lag-7 상관 = 주간 계절성의 신호임을 해석한다.",
+        "ACF/PACF 플롯으로 시각 확인하는 실무 절차를 언급할 수 있다."
+      ],
+      "commonMistakes": [
+        "lag=1 기본값으로 계산한다.",
+        "상관이 높다고 곧바로 '7일 주기 인과'로 단정한다."
+      ]
+    }
+  ]
+}
