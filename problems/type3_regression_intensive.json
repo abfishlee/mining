@@ -1,0 +1,187 @@
+{
+  "page": "type3_regression_intensive",
+  "title": "3유형 집중: statsmodels 회귀·가설검정 (최신 기출 경향)",
+  "problems": [
+    {
+      "id": "t3r_ols_r2_coef",
+      "type": "code_numeric",
+      "exam": ["BigData", "ADP"],
+      "topic": ["regression", "ols", "statsmodels", "r_squared"],
+      "difficulty": "intermediate",
+      "dataset": "data/tips.csv",
+      "timeLimitMinutes": 10,
+      "prompt": "tips.csv에서 tip을 종속변수, total_bill과 size를 독립변수로 하는 다중선형회귀를 statsmodels ols로 적합하시오. (1) 결정계수를 소수점 셋째 자리까지, (2) total_bill의 회귀계수를 소수점 넷째 자리까지 각각 출력하시오. [7회 기출 경향: scipy가 아닌 statsmodels 필수]",
+      "expected": {
+        "kind": "multiple_numeric_tolerance",
+        "values": { "결정계수": 0.468, "total_bill계수": 0.0927 },
+        "tolerance": 0.001
+      },
+      "rubric": [
+        "statsmodels.formula.api의 ols('tip ~ total_bill + size', data=df).fit()을 사용한다.",
+        "결정계수는 model.rsquared로 얻는다.",
+        "회귀계수는 model.params['total_bill']로 얻는다.",
+        "요구된 자릿수로 반올림해 출력한다."
+      ],
+      "commonMistakes": [
+        "sklearn LinearRegression을 사용해 rsquared·pvalues 속성이 없어 헤맨다.",
+        "formula 문법에서 종속~독립 순서를 뒤집는다.",
+        "rsquared_adj(수정 결정계수)를 결정계수로 잘못 출력한다.",
+        "round 자릿수를 문제 요구와 다르게 한다."
+      ]
+    },
+    {
+      "id": "t3r_ols_pvalue_size",
+      "type": "code_numeric",
+      "exam": ["BigData", "ADP"],
+      "topic": ["regression", "ols", "p_value", "significance"],
+      "difficulty": "intermediate",
+      "dataset": "data/tips.csv",
+      "timeLimitMinutes": 8,
+      "prompt": "위와 동일한 회귀모형(tip ~ total_bill + size)에서 size 변수의 p-value를 소수점 넷째 자리까지 출력하시오. 유의수준 0.05에서 size가 유의한지도 주석으로 판단하시오.",
+      "expected": { "kind": "numeric_tolerance", "value": 0.0249, "tolerance": 0.0005 },
+      "rubric": [
+        "model.pvalues['size']로 p-value를 얻는다.",
+        "p-value 0.0249 < 0.05 이므로 size는 유의하다고 판단한다.",
+        "소수점 넷째 자리까지 반올림한다."
+      ],
+      "commonMistakes": [
+        "summary() 표를 눈으로 읽고 손으로 옮겨 적다 오타를 낸다(코드로 추출할 것).",
+        "t값과 p-value를 혼동한다.",
+        "양측/단측을 임의로 바꿔 p/2를 출력한다."
+      ]
+    },
+    {
+      "id": "t3r_ols_conf_int",
+      "type": "code_numeric",
+      "exam": ["BigData"],
+      "topic": ["regression", "confidence_interval", "statsmodels"],
+      "difficulty": "intermediate",
+      "dataset": "data/tips.csv",
+      "timeLimitMinutes": 8,
+      "prompt": "동일 모형(tip ~ total_bill + size)에서 total_bill 회귀계수의 95% 신뢰구간 상한을 소수점 넷째 자리까지 출력하시오.",
+      "expected": { "kind": "numeric_tolerance", "value": 0.1107, "tolerance": 0.0005 },
+      "rubric": [
+        "model.conf_int()로 신뢰구간 데이터프레임을 얻는다.",
+        ".loc['total_bill', 1] 또는 [1]열이 상한임을 안다.",
+        "alpha 기본값 0.05가 95% 신뢰구간임을 이해한다."
+      ],
+      "commonMistakes": [
+        "하한(0열)과 상한(1열)을 혼동한다.",
+        "conf_int(alpha=0.95)로 잘못 지정해 5% 신뢰구간을 만든다.",
+        "표준오차에 1.96을 곱해 수동 계산하다 자유도 차이로 값이 어긋난다."
+      ]
+    },
+    {
+      "id": "t3r_logit_oddsratio_sex",
+      "type": "code_numeric",
+      "exam": ["BigData", "ADP"],
+      "topic": ["logistic_regression", "odds_ratio", "statsmodels"],
+      "difficulty": "advanced",
+      "dataset": "data/titanic.csv",
+      "timeLimitMinutes": 12,
+      "prompt": "titanic.csv에서 Age 결측 행을 제거한 뒤, Survived를 종속변수로 Age, Fare, Sex_male(남성=1)을 독립변수로 statsmodels Logit(logit) 로지스틱 회귀를 적합하시오. Sex_male의 오즈비(odds ratio)를 소수점 넷째 자리까지 출력하시오. [최신 3유형 핵심 유형]",
+      "expected": { "kind": "numeric_tolerance", "value": 0.0956, "tolerance": 0.001 },
+      "rubric": [
+        "Age 결측 행만 제거한다(dropna 대상 열 주의: Survived, Age, Fare, Sex).",
+        "Sex를 남성=1 더미변수 Sex_male로 변환한다.",
+        "logit('Survived ~ Age + Fare + Sex_male', data=df).fit()으로 적합한다.",
+        "오즈비 = np.exp(회귀계수) 임을 안다.",
+        "결과 해석: 오즈비 0.0956 -> 남성의 생존 오즈는 여성의 약 9.6% 수준."
+      ],
+      "commonMistakes": [
+        "오즈비 대신 회귀계수(로그오즈)를 그대로 출력한다.",
+        "전체 dropna로 Cabin 결측까지 제거해 표본이 크게 줄어 값이 달라진다.",
+        "여성=1로 인코딩하고도 남성 기준으로 해석한다.",
+        "sklearn LogisticRegression(규제 기본 적용)을 써서 계수가 statsmodels와 달라진다."
+      ]
+    },
+    {
+      "id": "t3r_logit_age_odds",
+      "type": "code_numeric",
+      "exam": ["BigData"],
+      "topic": ["logistic_regression", "odds_ratio", "interpretation"],
+      "difficulty": "advanced",
+      "dataset": "data/titanic.csv",
+      "timeLimitMinutes": 8,
+      "prompt": "위와 동일한 로지스틱 모형에서 Age의 오즈비를 소수점 넷째 자리까지 출력하시오. 'Age가 1세 증가할 때 생존 오즈가 몇 % 감소하는가'도 주석으로 계산하시오.",
+      "expected": { "kind": "numeric_tolerance", "value": 0.9895, "tolerance": 0.001 },
+      "rubric": [
+        "np.exp(model.params['Age'])로 오즈비를 계산한다.",
+        "오즈비 0.9895 -> (1-0.9895)*100 = 약 1.05% 감소로 해석한다.",
+        "연속형 변수의 오즈비는 '1단위 증가당' 해석임을 안다."
+      ],
+      "commonMistakes": [
+        "감소율을 (1-오즈비)가 아닌 계수 자체로 말한다.",
+        "확률(probability)과 오즈(odds)를 혼동해 해석한다."
+      ]
+    },
+    {
+      "id": "t3r_chi2_pclass",
+      "type": "code_numeric",
+      "exam": ["BigData", "ADP"],
+      "topic": ["chi_square", "independence_test", "crosstab"],
+      "difficulty": "basic",
+      "dataset": "data/titanic.csv",
+      "timeLimitMinutes": 8,
+      "prompt": "titanic.csv에서 Pclass와 Survived의 독립성을 카이제곱 검정으로 확인하시오. 검정통계량을 소수점 둘째 자리까지 출력하시오. (자유도와 p-value도 주석으로 확인)",
+      "expected": { "kind": "numeric_tolerance", "value": 102.89, "tolerance": 0.01 },
+      "rubric": [
+        "pd.crosstab(df['Pclass'], df['Survived'])으로 교차표를 만든다.",
+        "scipy.stats.chi2_contingency(교차표)를 사용한다.",
+        "반환 순서 (chi2, p, dof, expected)를 안다.",
+        "자유도 = (행-1)x(열-1) = 2임을 검산한다."
+      ],
+      "commonMistakes": [
+        "교차표 없이 원 데이터 두 열을 바로 넣는다.",
+        "chi2_contingency 반환값 순서를 혼동해 p를 통계량으로 출력한다.",
+        "correction 인자를 임의로 바꿔 값이 달라진다."
+      ]
+    },
+    {
+      "id": "t3r_welch_fare",
+      "type": "code_numeric",
+      "exam": ["BigData"],
+      "topic": ["t_test", "welch", "two_sample"],
+      "difficulty": "basic",
+      "dataset": "data/titanic.csv",
+      "timeLimitMinutes": 8,
+      "prompt": "titanic.csv에서 여성과 남성의 Fare 평균 차이를 Welch 이표본 t-검정(등분산 가정 X)으로 검정하시오. 검정통계량(여성-남성 방향)을 소수점 셋째 자리까지 출력하시오.",
+      "expected": { "kind": "numeric_tolerance", "value": 5.077, "tolerance": 0.005 },
+      "rubric": [
+        "ttest_ind(여성Fare, 남성Fare, equal_var=False)를 사용한다.",
+        "equal_var=False가 Welch 검정임을 안다.",
+        "인자 순서가 부호(방향)를 결정함을 안다."
+      ],
+      "commonMistakes": [
+        "equal_var 기본값(True)으로 두어 Student t가 된다.",
+        "그룹 순서를 바꿔 부호가 반대(-5.077)가 된다.",
+        "결측 처리 방식을 임의로 추가해 표본이 달라진다."
+      ]
+    },
+    {
+      "id": "t3r_shapiro_anova",
+      "type": "code_numeric",
+      "exam": ["BigData", "ADP"],
+      "topic": ["normality", "shapiro", "anova"],
+      "difficulty": "intermediate",
+      "dataset": "data/tips.csv",
+      "timeLimitMinutes": 10,
+      "prompt": "tips.csv에서 (1) tip의 정규성을 Shapiro-Wilk로 검정해 통계량 W를 소수점 넷째 자리까지, (2) 요일(day)별 total_bill 평균 차이를 일원분산분석(ANOVA)으로 검정해 F 통계량을 소수점 셋째 자리까지 출력하시오.",
+      "expected": {
+        "kind": "multiple_numeric_tolerance",
+        "values": { "W": 0.8978, "F": 2.767 },
+        "tolerance": 0.001
+      },
+      "rubric": [
+        "stats.shapiro(df['tip'])의 첫 번째 반환값이 W 통계량이다.",
+        "groupby로 요일별 total_bill 배열을 만들어 f_oneway(*groups)에 전달한다.",
+        "정규성 p<0.05면 정규성 기각 -> 비모수 대안(Kruskal-Wallis) 언급 가능."
+      ],
+      "commonMistakes": [
+        "shapiro 반환값 (W, p) 순서를 혼동한다.",
+        "f_oneway에 그룹 리스트를 언패킹(*) 없이 통째로 넣는다.",
+        "ANOVA 유의 후 사후검정 없이 '어느 그룹이 다른지'까지 단정한다."
+      ]
+    }
+  ]
+}

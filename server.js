@@ -174,14 +174,20 @@ app.get('/api/problem-sets', (req, res) => {
     const sets = fs.readdirSync(PROBLEMS_DIR)
         .filter((file) => file.endsWith('.json'))
         .map((file) => {
-            const data = readProblemSet(file);
-            return {
-                file,
-                page: data.page,
-                title: data.title,
-                problemCount: Array.isArray(data.problems) ? data.problems.length : 0
-            };
-        });
+            try {
+                const data = readProblemSet(file);
+                return {
+                    file,
+                    page: data.page,
+                    title: data.title,
+                    problemCount: Array.isArray(data.problems) ? data.problems.length : 0
+                };
+            } catch (error) {
+                console.error(`문제집 로드 실패: ${file} - ${error.message}`);
+                return null;
+            }
+        })
+        .filter(Boolean);
 
     res.json({ sets });
 });
