@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>통계·모델링 비유로 정복하기</title>
+<style>
+:root{--bg-color:#0f172a;--surface-color:rgba(30,41,59,.7);--text-main:#f8fafc;--text-muted:#94a3b8;--accent:#3b82f6;--glass-border:rgba(255,255,255,.1)}
+body{font-family:'Inter',sans-serif;background-color:var(--bg-color);background-image:radial-gradient(at 0% 0%,rgba(59,130,246,.15) 0,transparent 50%),radial-gradient(at 100% 100%,rgba(139,92,246,.15) 0,transparent 50%);background-attachment:fixed;color:var(--text-main);margin:0;padding:24px 16px 80px;line-height:1.7}
+.wrap{max-width:860px;margin:0 auto}
+a.back{color:var(--text-muted);text-decoration:none;font-size:.9rem}
+h1{margin:12px 0 4px;font-size:1.5rem}
+.sub{color:var(--text-muted);margin-bottom:20px;font-size:.92rem}
+.toc{background:var(--surface-color);border:1px solid var(--glass-border);border-radius:14px;padding:16px 20px;margin-bottom:24px;font-size:.88rem}
+.toc a{color:#93c5fd;text-decoration:none}
+.toc span{color:var(--text-muted)}
+details{background:var(--surface-color);border:1px solid var(--glass-border);border-radius:14px;margin-bottom:14px;overflow:hidden}
+summary{padding:16px 20px;cursor:pointer;font-weight:700;font-size:1.02rem;list-style:none;display:flex;align-items:center;gap:10px}
+summary::-webkit-details-marker{display:none}
+summary::before{content:'▸';color:var(--accent);transition:transform .15s}
+details[open] summary::before{transform:rotate(90deg)}
+.body{padding:0 20px 18px;font-size:.93rem;color:#dbe3ee}
+.lv{font-size:.68rem;padding:3px 9px;border-radius:999px;font-weight:800;letter-spacing:.05em}
+.lv.b{background:rgba(34,197,94,.18);color:#86efac}
+.lv.i{background:rgba(59,130,246,.2);color:#93c5fd}
+.lv.a{background:rgba(168,85,247,.2);color:#d8b4fe}
+.ana{background:rgba(59,130,246,.09);border-left:3px solid var(--accent);border-radius:0 10px 10px 0;padding:12px 14px;margin:12px 0}
+.ana b{color:#93c5fd}
+.ex{background:rgba(34,197,94,.07);border-left:3px solid #22c55e;border-radius:0 10px 10px 0;padding:12px 14px;margin:12px 0}
+.ex b{color:#86efac}
+.tip{background:rgba(250,204,21,.08);border-left:3px solid #facc15;border-radius:0 10px 10px 0;padding:12px 14px;margin:12px 0}
+.tip b{color:#fde68a}
+.body h4{margin:16px 0 6px;color:#f1f5f9}
+.body table{width:100%;border-collapse:collapse;font-size:.85rem;margin:10px 0}
+.body td,.body th{padding:6px 8px;border-bottom:1px solid var(--glass-border);text-align:left}
+.body th{color:var(--text-muted)}
+code{background:rgba(255,255,255,.08);padding:1px 6px;border-radius:5px;font-size:.85em}
+h2.part{margin:34px 0 14px;font-size:1.2rem;border-bottom:1px solid var(--glass-border);padding-bottom:8px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<a class="back" href="written.html">← 필기 홈</a>
+<h1>📊 통계·모델링 비유로 정복하기</h1>
+<p class="sub">ADP·빅데이터분석기사 2~4과목 핵심을 실무 예시와 비유로 — 초급 🟢 → 중급 🔵 → 고급 🟣</p>
+
+<div class="toc">
+<span>통계 편</span> — <a href="#s1">척도</a> · <a href="#s2">대푯값의 함정</a> · <a href="#s3">확률분포 3대장</a> · <a href="#s4">표본추출</a> · <a href="#s5">중심극한정리</a> · <a href="#s6">신뢰구간</a> · <a href="#s7">가설검정=재판</a> · <a href="#s8">검정 선택 지도</a> · <a href="#s9">상관≠인과</a><br>
+<span>모델링 편</span> — <a href="#m1">회귀</a> · <a href="#m2">로지스틱·오즈</a> · <a href="#m3">과적합=족보암기</a> · <a href="#m4">규제</a> · <a href="#m5">의사결정나무</a> · <a href="#m6">앙상블=집단지성</a> · <a href="#m7">SVM</a> · <a href="#m8">KNN</a> · <a href="#m9">군집</a> · <a href="#m10">연관분석</a> · <a href="#m11">시계열</a> · <a href="#m12">신경망·딥러닝</a> · <a href="#m13">평가지표</a> · <a href="#m14">불균형 데이터</a>
+</div>
+
+<h2 class="part">Ⅰ. 통계 편</h2>
+
+<details id="s1" open><summary><span class="lv b">초급</span> 1. 척도 — 옷 사이즈, 온도계, 몸무게의 차이</summary><div class="body">
+<div class="ana"><b>비유:</b> 등번호(명목)는 크기 비교가 무의미하고, 옷 사이즈 S·M·L(서열)은 순서만 있지 M−S가 얼마인지 모릅니다. 섭씨 온도(등간)는 뺄셈은 되지만 20℃가 10℃의 '2배 더움'은 아니고(0℃가 무(無)가 아니라서), 몸무게(비율)만이 진짜 0이 있어 2배·3배가 성립합니다.</div>
+<div class="ex"><b>실무 예시:</b> 고객 설문의 만족도 1~5점은 엄밀히는 서열척도입니다. 실무에선 평균을 내지만, 시험에선 "서열척도에 산술평균은 원칙적으로 부적절"이 정답 방향입니다. 회원 등급(브론즈/실버/골드)=서열, 가입 지역=명목, 구매금액=비율.</div>
+<div class="tip"><b>시험 포인트:</b> "절대영점이 있는가"가 등간 vs 비율의 결정타. 온도·주가지수·연도=등간, 키·무게·소득·나이=비율. 명목척도에 수치를 '부여'할 수는 있지만 그 수로 '연산'하면 오답.</div>
+</div></details>
+
+<details id="s2"><summary><span class="lv b">초급</span> 2. 평균의 함정 — 대푯값과 산포</summary><div class="body">
+<div class="ana"><b>비유:</b> 사원 9명이 연봉 3천, 사장이 30억인 회사의 '평균 연봉'은 약 3.3억. 구직자에게 의미 있는 숫자는 중앙값 3천입니다. 평균은 극단값에 끌려가는 '팔랑귀'이고, 중앙값은 흔들리지 않는 '고집쟁이'입니다.</div>
+<div class="ex"><b>실무 예시:</b> 이커머스 주문금액 분포는 거의 항상 오른쪽 꼬리가 긴(양의 왜도) 분포 → 최빈값 &lt; 중앙값 &lt; 평균. 리포트에 "평균 주문금액"만 쓰면 소수 고액주문이 지표를 왜곡합니다. 그래서 실무 대시보드는 중앙값·분위수를 병기합니다.</div>
+<h4>산포 비교의 도구, 변동계수</h4>
+<div class="ana"><b>비유:</b> 코끼리 몸무게(평균 5톤)와 쥐 몸무게(평균 30g)의 표준편차를 그냥 비교하면 코끼리가 무조건 큽니다. 변동계수 CV = 표준편차/평균으로 '몸집 대비 흔들림'을 봐야 공정한 비교가 됩니다.</div>
+<div class="tip"><b>시험 포인트:</b> 양의 왜도(오른쪽 꼬리)에서 대푯값 순서 = 최빈값&lt;중앙값&lt;평균. 단위·평균이 다른 집단의 산포 비교=변동계수. 상자그림으로 산포 차이는 볼 수 있지만 "통계적 유의성"까지는 판단 불가(그건 검정의 몫).</div>
+</div></details>
+
+<details id="s3"><summary><span class="lv i">중급</span> 3. 확률분포 3대장 + 비복원의 초기하</summary><div class="body">
+<div class="ana"><b>비유:</b> 이항분포는 "동전 n번 던져 앞면 몇 번?", 포아송은 "1시간에 콜센터 전화 몇 통?"(시행 횟수라는 개념 자체가 없고 발생률 λ만 있음), 정규분포는 "성인 남성 키"처럼 자연이 만드는 종 모양입니다.</div>
+<div class="ex"><b>실무 예시:</b> ① 배너 노출 1,000회 중 클릭 수 → 이항. ② 서버가 분당 받는 에러 로그 건수 → 포아송(희귀 사건 모형화, n 크고 p 작은 이항의 근사이기도). ③ 반품률처럼 '전체 N개 중 불량 K개가 섞인 상자에서 n개를 비복원으로 검사' → 초기하분포(로또와 같은 구조 — 뽑은 공을 되돌리지 않음).</div>
+<h4>연속분포 파생 3형제</h4>
+<p>정규에서 파생: 표본이 작을 때 평균 검정=t분포(정규보다 꼬리가 두꺼움), 분산 검정·적합도=카이제곱, 두 분산의 비=F분포(ANOVA의 엔진).</p>
+<div class="tip"><b>시험 포인트:</b> "단위시간당 발생 횟수"=포아송, "비복원추출"=초기하, "n회 중 성공 횟수"=이항. E(X) 계산형: P(X=1)=p, P(X=-1)=1-p이면 E(X)=1·p+(-1)(1-p)=2p-1.</div>
+</div></details>
+
+<details id="s4"><summary><span class="lv b">초급</span> 4. 표본추출 — 국 한 숟갈로 간 보기</summary><div class="body">
+<div class="ana"><b>비유:</b> 국 전체(모집단)를 다 마셔볼 필요 없이 잘 저은 뒤 한 숟갈(표본)로 간을 봅니다. '잘 젓는 것'이 무작위화입니다. 층화추출은 건더기·국물을 따로따로 한 숟갈씩(층 내부는 동질), 군집추출은 여러 냄비 중 몇 냄비를 통째로 맛보기(군집 내부는 모집단의 축소판=이질).</div>
+<div class="ex"><b>실무 예시:</b> 전사 만족도 조사에서 "본사/공장/영업소" 비율대로 뽑으면 층화추출. 전국 초등학교 중 30개 학교를 뽑아 그 학교 전원을 조사하면 군집추출. 회원ID 끝자리 0인 사람만 뽑으면 계통추출.</div>
+<div class="tip"><b>시험 포인트:</b> 층화=층 간 이질·층 내 동질 / 군집=군집 간 동질·군집 내 이질 — 방향이 정반대라 뒤집은 오답 보기가 단골. 빅데이터 시대에도 "표본조사가 무의미해졌다"는 서술은 부적절(전수 분석 경향은 있으나 표본 이론은 여전히 근간).</div>
+</div></details>
+
+<details id="s5"><summary><span class="lv i">중급</span> 5. 중심극한정리 — 주사위의 마법</summary><div class="body">
+<div class="ana"><b>비유:</b> 주사위 1개의 눈은 균등분포(1~6 모두 1/6)로 전혀 종 모양이 아닙니다. 그런데 30개를 던져 '평균'을 내는 실험을 수천 번 반복하면 그 평균들의 분포는 아름다운 종 모양이 됩니다. 원재료가 무엇이든 '평균을 내는 행위'가 정규분포를 만들어냅니다.</div>
+<div class="ex"><b>실무 예시:</b> 개별 주문금액 분포는 극단적으로 치우쳐 있어도, 일별 '평균 주문금액'의 분포는 정규에 가깝습니다. 그래서 일평균 지표에 관리도(±3σ)를 적용할 수 있는 겁니다.</div>
+<div class="tip"><b>시험 포인트:</b> 함정 3종 — ① 모집단이 정규로 '변하는' 게 아니다 ② 개별 관측치가 아니라 '표본평균'의 분포다 ③ 모집단 분포와 무관하게 성립한다(n 충분할 때). 표본평균의 표준편차(표준오차)=σ/√n → n이 4배면 오차 절반.</div>
+</div></details>
+
+<details id="s6"><summary><span class="lv i">중급</span> 6. 신뢰구간 — 그물 던지기</summary><div class="body">
+<div class="ana"><b>비유:</b> 모평균은 연못 속 한 마리 물고기(고정된 값), 신뢰구간은 우리가 던지는 그물입니다. 95% 신뢰구간이란 "이 그물에 물고기가 있을 확률 95%"가 아니라, "같은 방식으로 그물을 100번 던지면 약 95번은 물고기를 덮는다"는 뜻입니다. 확률은 물고기가 아니라 '그물 던지는 절차'에 붙습니다.</div>
+<div class="ex"><b>실무 예시:</b> 여론조사 "지지율 45%, 95% 신뢰수준에 표본오차 ±3.1%p" = 구간 (41.9%, 48.1%). 같은 조사를 다시 하면 표본이 달라져 구간 자체도 달라집니다(구간이 매번 동일하다는 보기 = 오답).</div>
+<div class="tip"><b>시험 포인트:</b> 신뢰수준을 99%로 올리면 그물이 커짐(구간 넓어짐), n을 키우면 그물이 정교해짐(구간 좁아짐). 점추정의 정밀도 표현=표준오차. 베이지안은 반대로 모수를 확률변수로 취급.</div>
+</div></details>
+
+<details id="s7"><summary><span class="lv b">초급</span> 7. 가설검정 — 법정 드라마로 이해하기</summary><div class="body">
+<div class="ana"><b>비유:</b> 형사재판의 대원칙 "무죄추정"이 곧 귀무가설(H0: 무죄=차이 없음)입니다. 검사(분석가)는 증거(데이터)를 제시하고, 판사는 증거가 '합리적 의심을 넘어설 만큼' 강할 때만 유죄(H0 기각)를 선고합니다. p-value는 "피고인이 정말 무죄라면 이런 증거가 우연히 나올 확률" — 이 값이 유의수준 α(재판부의 엄격함 기준, 보통 0.05)보다 작으면 유죄 선고.</div>
+<table>
+<tr><th>오류</th><th>재판 비유</th><th>통계 용어</th></tr>
+<tr><td>1종 오류(α)</td><td>무고한 사람을 감옥에</td><td>참인 H0를 기각</td></tr>
+<tr><td>2종 오류(β)</td><td>진범을 풀어줌</td><td>거짓인 H0를 채택</td></tr>
+<tr><td>검정력(1−β)</td><td>진범을 잡아내는 능력</td><td>거짓 H0를 올바르게 기각</td></tr>
+</table>
+<div class="ex"><b>실무 예시:</b> 신약 승인은 1종 오류(효과 없는 약 승인)가 치명적이라 α를 엄격하게, 암 선별검사는 2종 오류(환자를 놓침)가 치명적이라 검정력·민감도를 우선합니다. α를 낮추면 β는 올라가는 시소 관계.</div>
+<div class="tip"><b>시험 포인트:</b> p-value는 "대립가설이 참일 확률"도, "H0가 참일 확률"도 아님 — 'H0가 참이라는 가정 하에서의 극단성 확률'. 기각역="H0가 참인데도 기각하게 되는 통계량의 영역"(대립가설을 받아들일 확률 아님). "우리가 내린 유죄 판정이 잘못일 실제 확률"을 나타내는 값=p-value.</div>
+</div></details>
+
+<details id="s8"><summary><span class="lv i">중급</span> 8. 검정 선택 지도 — A/B 테스트 실무 흐름</summary><div class="body">
+<div class="ex"><b>실무 상황:</b> 쇼핑몰에서 새 결제 버튼(B)이 기존(A)보다 나은지 실험한다고 합시다.</div>
+<table>
+<tr><th>비교 대상</th><th>검정</th><th>실무 예</th></tr>
+<tr><td>두 그룹 평균 (독립)</td><td>독립 이표본 t (등분산X→Welch)</td><td>A안 vs B안 평균 결제금액</td></tr>
+<tr><td>같은 대상 전·후</td><td>대응표본 t</td><td>다이어트 전후 체중, 개편 전후 동일 고객 지출</td></tr>
+<tr><td>세 그룹 이상 평균</td><td>ANOVA (+사후검정)</td><td>A/B/C 세 디자인의 체류시간</td></tr>
+<tr><td>비율·범주 관계</td><td>카이제곱</td><td>버튼별 클릭 여부(했다/안했다) 독립성</td></tr>
+<tr><td>정규성 무너짐·서열자료</td><td>비모수(만-위트니, 윌콕슨, 크루스칼-왈리스)</td><td>표본 적고 치우친 만족도 점수</td></tr>
+</table>
+<div class="ana"><b>비유:</b> 검정 선택은 요리 도구 고르기 — 재료(데이터 형태: 연속/범주, 독립/대응, 그룹 수)를 보면 칼(검정)이 정해집니다. ANOVA가 유의해도 "누가 다른지"는 모름 → 사후검정(Tukey 등)이 필요한 이유.</div>
+<div class="tip"><b>시험 포인트:</b> 비모수 검정은 순위·부호를 이용하고 관측값의 절대적 크기(평균·분산)에 의존하지 않음. 정규성 검정 도구=샤피로-윌크, K-S, 히스토그램, Q-Q plot — Durbin-Watson은 정규성이 아니라 '잔차 자기상관' 진단(단골 함정!).</div>
+</div></details>
+
+<details id="s9"><summary><span class="lv b">초급</span> 9. 상관 ≠ 인과 — 아이스크림과 익사 사고 <span class="lv a">고급 맛보기</span></summary><div class="body">
+<div class="ana"><b>비유:</b> 아이스크림 판매량과 익사 사고는 강한 양의 상관이 있지만, 아이스크림이 사람을 빠뜨리진 않습니다. 숨은 제3의 변수 '여름 더위'가 둘 다 끌어올린 것(교란변수). 상관은 "함께 움직인다"이고 인과는 "하나가 다른 하나를 움직인다"입니다.</div>
+<div class="ex"><b>실무 예시:</b> "TV 광고비와 매출의 상관 0.78" → 광고를 늘리면 매출이 오른다고 단정하면 안 됩니다(성수기에 광고도 매출도 함께 늘었을 수 있음). 인과를 말하려면 실험(무작위 배정 A/B 테스트)이 필요합니다.</div>
+<h4>고급 맛보기: 심슨의 역설</h4>
+<p>부서별로 보면 남녀 합격률 차이가 없는데, 전체를 합치면 차이가 나타나는 현상 — 집단을 합치거나 나눌 때 결론이 뒤집힐 수 있습니다. "전체 통계만 보고 단정하지 말라"는 경고등.</p>
+<div class="tip"><b>시험 포인트:</b> 피어슨=선형·등간/비율척도, 스피어만=순위 기반(서열자료·비선형 단조·이상치에 강함). 상관계수 범위 −1~1, 0은 '선형관계 없음'(비선형 관계는 있을 수도!). "상관이 유의하므로 인과"류 보기=무조건 부적절.</div>
+</div></details>
+
+<h2 class="part">Ⅱ. 모델링 편</h2>
+
+<details id="m1"><summary><span class="lv b">초급</span> 10. 회귀 — 부동산 시세 감정사</summary><div class="body">
+<div class="ana"><b>비유:</b> 노련한 감정사는 "면적 1평 늘면 +2천, 역세권이면 +5천" 같은 마음속 공식으로 집값을 매깁니다. 회귀분석은 이 공식을 데이터에서 찾아내는 것: 가격 = β0 + β1·면적 + β2·역세권. 잔차는 '공식으로 설명 못 한 나머지', 최소제곱법은 잔차 제곱합이 최소가 되게 공식을 맞추는 방법.</div>
+<div class="ex"><b>실무 예시:</b> "total_bill이 1달러 늘 때 팁이 평균 0.09달러 증가(다른 조건 동일)" — '다른 변수를 고정했을 때'라는 단서가 다중회귀 해석의 핵심. 결정계수 R²=0.47이면 "팁 변동의 47%를 모형이 설명"(예측이 47% 맞는다는 뜻이 아님!).</div>
+<div class="tip"><b>시험 포인트:</b> 회귀 4대 가정=선형성·잔차의 정규성·등분산성·독립성. R²는 변수를 넣을수록 절대 감소하지 않음 → 모형 비교는 수정 R²(쓸모없는 변수를 넣으면 오히려 감소). 회귀식 검정의 귀무가설은 "기울기=0". 다중공선성은 계수의 분산을 부풀려 해석을 불안정하게 만들고 VIF로 진단(VIF 전부 1=공선성 없음, 5~10 넘으면 의심).</div>
+</div></details>
+
+<details id="m2"><summary><span class="lv i">중급</span> 11. 로지스틱 회귀 — 확률을 배당률로 번역하기</summary><div class="body">
+<div class="ana"><b>비유:</b> 스포츠 도박의 '승산(odds)'이 곧 오즈입니다. 승률 80%인 팀의 오즈 = 0.8/0.2 = 4 ("이길 가능성이 질 가능성의 4배"). 로지스틱 회귀는 확률(0~1에 갇힘)을 로그오즈(−∞~+∞로 해방)로 변환해 선형식을 씌우는 기술입니다. 이 변환 함수가 로짓(연결함수), 되돌리는 S자 곡선이 시그모이드.</div>
+<div class="ex"><b>실무 예시:</b> 이탈 예측 모형에서 '자격증 보유' 계수가 0.7이면 오즈비 e^0.7≈2.01 → "자격증 있으면 이직 오즈가 약 2배". 타이타닉에서 남성의 생존 오즈비 0.096 → 남성의 생존 오즈는 여성의 9.6% 수준. 계수(로그오즈)와 오즈비(e^계수)를 혼동하면 실기 3유형에서도 틀립니다.</div>
+<div class="tip"><b>시험 포인트:</b> 이름은 '회귀'지만 실제로는 분류 기법. 시그모이드 출력 범위는 0~1(−1~1 아님 — 그건 tanh). 종속변수는 이진형·순서형 가능. 왜 선형회귀로 분류하면 안 되나? 확률이 0~1을 벗어나고 오차 가정이 깨지기 때문(고급).</div>
+</div></details>
+
+<details id="m3"><summary><span class="lv b">초급</span> 12. 과적합 — 족보만 달달 외운 학생</summary><div class="body">
+<div class="ana"><b>비유:</b> 작년 기출(train)을 통째로 외운 학생은 모의고사(train 재시험)는 100점이지만 새 문제(test)에선 무너집니다. 반대로 개념을 너무 대충 잡은 학생은 둘 다 못 봅니다(과소적합=높은 편향). 공부의 목표는 '기출 점수'가 아니라 '새 문제 대응력'=일반화 성능.</div>
+<div class="ex"><b>실무 예시:</b> train 정확도 99%·test 78% → 전형적 과적합. 학습곡선에서 훈련오차는 계속 줄고 검증오차가 어느 순간 다시 오르면 그 지점이 과적합 시작 → 조기종료. train/test를 같은 데이터로 쓰면 평가가 무의미하고, 보통 test 성능은 train보다 좋지 않습니다.</div>
+<h4>교차검증: 문제집 돌려풀기</h4>
+<p>k-fold = 문제집을 k묶음으로 나눠 매번 한 묶음을 시험용으로 남기고 k번 반복 → 평가의 운빨(분할 우연)을 줄임. k=n이면 LOOCV(비용 최대). 부트스트랩=복원추출 재시험(원본의 약 63.2%만 표본에 포함, 나머지 OOB는 검증용).</p>
+<div class="tip"><b>시험 포인트:</b> 모형 유연성(복잡도)↑ → 분산↑·편향↓ (편향-분산 트레이드오프). 과적합 방지 = 규제·드롭아웃·조기종료·가지치기·교차검증·데이터 증강 — "층과 노드를 늘린다"는 반대로 악화 보기.</div>
+</div></details>
+
+<details id="m4"><summary><span class="lv i">중급</span> 13. 규제(Regularization) — 계수에게 다이어트 시키기</summary><div class="body">
+<div class="ana"><b>비유:</b> 규제는 "설명을 잘하되, 공식을 너무 요란하게 만들면 벌점"이라는 규칙입니다. L1(Lasso)은 엄격한 코치 — 기여가 적은 계수를 아예 0으로 잘라버림(자동 변수 선택, 희소한 모형). L2(Ridge)는 온건한 코치 — 모든 계수를 조금씩 눌러 0에 가깝게만(완전히 0은 안 만듦). 벌점 강도는 λ로 조절.</div>
+<div class="ex"><b>실무 예시:</b> 변수 200개짜리 마케팅 반응 모형에서 Lasso를 걸면 계수 대부분이 0이 되고 핵심 변수 십수 개만 남아 "무엇이 반응을 이끄는가"를 설명하기 좋아집니다. 예측 안정성이 우선이면 Ridge, 둘을 섞으면 엘라스틱넷.</div>
+<div class="tip"><b>시험 포인트:</b> Lasso=|계수| 합 벌점=L1=변수선택 O / Ridge=계수² 합 벌점=L2=변수선택 X. "Lasso가 L2를 쓴다"는 단골 오답. λ가 크면 벌점 세짐→계수 더 축소.</div>
+</div></details>
+
+<details id="m5"><summary><span class="lv b">초급</span> 14. 의사결정나무 — 스무고개의 과학</summary><div class="body">
+<div class="ana"><b>비유:</b> 스무고개 고수는 "생물입니까?"처럼 후보를 가장 잘 반으로 가르는 질문부터 던집니다. 나무도 똑같이 '불순도(뒤섞임)를 가장 크게 줄이는 질문(분할)'을 위에서부터 고릅니다(하향식·탐욕적). 불순도의 자= 지니지수·엔트로피(분류), 분산(회귀).</div>
+<div class="ex"><b>실무 예시:</b> 대출 심사 나무의 첫 질문이 "연소득 ≥ 4천?"이라면 그 변수가 가장 정보가 많다는 뜻. 규칙이 그대로 읽혀서(if-then) 심사 근거 설명이 필요한 금융·의료에서 사랑받습니다. 질문을 끝없이 이어가면 고객 한 명 한 명을 암기(과적합) → 가지치기로 다듬기.</div>
+<div class="tip"><b>시험 포인트:</b> 엔트로피 계산형: Yes 3/No 2면 −(3/5)log(3/5)−(2/5)log(2/5). 알고리즘=CART(지니)·C4.5(엔트로피)·CHAID(카이제곱). "상향식 흐름"이라는 보기=오답(뿌리→잎 하향식). 뿌리에서 내려갈수록 불순도는 감소.</div>
+</div></details>
+
+<details id="m6"><summary><span class="lv i">중급</span> 15. 앙상블 — 집단지성 3형제 <span class="lv a">스태킹</span></summary><div class="body">
+<div class="ana"><b>비유:</b> ① <b>배깅</b>=전문가 100명에게 서로 다른 자료 요약본(부트스트랩 표본)을 주고 병렬로 의견을 받아 다수결 — 한 명의 변덕(분산)이 줄어듦. ② <b>부스팅</b>=과외 선생이 첫 시험 오답에 가중치를 주며 순차적으로 보충수업 — 실력 부족(편향)을 깎아냄. ③ <b>랜덤포레스트</b>=배깅 + 회의 때마다 참고자료(변수)도 무작위 제한 → 전문가들이 서로 닮지 않게(트리 간 상관↓).</div>
+<div class="ex"><b>실무 예시:</b> 신용평가·이탈예측 대회의 단골 우승자는 GBM 계열(XGBoost/LightGBM). RF는 튜닝 없이도 강건해 베이스라인으로 최적. OOB 표본(복원추출에서 빠진 36.8%)으로 별도 검증 없이 성능 추정 가능. 스태킹(고급)=서로 다른 모델들의 예측을 다시 입력으로 받는 메타 모델.</div>
+<div class="tip"><b>시험 포인트:</b> 배깅=병렬·복원추출·분산↓ / 부스팅=순차·오분류 가중·편향↓. "배깅이 오분류에 가중치"·"RF는 부스팅 계열"=단골 오답. 소프트맥스는 앙상블 기법이 아님(활성화 함수).</div>
+</div></details>
+
+<details id="m7"><summary><span class="lv i">중급</span> 16. SVM — 가장 넓은 도로 긋기</summary><div class="body">
+<div class="ana"><b>비유:</b> 두 마을(클래스) 사이에 도로를 낸다면, 양쪽 집들에서 최대한 멀리 떨어진 '가장 넓은 도로'가 안전합니다. 그 도로 폭이 마진, 도로변에 바짝 붙은 집들이 서포트 벡터(이들만이 경계를 결정). 마을이 뒤섞여 평면 도로가 불가능하면? 종이를 3차원으로 접어 올리면(고차원 매핑) 가위로 싹둑 — 실제 좌표 계산 없이 접은 효과만 내는 수학 트릭이 커널.</div>
+<div class="ex"><b>실무 예시:</b> 표본이 수천 건 수준인 텍스트 분류·이미지 소분류에서 여전히 강력. 거리 기반이라 스케일링 필수.</div>
+<div class="tip"><b>시험 포인트:</b> 목표는 마진 '최대화'(최소화 아님). 커널 트릭=저차원에서 분리 불가한 데이터를 고차원에서 선형 분리. 대표 커널: RBF·다항.</div>
+</div></details>
+
+<details id="m8"><summary><span class="lv b">초급</span> 17. KNN — 유유상종 알고리즘</summary><div class="body">
+<div class="ana"><b>비유:</b> 이사 간 동네의 성향이 궁금하면 가장 가까운 이웃 k명을 보면 됩니다. KNN은 학습이랄 게 없이(게으른 학습) 새 데이터가 오면 그때 가장 가까운 k개를 찾아 다수결.</div>
+<div class="ex"><b>실무 예시:</b> 연소득(단위: 만원, 0~100,000)과 나이(0~100)를 그대로 거리 계산하면 소득이 거리를 독식합니다 → 스케일링 없이는 엉터리 이웃을 뽑음. k가 작으면 소음에 민감(과적합), 크면 뭉툭(과소적합).</div>
+<div class="tip"><b>시험 포인트:</b> 거리 측도 — 유클리드(직선), 맨하튼(직각 이동 합), 표준화 거리(표준편차 반영), 마할라노비스(변수 간 상관까지 반영 — "상관 있으면 표준화 거리 검토" 식 서술은 반대로 뒤집힌 함정). k는 하이퍼파라미터.</div>
+</div></details>
+
+<details id="m9"><summary><span class="lv i">중급</span> 18. 군집분석 — 라벨 없는 세상에서 편 가르기</summary><div class="body">
+<div class="ana"><b>비유:</b> <b>K-means</b>=배달 거점 k곳을 찍고 "가까운 거점으로 모여!" → 거점을 무게중심으로 이동 → 반복. 평균으로 움직이니 외딴 별장(이상치) 하나가 거점을 끌고 가버림 → 대표 '집'(중앙 관측치)을 쓰는 K-medoids로 보완. <b>계층적 군집</b>=가까운 사람끼리 차례로 팀 합병하며 가계도(덴드로그램)를 그림 — 나중에 원하는 높이에서 잘라 군집 수 결정(사전 k 불필요, 단 병합은 비가역). <b>DBSCAN</b>=사람이 빽빽한 곳이 상권 — 밀도로 군집을 찾아 초승달·도넛 모양도 잡고 외톨이는 '잡음'으로 분리.</div>
+<div class="ex"><b>실무 예시:</b> 고객 세분화(RFM 변수로 K-means 후 각 군집의 요약통계로 페르소나 명명), GPS 핫스팟 탐지(DBSCAN). k 선택=엘보(관성 급감 지점)·실루엣(군집 내 응집 vs 군집 간 분리, 1에 가까울수록 좋음).</div>
+<div class="tip"><b>시험 포인트:</b> 최단연결법=사슬 군집 가능·계산 가벼움(평균연결이 계산량 많음), 와드=군집 내 분산 최소화. K-means는 연속형 전용·초기값 의존·대량 자료 처리에 유리(계층적 대비). 거리 측도가 바뀌면 군집 결과도 달라짐. SOM(고급)=신경망 기반 비지도 — 경쟁학습(역전파 아님!)으로 고차원을 2차원 지도로.</div>
+</div></details>
+
+<details id="m10"><summary><span class="lv b">초급</span> 19. 연관분석 — 맥주와 기저귀의 전설</summary><div class="body">
+<div class="ana"><b>비유:</b> "기저귀를 산 아빠들이 맥주도 산다"는 마트 전설. 규칙 A→B의 성적표 3과목: <b>지지도</b>=전체 영수증 중 둘 다 있는 비율(흔한가?), <b>신뢰도</b>=A 산 사람 중 B도 산 비율(믿을 만한가?), <b>향상도</b>=신뢰도/P(B) (A가 정말 B를 '끌어올리는가?' — 1이면 남남, &gt;1 양의 연관, &lt;1 음의 연관).</div>
+<div class="ex"><b>실무 예시:</b> 거래 100건 중 A∩B가 10건, A가 20건, B가 25건이면: 지지도 0.10, 신뢰도 10/20=0.50, 향상도 0.50/0.25=2.0 → "A 구매자는 일반 고객보다 B를 2배 잘 산다" → 진열·추천·번들에 활용. 신뢰도가 높아도 B 자체가 국민 상품(P(B) 높음)이면 향상도는 1 근처 — 신뢰도만 보면 속습니다.</div>
+<div class="tip"><b>시험 포인트:</b> 향상도 공식 P(A∩B)/(P(A)P(B)). Apriori=최소지지도 이상의 빈발항목집합만 후보로 유지해 탐색 축소. 시차(순차) 연관분석은 순서를 다루지만 인과로 해석하면 안 됨. "도출 규칙은 잘 알려진 사실이어야만 한다"=부적절(오히려 새롭고 활용 가능한 규칙이 가치).</div>
+</div></details>
+
+<details id="m11"><summary><span class="lv i">중급</span> 20. 시계열 — 카페 매출 해부하기 <span class="lv a">SARIMA</span></summary><div class="body">
+<div class="ana"><b>비유:</b> 카페 월매출 = 추세(단골이 늘며 우상향) + 계절변동(여름 아이스 성수기, 주기 있음) + 순환변동(경기 사이클 — 주기가 일정치 않은 장기 부침) + 불규칙(옆 건물 공사 같은 돌발). 시계열 분해는 이 네 겹을 벗겨내는 일.</div>
+<div class="ana"><b>정상성 비유:</b> 눈금이 자꾸 틀어지는 체중계(비정상)로는 다이어트 효과를 잴 수 없습니다. 평균·분산이 시점과 무관하게 일정해야(정상성) 예측 모형을 세울 수 있고, 틀어진 체중계는 차분(오늘−어제)으로 교정합니다. ADF 검정의 H0="비정상(단위근 있음)" — p가 크면 비정상.</div>
+<div class="ex"><b>실무 예시:</b> 일별 매출에서 lag-7 자기상관이 높다=요일 패턴(주간 계절성). ARIMA(p,d,q): AR(p)=과거 값의 관성, I(d)=차분 횟수, MA(q)=과거 충격(오차)의 여운 — p는 PACF, q는 ACF 절단으로 식별. 주기가 뚜렷하면 SARIMA(계절 차수 추가). 지수평활=최근에 더 큰 가중을 주는 가중평균 예측(복잡한 모형 없이).</div>
+<div class="tip"><b>시험 포인트:</b> 순환변동≠계절변동(순환은 '일정 주기 없음'). 시계열 train/test는 시간 순서 보존(무작위 셔플 금지). "정상시계열=일정한 값을 중심으로 일정한 변동폭" 서술은 적절.</div>
+</div></details>
+
+<details id="m12"><summary><span class="lv i">중급</span> 21. 신경망·딥러닝 — 뉴런들의 릴레이 <span class="lv a">고급</span></summary><div class="body">
+<div class="ana"><b>비유:</b> 각 뉴런은 "입력 신호에 가중치를 곱해 더하고, 임계 이상이면 발화"하는 작은 심사위원. 활성화 함수가 발화 방식을 정합니다 — 은닉층의 표준 ReLU(음수는 침묵, 양수는 그대로), 이진 출력 시그모이드(0~1 확률), 다중분류 출력 소프트맥스(확률 합=1). 학습=오답의 책임을 출력에서 입력 방향으로 되돌려 묻는 역전파.</div>
+<div class="ana"><b>기울기 소실 비유:</b> 100명이 릴레이로 귓속말을 전하면(깊은 층 + 시그모이드의 작은 미분) 첫 사람에겐 메시지가 거의 안 남습니다 → ReLU·잔차연결·배치정규화가 확성기 역할.</div>
+<div class="ex"><b>실무 예시 (한 줄 지도):</b> CNN=이미지(필터가 부분 패턴 스캔), RNN/LSTM=순서 데이터(문장·센서 — LSTM은 게이트로 장기 기억 보존), 어텐션/트랜스포머=문장 전체에서 '지금 중요한 단어'에 스포트라이트(RNN의 장기 의존성 한계를 극복, 번역·요약의 표준). 경사하강법=안개 낀 산에서 가장 가파른 내리막으로 한 걸음씩 — 보폭(학습률)이 크면 계곡을 건너뛰며 발산, 작으면 하산이 하세월.</div>
+<div class="tip"><b>시험 포인트:</b> 활성화 함수 목록에 '엔트로피 함수'는 없음(그건 손실/불순도). 학습률·층수·노드수=하이퍼파라미터, 가중치=학습 파라미터. 배치/미니배치/확률적 경사하강 구분.</div>
+</div></details>
+
+<details id="m13"><summary><span class="lv i">중급</span> 22. 평가지표 — 암 진단과 스팸함의 딜레마</summary><div class="body">
+<div class="ana"><b>비유:</b> <b>재현율(민감도)</b>="실제 환자 중 몇 %를 잡아냈나" — 암 선별검사의 목숨줄(놓치면 치명). <b>정밀도</b>="양성이라 외친 것 중 진짜는 몇 %" — 스팸함의 신뢰(멀쩡한 메일을 가두면 곤란). 둘은 시소라서 조화평균 F1로 균형을 봅니다. <b>특이도</b>="실제 정상 중 정상 판정 비율".</div>
+<table>
+<tr><th>지표</th><th>공식</th><th>언제 우선?</th></tr>
+<tr><td>재현율</td><td>TP/(TP+FN)</td><td>미탐(FN) 비용 클 때 — 암, 사기 탐지</td></tr>
+<tr><td>정밀도</td><td>TP/(TP+FP)</td><td>오탐(FP) 비용 클 때 — 스팸, 자동 차단</td></tr>
+<tr><td>정확도</td><td>(TP+TN)/전체</td><td>클래스 균형일 때만</td></tr>
+</table>
+<div class="ana"><b>ROC-AUC 비유:</b> 임계값을 0→1로 훑으며 (FPR, TPR)을 그린 성적 곡선. AUC 1.0=만점 감별사, 0.5=동전 던지기. PR 곡선(정밀도-재현율)은 불균형이 심할 때 더 정직한 성적표(고급).</div>
+<div class="ex"><b>실무 예시:</b> 회귀는 RMSE(큰 오차에 벌점 증폭 — 이상치 민감) vs MAE(둔감). 수요예측에서 대형 결품이 치명적이면 RMSE, 이상치 많은 데이터면 MAE. 모형 평가 3기준=일반화 가능성·효율성·정확성.</div>
+<div class="tip"><b>시험 포인트:</b> ROC의 x축=FPR(1−특이도), y축=TPR(재현율) — "x축이 재현율"이면 PR 곡선과 혼동시킨 함정. F1=정밀도·재현율의 '조화'평균(산술 아님). 혼동행렬 구성=TP/FP/FN/TN.</div>
+</div></details>
+
+<details id="m14"><summary><span class="lv i">중급</span> 23. 불균형 데이터 — 99% 정확도의 사기극</summary><div class="body">
+<div class="ana"><b>비유:</b> 1,000명 중 사기꾼이 10명인 마을에서 "전원 무죄!"라고 외치는 게으른 보안관도 정확도 99%입니다. 정확도가 높은 게 아니라 문제가 쉬워 보이게 왜곡된 것 — 진짜 실력은 사기꾼 10명 중 몇을 잡았나(재현율)로 재야 합니다.</div>
+<div class="ex"><b>실무 예시:</b> 이탈·부도·불량 예측은 거의 다 불균형. 대응 3층위 — ① 데이터: 오버샘플링(SMOTE=소수 클래스와 이웃 사이를 보간해 합성 표본 생성, 단순 복제보다 과적합 덜함)·언더샘플링(다수 축소, 정보 손실 위험) ② 알고리즘: 클래스 가중치 ③ 판정: 임계값을 0.5에서 하향 조정. 단, SMOTE는 훈련 데이터에만(테스트에 적용=누수).</div>
+<div class="tip"><b>시험 포인트:</b> "정분류율(정확도)은 불균형일 때 효과적"=부적절 보기 단골. 언더샘플링은 소수가 아니라 '다수' 클래스를 줄이는 것. 평가지표는 F1·재현율·ROC-AUC로 교체.</div>
+</div></details>
+
+<p style="color:var(--text-muted);font-size:.85rem;margin-top:26px">💡 학습법: 각 섹션을 읽고 → <a href="written_quiz.html" style="color:#93c5fd">문제풀이</a>에서 해당 토픽을 바로 풀어 확인하세요. 비유가 기억나면 개념은 따라옵니다.</p>
+</div>
+</body>
+</html>
